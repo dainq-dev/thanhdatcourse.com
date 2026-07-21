@@ -128,6 +128,13 @@
 
 5. **Media Library tập trung:** Mọi ảnh upload đều qua endpoint `/api/media/upload`, lưu metadata vào bảng `media`, file vào disk. Các entity khác tham chiếu qua `media_id` hoặc `url`.
 
+6. **SQLite WAL Mode — 2 Databases riêng biệt:**
+   - `apps/api` → `app.db` (15 bảng business: courses, posts, settings, users...)
+   - `apps/media` → `media.db` (2 bảng metadata: media, media_variants)
+   - WAL mode: reads không bao giờ bị block bởi writes. In-process reads < 0.1ms.
+   - PostgreSQL NOT needed at this scale (1 admin writer, SSR reads, vài nghìn rows).
+   - Drizzle ORM supports both SQLite and PostgreSQL — migrate later chỉ cần đổi driver, không sửa code.
+
 ---
 
 ## 2. Thiết kế Database đầy đủ
