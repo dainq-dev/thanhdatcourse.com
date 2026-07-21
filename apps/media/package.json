@@ -8,9 +8,10 @@
     "test": "bun test"
   },
   "dependencies": {
+    "@workspace/types": "workspace:*",
+    "drizzle-orm": "^0.45.2",
     "hono": "^4.3.0",
-    "sharp": "^0.33.3",
-    "@workspace/types": "workspace:*"
+    "sharp": "^0.33.3"
   },
   "devDependencies": {
     "@types/bun": "latest",
