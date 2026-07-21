@@ -2,12 +2,23 @@ import { expect, test, describe } from "bun:test";
 import app from "./index";
 
 describe("API Service", () => {
-  test("GET /", async () => {
-    // Note: app is the export default object { port, fetch } from hono under bun.serve
-    // But since Hono instance itself has .fetch, we can just use app.fetch directly.
-    // Wait, the export default is actually an object with .fetch.
-    const res = await app.fetch(new Request("http://localhost/"));
+  test("GET / returns 200 with JSON", async () => {
+    const res = await app.request("/");
     expect(res.status).toBe(200);
-    expect(await res.text()).toBe("API Service is running!");
+    const data = await res.json();
+    expect(data.service).toBe("thanhdatcomputer API");
+    expect(data.version).toBe("1.0.0");
+  });
+
+  test("CORS headers are present", async () => {
+    const res = await app.request("/", {
+      headers: { Origin: "http://localhost:3000" },
+    });
+    expect(res.headers.get("access-control-allow-origin")).toBe("*");
+  });
+
+  test("404 for unknown routes", async () => {
+    const res = await app.request("/nonexistent");
+    expect(res.status).toBe(404);
   });
 });

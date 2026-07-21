@@ -8,13 +8,15 @@
     "test": "bun test"
   },
   "dependencies": {
-    "hono": "^4.3.0",
+    "@hono/zod-validator": "^0.9.0",
     "@workspace/types": "workspace:*",
     "drizzle-orm": "^0.30.0",
+    "hono": "^4.12.31",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@workspace/config": "workspace:*"
+    "@workspace/config": "workspace:*",
+    "drizzle-kit": "^0.31.10"
   }
 }
