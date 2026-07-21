@@ -1,0 +1,69 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.accordion {
+  border-bottom: 1px solid $clr-border;
+}
+
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  padding: $space-6 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: $clr-text;
+  font-weight: $fw-semibold;
+  font-size: var(--fs-lg);
+  transition: color $duration-normal;
+
+  &:hover {
+    color: $clr-primary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $clr-primary;
+    outline-offset: -2px;
+    border-radius: $radius-sm;
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: transform $duration-normal;
+  font-size: 1.2rem;
+  @include text-muted;
+}
+
+.iconOpen {
+  transform: rotate(45deg);
+}
+
+.panel {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height $duration-normal;
+}
+
+.panelOpen {
+  max-height: 2000px;
+}
+
+.content {
+  padding-bottom: $space-6;
+  @include text-muted;
+  line-height: 1.7;
+  font-size: var(--fs-body);
+}

@@ -1,0 +1,35 @@
+@use '../../styles/abstracts/variables' as *;
+
+.counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-4;
+  text-align: center;
+}
+
+.number {
+  font-size: var(--fs-h1);
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  font-size: var(--fs-sm);
+  color: $clr-text-muted;
+  font-weight: $fw-medium;
+  text-transform: capitalize;
+}
+
+@media (max-width: $bp-md) {
+  .counter {
+    padding: $space-3;
+  }
+
+  .number {
+    font-size: var(--fs-h2);
+  }
+}

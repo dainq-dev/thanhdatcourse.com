@@ -1,0 +1,61 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/functions' as *;
+@use 'base/reset';
+@use 'base/typography';
+
+:root {
+  --clr-bg: #{$clr-bg};
+  --clr-bg-card: #{$clr-bg-card};
+  --clr-bg-elevated: #{$clr-bg-elevated};
+  --clr-text: #{$clr-text};
+  --clr-text-muted: #{$clr-text-muted};
+  --clr-primary: #{$clr-primary};
+  --clr-primary-dark: #{$clr-primary-dark};
+  --clr-white: #{$clr-white};
+  --clr-dark: #{$clr-dark};
+  --clr-border: #{$clr-border};
+
+  --ff-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ff-display: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --fs-h1: #{fluid-type(320px, 1280px, 2rem, 3rem)};
+  --fs-h2: #{fluid-type(320px, 1280px, 1.5rem, 2.5rem)};
+  --fs-h3: #{fluid-type(320px, 1280px, 1.25rem, 1.75rem)};
+  --fs-body: 1rem;
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.75rem;
+  --fs-lg: 1.125rem;
+
+  --section-padding-y: #{$section-padding-y};
+  --header-height: #{$header-height};
+  --container-max: #{$container-max};
+
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+  --radius-xl: #{$radius-xl};
+
+  --shadow-card: #{$shadow-card};
+  --shadow-card-hover: #{$shadow-card-hover};
+  --shadow-glow: #{$shadow-glow};
+  --shadow-header: #{$shadow-header};
+
+  --ease-out-expo: #{$ease-out-expo};
+  --duration-normal: #{$duration-normal};
+  --duration-slow: #{$duration-slow};
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  font-family: var(--ff-sans);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--clr-text);
+  background: var(--clr-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

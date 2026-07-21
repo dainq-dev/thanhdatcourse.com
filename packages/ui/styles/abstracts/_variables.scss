@@ -1,0 +1,82 @@
+// ── Brand Colors (extracted from minhtravel.vn, unified per taste-skill) ──
+$clr-bg:           #000000;
+$clr-bg-card:      #0B0F19;
+$clr-bg-elevated:  #111111;
+$clr-text:         #FFFFFF;
+$clr-text-muted:   #B0B0B0;
+$clr-text-dimmer:  #BABABA;
+$clr-primary:      #FF005A;
+$clr-primary-dark: #CA004D;
+$clr-primary-tint: #FF6B8A;
+$clr-white:        #FFFFFF;
+$clr-dark:         #000000;
+$clr-border:       rgba(255, 255, 255, 0.08);
+$clr-border-heavy: rgba(255, 255, 255, 0.14);
+$clr-overlay:      rgba(0, 0, 0, 0.55);
+$clr-hero-border:  #192134;
+
+// ── HSL variants for opacity-based effects ──
+$clr-primary-h: 343;
+$clr-primary-s: 100%;
+$clr-primary-l: 50%;
+
+// ── Typography ──
+$ff-sans: 'Manrope', system-ui, -apple-system, sans-serif;
+$ff-display: 'Manrope', system-ui, sans-serif;
+$fw-light: 200;
+$fw-normal: 400;
+$fw-medium: 500;
+$fw-semibold: 600;
+$fw-bold: 700;
+$fw-extrabold: 800;
+
+// ── Spacing Scale (4px base) ──
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-6: 1.5rem;
+$space-8: 2rem;
+$space-10: 2.5rem;
+$space-12: 3rem;
+$space-16: 4rem;
+$space-20: 5rem;
+$space-24: 6rem;
+$space-28: 7rem;
+$space-32: 8rem;
+
+// ── Section Spacing (cinematic breathing room) ──
+$section-padding-y: clamp(4rem, 8vw, 8rem);
+
+// ── Layout ──
+$header-height: 69px;
+$container-max: 1300px;
+
+// ── Border Radius ──
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-2xl: 24px;
+
+// ── Shadows (dark theme) ──
+$shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+$shadow-card-hover: 0 10px 30px rgba(0, 0, 0, 0.4);
+$shadow-cta: 0 0 10px rgba(0, 0, 0, 0.5);
+$shadow-header: 0 2px 16px rgba(0, 0, 0, 0.3);
+$shadow-glow: 0 0 30px rgba(255, 0, 90, 0.15);
+
+// ── Animation ──
+$ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+$duration-fast: 200ms;
+$duration-normal: 300ms;
+$duration-slow: 500ms;
+$duration-cinematic: 800ms;
+
+// ── Breakpoints (mobile-first) ──
+$bp-sm: 640px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1280px;
+$bp-2xl: 1536px;

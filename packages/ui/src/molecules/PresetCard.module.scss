@@ -1,0 +1,61 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.card {
+  @include card-dark;
+  @include card-hover;
+}
+
+.thumbnail {
+  aspect-ratio: 1 / 1;
+  background: $clr-bg-elevated;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slow);
+  }
+
+  .card:hover & img {
+    transform: scale(1.05);
+  }
+}
+
+.body {
+  padding: $space-4;
+}
+
+.name {
+  font-weight: $fw-semibold;
+  color: $clr-text;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
+}
+
+.description {
+  font-size: var(--fs-sm);
+  @include text-muted;
+  margin-top: $space-1;
+}
+
+.price {
+  font-weight: $fw-bold;
+  color: $clr-primary;
+  font-size: var(--fs-lg);
+}
+
+.tag {
+  position: absolute;
+  top: $space-2;
+  left: $space-2;
+  font-size: var(--fs-xs);
+  font-weight: $fw-semibold;
+  background: $clr-primary;
+  color: $clr-white;
+  padding: 0.15em 0.5em;
+  border-radius: 999px;
+}

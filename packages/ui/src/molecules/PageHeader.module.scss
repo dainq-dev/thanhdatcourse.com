@@ -1,0 +1,21 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.pageHeader {
+  position: relative;
+  text-align: center;
+  @include section;
+  background: $clr-bg;
+}
+
+.title {
+  @include heading-section;
+  margin-bottom: $space-3;
+}
+
+.subtitle {
+  font-size: var(--fs-body);
+  @include text-muted;
+  max-width: 40rem;
+  margin-inline: auto;
+}

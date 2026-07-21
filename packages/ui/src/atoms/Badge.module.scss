@@ -1,0 +1,25 @@
+@use '../../styles/abstracts/variables' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: var(--fs-sm);
+  font-weight: $fw-semibold;
+}
+
+.default {
+  background: rgba(255, 255, 255, 0.1);
+  color: $clr-text-muted;
+}
+
+.primary {
+  background: $clr-primary;
+  color: $clr-white;
+}
+
+.success {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--clr-success);
+}

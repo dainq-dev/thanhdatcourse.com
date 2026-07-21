@@ -1,0 +1,12 @@
+@use '../../styles/abstracts/variables' as *;
+
+.skeleton {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

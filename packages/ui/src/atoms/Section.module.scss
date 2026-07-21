@@ -1,0 +1,32 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.section {
+  padding-block: var(--section-padding-y);
+}
+
+.bg-white {
+  background: $clr-bg-elevated;
+}
+
+.bg-muted {
+  background: $clr-bg-card;
+}
+
+.container {
+  @include container;
+}
+
+.title {
+  @include heading-section;
+  text-align: center;
+  margin-bottom: $space-3;
+}
+
+.subtitle {
+  max-width: 42rem;
+  margin-inline: auto;
+  margin-bottom: $space-12;
+  text-align: center;
+  @include text-muted;
+}

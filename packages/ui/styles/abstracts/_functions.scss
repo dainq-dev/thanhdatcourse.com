@@ -1,0 +1,21 @@
+@use 'sass:math';
+
+// ── Convert px to rem ──
+@function px-to-rem($px) {
+  @return math.div($px, 16) * 1rem;
+}
+
+// ── Strip unit from number (helper for fluid-type) ──
+@function strip-unit($value) {
+  @return math.div($value, ($value * 0 + 1));
+}
+
+// ── Fluid typography: min size at min-vw → max size at max-vw ──
+@function fluid-type($min-vw, $max-vw, $min-font, $max-font) {
+  @return clamp(
+    #{$min-font},
+    #{$min-font} + #{strip-unit($max-font - $min-font)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}),
+    #{$max-font}
+  );
+}
+

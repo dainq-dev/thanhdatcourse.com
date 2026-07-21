@@ -1,0 +1,104 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/functions' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.btn {
+  @include btn-base;
+  display: inline-flex;
+  gap: $space-2;
+  font-weight: $fw-semibold;
+  border: 2px solid transparent;
+
+  @include focus-ring;
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.primary {
+  background: $clr-primary;
+  color: $clr-white;
+  border-color: $clr-primary;
+
+  &:hover:not(:disabled) {
+    background: $clr-primary-dark;
+    border-color: $clr-primary-dark;
+  }
+}
+
+.outline {
+  background: transparent;
+  color: $clr-white;
+  border-color: $clr-white;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.ghost {
+  background: transparent;
+  color: $clr-text;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.dark {
+  background: $clr-text-dimmer;
+  color: $clr-white;
+  border-color: transparent;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.sm {
+  height: px-to-rem(36);
+  padding-inline: $space-4;
+  font-size: var(--fs-sm);
+}
+
+.md {
+  height: px-to-rem(44);
+  padding-inline: $space-6;
+  font-size: var(--fs-sm);
+}
+
+.lg {
+  height: px-to-rem(56);
+  padding-inline: $space-8;
+  font-size: var(--fs-body);
+}
+
+.loading {
+  position: relative;
+  color: transparent;
+
+  .spinner {
+    display: block;
+  }
+}
+
+.spinner {
+  display: none;
+  position: absolute;
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

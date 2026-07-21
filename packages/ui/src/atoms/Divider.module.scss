@@ -1,0 +1,28 @@
+@use '../../styles/abstracts/variables' as *;
+
+.divider {
+  display: flex;
+  align-items: center;
+
+  &.vertical {
+    flex-direction: column;
+
+    .line {
+      width: 2px;
+      height: 3rem;
+      background: $clr-primary;
+    }
+  }
+
+  &.horizontal {
+    .line {
+      height: 2px;
+      width: 3rem;
+      background: $clr-primary;
+    }
+  }
+}
+
+.line {
+  display: block;
+}

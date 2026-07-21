@@ -1,0 +1,19 @@
+{
+  "name": "@workspace/media",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "hono": "^4.3.0",
+    "sharp": "^0.33.3",
+    "@workspace/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@workspace/config": "workspace:*"
+  }
+}

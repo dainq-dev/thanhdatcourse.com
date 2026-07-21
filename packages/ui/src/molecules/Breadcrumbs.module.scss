@@ -1,0 +1,32 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  flex-wrap: wrap;
+  font-size: var(--fs-sm);
+  @include text-muted;
+}
+
+.link {
+  @include text-muted;
+  text-decoration: none;
+  transition: color $duration-normal;
+
+  &:hover {
+    color: $clr-primary;
+    text-decoration: underline;
+  }
+}
+
+.separator {
+  user-select: none;
+  opacity: 0.4;
+}
+
+.current {
+  color: $clr-text;
+  font-weight: $fw-medium;
+}
