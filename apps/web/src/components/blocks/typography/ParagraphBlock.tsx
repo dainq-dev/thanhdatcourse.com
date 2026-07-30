@@ -30,8 +30,29 @@ const LINE_MAP: Record<string, string> = {
   relaxed: "2",
 };
 
+const TOKEN_RE = /(\*\*[^*]+\*\*|\*[^*]+\*|==[^=]+==)/g;
+
+function renderLine(line: string): React.ReactNode[] {
+  const parts = line.split(TOKEN_RE);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("==") && part.endsWith("==") && part.length > 4) {
+      return <mark key={i} className={styles.highlight}>{part.slice(2, -2)}</mark>;
+    }
+    if (part.startsWith("*") && part.endsWith("*") && !part.startsWith("**") && part.length > 2) {
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
 export function ParagraphBlock({ data }: { data: BlockData<"paragraph"> }) {
   const d = data as any;
+  const text = data.text || "";
+  const lines = text.split("\n");
+
   const style: React.CSSProperties = {
     textAlign: d.alignment || "left",
     fontSize: SIZE_MAP[d.fontSize || "md"],
@@ -39,9 +60,15 @@ export function ParagraphBlock({ data }: { data: BlockData<"paragraph"> }) {
     fontWeight: WEIGHT_MAP[d.weight || "regular"],
     color: COLOR_MAP[d.color || "inherit"],
   };
+
   return (
     <p className={d.dropCap ? styles.dropCap : undefined} style={style}>
-      {data.text}
+      {lines.map((line, i) => (
+        <span key={i}>
+          {i > 0 && <br />}
+          {renderLine(line)}
+        </span>
+      ))}
     </p>
   );
 }

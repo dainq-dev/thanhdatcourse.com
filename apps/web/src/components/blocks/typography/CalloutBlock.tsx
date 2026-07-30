@@ -9,7 +9,7 @@ export function CalloutBlock({
     <div className={[styles.root, styles[data.variant] || ""].filter(Boolean).join(" ")}>
       {data.icon && <span className={styles.icon}>{data.icon}</span>}
       {data.title && <div className={styles.title}>{data.title}</div>}
-      {data.text}
+      {data.text && <div className={styles.text}>{data.text}</div>}
     </div>
   );
 }

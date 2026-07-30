@@ -7,7 +7,9 @@
 
 .infoPanel { display: flex; flex-direction: column; gap: 14px; }
 .infoField { display: flex; flex-direction: column; gap: 4px; }
-.infoLabel { font-size: 0.6875rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
+.infoLabel { font-size: 0.8875rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
 .infoInput { width: 100%; padding: 7px 10px; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 0.8125rem; color: #1a1a1a; outline: none; font-family: inherit; box-sizing: border-box; &:focus { border-color: #06a84c; } &::placeholder { color: #bbb; } }
 .infoTextarea { composes: infoInput; resize: vertical; min-height: 60px; }
 .thumbPreview { margin-top: 6px; max-width: 100%; border-radius: 4px; border: 1px solid #e0e0e0; }
+.infoHint { font-size: 0.725rem; color: rgba(121, 61, 61, 0.965); margin-top: 2px; }
+.infoReadonly { font-size: 0.8125rem; color: #555; padding: 7px 10px; background: #f5f5f3; border-radius: 4px; font-weight: 500; }

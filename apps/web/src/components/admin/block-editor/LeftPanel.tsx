@@ -2,9 +2,16 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import type { Block } from "@workspace/types";
+import {
+  Heading, Pilcrow, Quote, List, CodeXml, AlertTriangle,
+  Image, Video, LayoutGrid, Images, Columns2,
+  Minus, ArrowUpDown, Columns3, FolderKanban,
+  ChevronsDownUp, ChevronDown, Clock, Table,
+  ArrowRight, DollarSign, Star,
+} from "lucide-react";
 import styles from "./workspace.module.scss";
 
-const BLOCK_LABELS: Record<string, string> = {
+export const BLOCK_LABELS: Record<string, string> = {
   heading: "Tiêu đề", paragraph: "Đoạn văn", quote: "Trích dẫn", list: "Danh sách",
   code: "Code", callout: "Callout", image: "Ảnh", video: "Video",
   gallery: "Gallery", carousel: "Carousel", beforeAfter: "Trước/Sau",
@@ -13,11 +20,29 @@ const BLOCK_LABELS: Record<string, string> = {
   table: "Bảng", cta: "CTA", pricingTable: "Bảng giá", testimonial: "Đánh giá",
 };
 
-const BLOCK_ICONS: Record<string, string> = {
-  heading: "H", paragraph: "¶", quote: '"', list: "≡", code: "</>", callout: "!",
-  image: "🖼", video: "▶", gallery: "▦", carousel: "◀▶", beforeAfter: "⇔",
-  divider: "—", spacer: "↕", columns: "▤", tabs: "📑", accordion: "☰",
-  collapse: "▾", timeline: "◉", table: "⊞", cta: "→", pricingTable: "$", testimonial: "★",
+const BLOCK_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
+  heading:       Heading,
+  paragraph:     Pilcrow,
+  quote:         Quote,
+  list:          List,
+  code:          CodeXml,
+  callout:       AlertTriangle,
+  image:         Image,
+  video:         Video,
+  gallery:       LayoutGrid,
+  carousel:      Images,
+  beforeAfter:   Columns2,
+  divider:       Minus,
+  spacer:        ArrowUpDown,
+  columns:       Columns3,
+  tabs:          FolderKanban,
+  accordion:     ChevronsDownUp,
+  collapse:      ChevronDown,
+  timeline:      Clock,
+  table:         Table,
+  cta:           ArrowRight,
+  pricingTable:  DollarSign,
+  testimonial:   Star,
 };
 
 const CATEGORIES = [
@@ -66,13 +91,18 @@ export function LeftPanel({ activeTab, onTabChange, infoPanel, onDrop }: Props) 
             {filtered.map((cat) => (
               <div key={cat.name} className={styles.categoryGroup}>
                 <div className={styles.categoryTitle}>{cat.name}</div>
-                {cat.types.map((type) => (
-                  <button key={type} type="button" className={styles.blockTypeBtn}
-                    onClick={() => onDrop(type as Block["type"])}>
-                    <span className={styles.blockTypeIcon}>{BLOCK_ICONS[type]}</span>
-                    <span className={styles.blockTypeLabel}>{BLOCK_LABELS[type]}</span>
-                  </button>
-                ))}
+                {cat.types.map((type) => {
+                  const IconComp = BLOCK_ICONS[type];
+                  return (
+                    <button key={type} type="button" className={styles.blockTypeBtn}
+                      onClick={() => onDrop(type as Block["type"])}>
+                      <span className={styles.blockTypeIcon}>
+                        {IconComp ? <IconComp size={20} /> : null}
+                      </span>
+                      <span className={styles.blockTypeLabel}>{BLOCK_LABELS[type]}</span>
+                    </button>
+                  );
+                })}
               </div>
             ))}
             {filtered.length === 0 && <div className={styles.noResults}>Không tìm thấy block</div>}

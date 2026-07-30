@@ -1,0 +1,38 @@
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 16px;
+}
+
+.article {
+  :global(.block-content) {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.empty {
+  max-width: 720px;
+  margin: 80px auto 0;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.emptyTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 1rem;
+}
+
+.emptyText {
+  color: #94a3b8;
+  font-size: 0.9375rem;
+}
+
+.errorHint {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}

@@ -1,8 +1,20 @@
 "use client";
 
 import type { Block } from "@workspace/types";
-import { useState, useCallback } from "react";
+import { useState, useCallback, type ReactNode } from "react";
 import { MediaManager } from "@/components/admin/media-manager";
+import {
+  AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Bold, Italic as ItalicIcon, Underline as UnderlineIcon,
+  Square, LayoutGrid, LayoutList, Columns2 as Cols2, Columns3 as Cols3,
+  Info, AlertTriangle, Lightbulb, AlertCircle,
+  MoveHorizontal, MoveVertical,
+  Minus, ArrowRightLeft, EyeOff,
+  Sun, Moon, Maximize, Shrink, SquareDashed, Circle,
+  Equal, WrapText, ArrowLeftToLine,
+  X, ChevronDown, ChevronRight, Diamond, ListCollapse, Trash2,
+  GripHorizontal,
+} from "lucide-react";
 import styles from "./block-editors.module.scss";
 
 interface EditorProps {
@@ -24,10 +36,6 @@ function TextArea({ value, onChange, placeholder, rows = 3 }: { value: string; o
   return <textarea className={styles.textarea} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} rows={rows} />;
 }
 
-function Select({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { label: string; value: string }[] }) {
-  return <select className={styles.select} value={value} onChange={(e) => onChange(e.target.value)}>{options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select>;
-}
-
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
   return <label className={styles.toggleRow}><input type="checkbox" checked={value} onChange={(e) => onChange(e.target.checked)} className={styles.checkbox} /><span>{label}</span></label>;
 }
@@ -36,46 +44,241 @@ function NumberInput({ value, onChange, min, max }: { value: number; onChange: (
   return <input type="number" className={styles.input} value={value} min={min} max={max} onChange={(e) => onChange(Number(e.target.value))} />;
 }
 
+function FieldGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className={styles.fieldGroup}>
+      <div className={styles.fieldGroupTitle}>{title}</div>
+      <div className={styles.fieldGroupBody}>{children}</div>
+    </div>
+  );
+}
+
+// ── IconGroup (Word/Office-style toolbar) ──
+
+type IconOption = { value: string; label: string; icon: ReactNode };
+
+function IconGroup({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: IconOption[] }) {
+  return (
+    <div className={styles.iconToolbar}>
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          className={`${styles.iconToolbarBtn} ${value === opt.value ? styles.iconToolbarBtnActive : ""}`}
+          onClick={() => onChange(opt.value)}
+          title={opt.label}
+        >
+          {opt.icon}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function LabelGroup({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+  return (
+    <div className={styles.iconToolbar}>
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          className={`${styles.iconToolbarBtn} ${styles.iconToolbarLabelBtn} ${value === opt.value ? styles.iconToolbarBtnActive : ""}`}
+          onClick={() => onChange(opt.value)}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+const ICON_ALIGNMENT: IconOption[] = [
+  { value: "left", label: "Căn trái", icon: <AlignLeft size={17} /> },
+  { value: "center", label: "Căn giữa", icon: <AlignCenter size={17} /> },
+  { value: "right", label: "Căn phải", icon: <AlignRight size={17} /> },
+  { value: "justify", label: "Căn đều", icon: <AlignJustify size={17} /> },
+];
+
+const ICON_WEIGHT: IconOption[] = [
+  { value: "regular", label: "Thường", icon: <span className={styles.iconText}>R</span> },
+  { value: "medium", label: "Vừa", icon: <span className={styles.iconTextBold}>M</span> },
+  { value: "semibold", label: "Đậm vừa", icon: <span className={styles.iconTextHeavy}>S</span> },
+  { value: "bold", label: "Đậm", icon: <Bold size={17} /> },
+];
+
+const ICON_FONT_SIZE: IconOption[] = [
+  { value: "sm", label: "Nhỏ", icon: <span className={styles.iconTextSm}>A</span> },
+  { value: "md", label: "Vừa", icon: <span className={styles.iconTextMd}>A</span> },
+  { value: "lg", label: "Lớn", icon: <span className={styles.iconTextLg}>A</span> },
+];
+
+const ICON_LINE_HEIGHT: IconOption[] = [
+  { value: "tight", label: "Chặt", icon: <ListCollapse size={17} /> },
+  { value: "normal", label: "Thường", icon: <AlignLeft size={17} /> },
+  { value: "relaxed", label: "Thoáng", icon: <WrapText size={17} /> },
+];
+
+const ICON_ROUNDED: IconOption[] = [
+  { value: "none", label: "Vuông", icon: <Square size={17} /> },
+  { value: "sm", label: "Bo nhẹ", icon: <SquareDashed size={17} /> },
+  { value: "md", label: "Bo vừa", icon: <span style={{ border: "none", background: "currentColor", width: 14, height: 14, borderRadius: 4, display: "inline-block", opacity: 0.7 }} /> },
+  { value: "lg", label: "Bo lớn", icon: <span style={{ border: "none", background: "currentColor", width: 14, height: 14, borderRadius: 6, display: "inline-block", opacity: 0.5 }} /> },
+  { value: "full", label: "Tròn", icon: <Circle size={17} /> },
+];
+
+const ICON_SHADOW_OPTS = [
+  { value: "none", label: "Không đổ bóng" },
+  { value: "sm", label: "Đổ bóng nhẹ" },
+  { value: "md", label: "Đổ bóng vừa" },
+  { value: "lg", label: "Đổ bóng lớn" },
+  { value: "xl", label: "Đổ bóng XL" },
+];
+
+const ICON_BORDER: IconOption[] = [
+  { value: "none", label: "Không viền", icon: <EyeOff size={17} /> },
+  { value: "thin", label: "Viền mỏng", icon: <Minus size={17} /> },
+  { value: "medium", label: "Viền vừa", icon: <GripHorizontal size={17} /> },
+  { value: "thick", label: "Viền dày", icon: <Equal size={17} /> },
+];
+
+const ICON_OBJECT_FIT: IconOption[] = [
+  { value: "cover", label: "Cover", icon: <Maximize size={17} /> },
+  { value: "contain", label: "Contain", icon: <Shrink size={17} /> },
+  { value: "fill", label: "Fill", icon: <Square size={17} /> },
+];
+
+const ICON_WIDTH: IconOption[] = [
+  { value: "full", label: "Full", icon: <ArrowRightLeft size={17} /> },
+  { value: "wide", label: "Rộng", icon: <MoveHorizontal size={17} /> },
+  { value: "contained", label: "Thu gọn", icon: <ArrowLeftToLine size={17} /> },
+  { value: "inline", label: "Inline", icon: <Minus size={17} /> },
+];
+
+const ICON_COLUMNS: IconOption[] = [
+  { value: "2", label: "2 cột", icon: <Cols2 size={16} /> },
+  { value: "3", label: "3 cột", icon: <Cols3 size={16} /> },
+  { value: "4", label: "4 cột", icon: <span style={{ display: "flex", gap: 1 }}><span className={styles.miniCol} /><span className={styles.miniCol} /><span className={styles.miniCol} /><span className={styles.miniCol} /></span> },
+];
+
+const ICON_GAP: IconOption[] = [
+  { value: "sm", label: "Hẹp", icon: <span className={styles.iconTextSm}>| |</span> },
+  { value: "md", label: "Vừa", icon: <span className={styles.iconTextMd}>| |</span> },
+  { value: "lg", label: "Rộng", icon: <span className={styles.iconTextLg}>| |</span> },
+];
+
+const ICON_LAYOUT: IconOption[] = [
+  { value: "grid", label: "Lưới", icon: <LayoutGrid size={17} /> },
+  { value: "masonry", label: "Masonry", icon: <LayoutList size={17} /> },
+];
+
+const ICON_ASPECT: IconOption[] = [
+  { value: "16:9", label: "16:9", icon: <span className={styles.iconTextSm}>16:9</span> },
+  { value: "4:3", label: "4:3", icon: <span className={styles.iconTextSm}>4:3</span> },
+  { value: "9:16", label: "9:16", icon: <span className={styles.iconTextSm}>9:16</span> },
+  { value: "1:1", label: "1:1", icon: <span className={styles.iconTextSm}>1:1</span> },
+  { value: "auto", label: "Tự động", icon: <span className={styles.iconTextSm}>Auto</span> },
+];
+
+const ICON_TRANSITION: IconOption[] = [
+  { value: "slide", label: "Slide", icon: <MoveHorizontal size={17} /> },
+  { value: "fade", label: "Fade", icon: <Circle size={17} /> },
+  { value: "cube", label: "Cube", icon: <Square size={17} /> },
+];
+
+const ICON_SLIDES: IconOption[] = [
+  { value: "1", label: "1 slide", icon: <span className={styles.iconTextMd}>1</span> },
+  { value: "2", label: "2 slides", icon: <span className={styles.iconTextMd}>2</span> },
+  { value: "3", label: "3 slides", icon: <span className={styles.iconTextMd}>3</span> },
+];
+
+const ICON_VARIANT: IconOption[] = [
+  { value: "info", label: "Thông tin", icon: <Info size={17} /> },
+  { value: "warning", label: "Cảnh báo", icon: <AlertTriangle size={17} /> },
+  { value: "tip", label: "Mẹo", icon: <Lightbulb size={17} /> },
+  { value: "danger", label: "Nguy hiểm", icon: <AlertCircle size={17} /> },
+];
+
+const ICON_THEME: IconOption[] = [
+  { value: "dark", label: "Tối", icon: <Moon size={17} /> },
+  { value: "light", label: "Sáng", icon: <Sun size={17} /> },
+];
+
+const ICON_ORIENTATION: IconOption[] = [
+  { value: "horizontal", label: "Ngang", icon: <MoveHorizontal size={17} /> },
+  { value: "vertical", label: "Dọc", icon: <MoveVertical size={17} /> },
+];
+
+const ICON_BTN_STYLE: IconOption[] = [
+  { value: "solid", label: "Đặc", icon: <Square size={17} /> },
+  { value: "outline", label: "Viền", icon: <SquareDashed size={17} /> },
+  { value: "ghost", label: "Ghost", icon: <EyeOff size={17} /> },
+];
+
+const ICON_SIZE: IconOption[] = [
+  { value: "sm", label: "Nhỏ", icon: <span className={styles.iconTextSm}>S</span> },
+  { value: "md", label: "Vừa", icon: <span className={styles.iconTextMd}>M</span> },
+  { value: "lg", label: "Lớn", icon: <span className={styles.iconTextLg}>L</span> },
+];
+
+// ── ColorSelect ──
+
+const COLOR_OPTIONS = [
+  { label: "Kế thừa", value: "inherit", swatch: "linear-gradient(135deg, #94a3b8 50%, transparent 50%)" },
+  { label: "Trắng", value: "--color-text", swatch: "#f1f5f9" },
+  { label: "Xám", value: "--color-text-muted", swatch: "#94a3b8" },
+  { label: "Primary", value: "--color-primary", swatch: "#0ea5e9" },
+  { label: "Accent", value: "--color-accent", swatch: "#f59e0b" },
+  { label: "Border", value: "--color-border", swatch: "#334155" },
+];
+
+function ColorSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className={styles.iconToolbar}>
+      {COLOR_OPTIONS.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          className={`${styles.colorToolbarBtn} ${value === opt.value ? styles.colorToolbarBtnActive : ""}`}
+          onClick={() => onChange(opt.value)}
+          title={opt.label}
+        >
+          <span className={styles.colorSwatchDot} style={{ background: opt.swatch }} />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── MediaPicker ──
+
 function MediaPicker({ value, onChange, filter }: { value: string; onChange: (v: string) => void; filter?: "image" | "video" }) {
   const [open, setOpen] = useState(false);
   return (
     <div className={styles.mediaPicker}>
-      <input type="text" className={styles.input} value={value} onChange={(e) => onChange(e.target.value)} placeholder="Media ID" />
-      <button type="button" className={styles.mediaBtn} onClick={() => setOpen(true)}>Chọn</button>
+      {value && filter === "image" ? (
+        <div className={styles.mediaPreview}>
+          <img src={value.startsWith("http") ? value : `/img/${value}/thumbnail`} alt="" className={styles.mediaPreviewImg} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          <button type="button" className={styles.smallBtn} onClick={() => onChange("")}><X size={17} /></button>
+        </div>
+      ) : (
+        <input type="text" className={styles.input} value={value} onChange={(e) => onChange(e.target.value)} placeholder="Media ID / URL" />
+      )}
+      <button type="button" className={styles.mediaBtn} onClick={() => setOpen(true)}>{value ? "Đổi" : "Chọn"}</button>
       {open && <MediaManager open={open} onClose={() => setOpen(false)} onSelect={(url) => { onChange(url); setOpen(false); }} filter={filter} accept={filter === "image" ? "image/*" : "video/*"} />}
     </div>
   );
 }
 
-// ── Shared select options ──
-
-const ROUNDED_OPTIONS = [
-  { label: "Không", value: "none" }, { label: "Nhỏ (4px)", value: "sm" },
-  { label: "Vừa (8px)", value: "md" }, { label: "Lớn (16px)", value: "lg" }, { label: "Tròn", value: "full" },
-];
-const SHADOW_OPTIONS = [
-  { label: "Không", value: "none" }, { label: "Nhỏ", value: "sm" },
-  { label: "Vừa", value: "md" }, { label: "Lớn", value: "lg" }, { label: "XL", value: "xl" },
-];
-const ALIGNMENT_OPTIONS = [
-  { label: "Trái", value: "left" }, { label: "Giữa", value: "center" },
-  { label: "Phải", value: "right" }, { label: "Đều", value: "justify" },
-];
-const WEIGHT_OPTIONS = [
-  { label: "Thường", value: "regular" }, { label: "Vừa", value: "medium" },
-  { label: "Đậm vừa", value: "semibold" }, { label: "Đậm", value: "bold" },
-];
-const COLOR_OPTIONS = [
-  { label: "Kế thừa", value: "inherit" }, { label: "Trắng", value: "--color-text" },
-  { label: "Xám", value: "--color-text-muted" }, { label: "Primary", value: "--color-primary" },
-  { label: "Accent", value: "--color-accent" }, { label: "Border", value: "--color-border" },
-];
-const FONT_SIZE_OPTIONS = [
-  { label: "Nhỏ", value: "sm" }, { label: "Vừa", value: "md" }, { label: "Lớn", value: "lg" },
-];
-const LINE_HEIGHT_OPTIONS = [
-  { label: "Chặt", value: "tight" }, { label: "Bình thường", value: "normal" }, { label: "Thoáng", value: "relaxed" },
-];
+function MultiMediaPicker({ value, onChange, filter }: { value: string; onChange: (v: string) => void; filter?: "image" | "video" }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={styles.mediaPicker}>
+      <input type="text" className={styles.input} value={value} onChange={(e) => onChange(e.target.value)} placeholder="Media ID / URL" />
+      <button type="button" className={styles.mediaBtn} onClick={() => setOpen(true)}>{value ? "Đổi" : "Chọn"}</button>
+      {open && <MediaManager open={open} onClose={() => setOpen(false)} onSelect={(url) => { onChange(url); }} filter={filter} accept={filter === "image" ? "image/*" : "video/*"} multi />}
+    </div>
+  );
+}
 
 // ── IconPicker ──
 
@@ -107,9 +310,9 @@ function IconPicker({ value, onChange }: { value: string | null; onChange: (v: s
   return (
     <div className={styles.iconPicker}>
       <div className={styles.iconPickerRow}>
-        {value ? <span className={styles.iconPreview}>◆ {value}</span> : <span className={styles.iconEmpty}>Chưa chọn</span>}
+        {value ? <span className={styles.iconPreview}><Diamond size={12} /> {value}</span> : <span className={styles.iconEmpty}>Chưa chọn</span>}
         <button type="button" className={styles.mediaBtn} onClick={() => setOpen(!open)}>{value ? "Đổi" : "Chọn icon"}</button>
-        {value && <button type="button" className={styles.smallBtn} onClick={() => onChange(null)}>✕</button>}
+        {value && <button type="button" className={styles.smallBtn} onClick={() => onChange(null)}><X size={17} /></button>}
       </div>
       {open && (
         <div className={styles.iconDropdown}>
@@ -142,21 +345,24 @@ export function HeadingEditor({ data, onChange }: EditorProps) {
   const d = data as { level: number; text: string; alignment: string; weight: string; italic: boolean; underline: boolean; color: string };
   return (
     <div className={styles.editorBody}>
-      <div className={styles.inlineRow}>
-        <Select value={String(d.level || 2)} onChange={(v) => onChange({ ...data, level: Number(v) })} options={[
-          { label: "H1", value: "1" }, { label: "H2", value: "2" }, { label: "H3", value: "3" }, { label: "H4", value: "4" }, { label: "H5", value: "5" }, { label: "H6", value: "6" },
+      <FieldGroup title="Nội dung">
+        <TextArea value={d.text || ""} onChange={(v) => onChange({ ...data, text: v })} placeholder="Tiêu đề..." rows={2} />
+      </FieldGroup>
+      <FieldGroup title="Định dạng">
+        <LabelGroup value={String(d.level || 2)} onChange={(v) => onChange({ ...data, level: Number(v) })} options={[
+          { label: "H1", value: "1" }, { label: "H2", value: "2" }, { label: "H3", value: "3" },
+          { label: "H4", value: "4" }, { label: "H5", value: "5" }, { label: "H6", value: "6" },
         ]} />
-        <Select value={d.weight || "bold"} onChange={(v) => onChange({ ...data, weight: v })} options={WEIGHT_OPTIONS} />
-      </div>
-      <TextInput value={d.text || ""} onChange={(v) => onChange({ ...data, text: v })} placeholder="Tiêu đề..." />
-      <Select value={d.alignment || "left"} onChange={(v) => onChange({ ...data, alignment: v })} options={ALIGNMENT_OPTIONS} />
-      <div className={styles.inlineRow}>
-        <Toggle label="In nghiêng" value={d.italic || false} onChange={(v) => onChange({ ...data, italic: v })} />
-        <Toggle label="Gạch chân" value={d.underline || false} onChange={(v) => onChange({ ...data, underline: v })} />
-      </div>
-      <Field label="Màu chữ">
-        <Select value={d.color || "inherit"} onChange={(v) => onChange({ ...data, color: v })} options={COLOR_OPTIONS} />
-      </Field>
+        <IconGroup value={d.alignment || "left"} onChange={(v) => onChange({ ...data, alignment: v })} options={ICON_ALIGNMENT} />
+        <IconGroup value={d.weight || "bold"} onChange={(v) => onChange({ ...data, weight: v })} options={ICON_WEIGHT} />
+        <div className={styles.inlineRow}>
+          <button type="button" className={`${styles.iconToolbarBtn} ${d.italic ? styles.iconToolbarBtnActive : ""}`} onClick={() => onChange({ ...data, italic: !d.italic })} title="In nghiêng"><ItalicIcon size={15} /></button>
+          <button type="button" className={`${styles.iconToolbarBtn} ${d.underline ? styles.iconToolbarBtnActive : ""}`} onClick={() => onChange({ ...data, underline: !d.underline })} title="Gạch chân"><UnderlineIcon size={15} /></button>
+        </div>
+      </FieldGroup>
+      <FieldGroup title="Màu sắc">
+        <ColorSelect value={d.color || "inherit"} onChange={(v) => onChange({ ...data, color: v })} />
+      </FieldGroup>
     </div>
   );
 }
@@ -165,19 +371,21 @@ export function ParagraphEditor({ data, onChange }: EditorProps) {
   const d = data as { text: string; alignment: string; dropCap: boolean; fontSize: string; lineHeight: string; weight: string; color: string };
   return (
     <div className={styles.editorBody}>
-      <TextArea value={d.text || ""} onChange={(v) => onChange({ ...data, text: v })} placeholder="Nội dung đoạn văn..." rows={4} />
-      <Select value={d.alignment || "left"} onChange={(v) => onChange({ ...data, alignment: v })} options={ALIGNMENT_OPTIONS} />
-      <div className={styles.inlineRow}>
-        <Select value={d.fontSize || "md"} onChange={(v) => onChange({ ...data, fontSize: v })} options={FONT_SIZE_OPTIONS} />
-        <Select value={d.lineHeight || "normal"} onChange={(v) => onChange({ ...data, lineHeight: v })} options={LINE_HEIGHT_OPTIONS} />
-      </div>
-      <div className={styles.inlineRow}>
-        <Select value={d.weight || "regular"} onChange={(v) => onChange({ ...data, weight: v })} options={WEIGHT_OPTIONS} />
-        <Toggle label="Drop Cap" value={d.dropCap || false} onChange={(v) => onChange({ ...data, dropCap: v })} />
-      </div>
-      <Field label="Màu chữ">
-        <Select value={d.color || "inherit"} onChange={(v) => onChange({ ...data, color: v })} options={COLOR_OPTIONS} />
-      </Field>
+      <FieldGroup title="Nội dung">
+        <TextArea value={d.text || ""} onChange={(v) => onChange({ ...data, text: v })} placeholder="Nội dung đoạn văn..." rows={6} />
+      </FieldGroup>
+      <FieldGroup title="Định dạng">
+        <IconGroup value={d.alignment || "left"} onChange={(v) => onChange({ ...data, alignment: v })} options={ICON_ALIGNMENT} />
+        <IconGroup value={d.fontSize || "md"} onChange={(v) => onChange({ ...data, fontSize: v })} options={ICON_FONT_SIZE} />
+        <IconGroup value={d.lineHeight || "normal"} onChange={(v) => onChange({ ...data, lineHeight: v })} options={ICON_LINE_HEIGHT} />
+        <div className={styles.inlineRow}>
+          <IconGroup value={d.weight || "regular"} onChange={(v) => onChange({ ...data, weight: v })} options={ICON_WEIGHT} />
+          <Toggle label="Drop Cap" value={d.dropCap || false} onChange={(v) => onChange({ ...data, dropCap: v })} />
+        </div>
+      </FieldGroup>
+      <FieldGroup title="Màu sắc">
+        <ColorSelect value={d.color || "inherit"} onChange={(v) => onChange({ ...data, color: v })} />
+      </FieldGroup>
     </div>
   );
 }
@@ -186,9 +394,11 @@ export function QuoteEditor({ data, onChange }: EditorProps) {
   const d = data as { text: string; author?: string; style: string; icon: string | null };
   return (
     <div className={styles.editorBody}>
-      <Select value={d.style || "default"} onChange={(v) => onChange({ ...data, style: v })} options={[
-        { label: "Mặc định", value: "default" }, { label: "Có viền", value: "bordered" }, { label: "Pull quote", value: "pull" },
-      ]} />
+      <FieldGroup title="Kiểu">
+        <LabelGroup value={d.style || "default"} onChange={(v) => onChange({ ...data, style: v })} options={[
+          { label: "Mặc định", value: "default" }, { label: "Có viền", value: "bordered" }, { label: "Pull", value: "pull" },
+        ]} />
+      </FieldGroup>
       <TextArea value={d.text || ""} onChange={(v) => onChange({ ...data, text: v })} placeholder="Nội dung trích dẫn..." />
       <TextInput value={d.author || ""} onChange={(v) => onChange({ ...data, author: v })} placeholder="Tác giả (tùy chọn)" />
       <Field label="Icon">
@@ -205,11 +415,13 @@ export function ListEditor({ data, onChange }: EditorProps) {
   const removeItem = (i: number) => onChange({ ...data, items: d.items.filter((_, idx) => idx !== i) });
   return (
     <div className={styles.editorBody}>
-      <Select value={d.style} onChange={(v) => onChange({ ...data, style: v })} options={[
-        { label: "Danh sách không thứ tự", value: "unordered" }, { label: "Danh sách có thứ tự", value: "ordered" }, { label: "Checklist", value: "checklist" },
-      ]} />
+      <FieldGroup title="Kiểu">
+        <LabelGroup value={d.style} onChange={(v) => onChange({ ...data, style: v })} options={[
+          { label: "UL", value: "unordered" }, { label: "OL", value: "ordered" }, { label: "Checklist", value: "checklist" },
+        ]} />
+      </FieldGroup>
       {d.items.map((item, i) => (
-        <div key={i} className={styles.listRow}><input type="text" className={styles.input} value={item} onChange={(e) => updateItem(i, e.target.value)} placeholder={`Mục ${i + 1}`} /><button type="button" className={styles.smallBtn} onClick={() => removeItem(i)}>✕</button></div>
+        <div key={i} className={styles.listRow}><input type="text" className={styles.input} value={item} onChange={(e) => updateItem(i, e.target.value)} placeholder={`Mục ${i + 1}`} /><button type="button" className={styles.smallBtn} onClick={() => removeItem(i)}><X size={17} /></button></div>
       ))}
       <button type="button" className={styles.addBtn} onClick={addItem}>+ Thêm mục</button>
     </div>
@@ -220,16 +432,17 @@ export function CodeEditor({ data, onChange }: EditorProps) {
   const d = data as { code: string; language: string; showLineNumbers: boolean; theme: string; showCopyButton: boolean };
   return (
     <div className={styles.editorBody}>
-      <div className={styles.inlineRow}>
-        <Select value={d.language || "plaintext"} onChange={(v) => onChange({ ...data, language: v })} options={[
-          { label: "JavaScript", value: "javascript" }, { label: "TypeScript", value: "typescript" }, { label: "Python", value: "python" },
-          { label: "HTML", value: "html" }, { label: "CSS", value: "css" }, { label: "Bash", value: "bash" },
-          { label: "JSON", value: "json" }, { label: "SQL", value: "sql" }, { label: "Plain Text", value: "plaintext" },
-        ]} />
-        <Select value={d.theme || "dark"} onChange={(v) => onChange({ ...data, theme: v })} options={[
-          { label: "Tối", value: "dark" }, { label: "Sáng", value: "light" },
-        ]} />
-      </div>
+      <FieldGroup title="Ngôn ngữ">
+        <select className={styles.select} value={d.language || "plaintext"} onChange={(e) => onChange({ ...data, language: e.target.value })}>
+          <option value="javascript">JavaScript</option><option value="typescript">TypeScript</option>
+          <option value="python">Python</option><option value="html">HTML</option>
+          <option value="css">CSS</option><option value="bash">Bash</option>
+          <option value="json">JSON</option><option value="sql">SQL</option><option value="plaintext">Plain Text</option>
+        </select>
+      </FieldGroup>
+      <FieldGroup title="Theme">
+        <IconGroup value={d.theme || "dark"} onChange={(v) => onChange({ ...data, theme: v })} options={ICON_THEME} />
+      </FieldGroup>
       <TextArea value={d.code || ""} onChange={(v) => onChange({ ...data, code: v })} placeholder="Dán code vào đây..." rows={6} />
       <div className={styles.inlineRow}>
         <Toggle label="Số dòng" value={d.showLineNumbers || false} onChange={(v) => onChange({ ...data, showLineNumbers: v })} />
@@ -243,11 +456,9 @@ export function CalloutEditor({ data, onChange }: EditorProps) {
   const d = data as { text: string; variant: string; icon: string | null; title?: string };
   return (
     <div className={styles.editorBody}>
-      <div className={styles.inlineRow}>
-        <Select value={d.variant || "info"} onChange={(v) => onChange({ ...data, variant: v })} options={[
-          { label: "Thông tin", value: "info" }, { label: "Cảnh báo", value: "warning" }, { label: "Mẹo", value: "tip" }, { label: "Nguy hiểm", value: "danger" },
-        ]} />
-      </div>
+      <FieldGroup title="Kiểu">
+        <IconGroup value={d.variant || "info"} onChange={(v) => onChange({ ...data, variant: v })} options={ICON_VARIANT} />
+      </FieldGroup>
       <TextInput value={d.title || ""} onChange={(v) => onChange({ ...data, title: v })} placeholder="Tiêu đề (tùy chọn)" />
       <TextArea value={d.text || ""} onChange={(v) => onChange({ ...data, text: v })} placeholder="Nội dung callout..." rows={3} />
       <Field label="Icon">
@@ -264,19 +475,21 @@ export function ImageEditor({ data, onChange }: EditorProps) {
   return (
     <div className={styles.editorBody}>
       <Field label="Media ID"><MediaPicker value={d.mediaId || ""} onChange={(v) => onChange({ ...data, mediaId: v })} filter="image" /></Field>
-      <Select value={d.width || "wide"} onChange={(v) => onChange({ ...data, width: v })} options={[
-        { label: "Toàn màn hình", value: "full" }, { label: "Rộng", value: "wide" }, { label: "Thu gọn", value: "contained" }, { label: "Cùng dòng", value: "inline" },
-      ]} />
-      <Select value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ROUNDED_OPTIONS} />
-      <Select value={d.border || "none"} onChange={(v) => onChange({ ...data, border: v })} options={[
-        { label: "Không viền", value: "none" }, { label: "Mỏng (1px)", value: "thin" }, { label: "Vừa (2px)", value: "medium" }, { label: "Dày (4px)", value: "thick" },
-      ]} />
-      <Select value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={SHADOW_OPTIONS} />
+      <FieldGroup title="Kích thước">
+        <IconGroup value={d.width || "wide"} onChange={(v) => onChange({ ...data, width: v })} options={ICON_WIDTH} />
+      </FieldGroup>
+      <FieldGroup title="Bo góc">
+        <IconGroup value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ICON_ROUNDED} />
+      </FieldGroup>
+      <FieldGroup title="Viền">
+        <IconGroup value={d.border || "none"} onChange={(v) => onChange({ ...data, border: v })} options={ICON_BORDER} />
+      </FieldGroup>
+      <FieldGroup title="Đổ bóng">
+        <LabelGroup value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={ICON_SHADOW_OPTS} />
+      </FieldGroup>
       <div className={styles.inlineRow}>
         <Toggle label="Phóng to khi hover" value={d.hoverZoom || false} onChange={(v) => onChange({ ...data, hoverZoom: v })} />
-        <Select value={d.objectFit || "cover"} onChange={(v) => onChange({ ...data, objectFit: v })} options={[
-          { label: "Cover", value: "cover" }, { label: "Contain", value: "contain" }, { label: "Fill", value: "fill" },
-        ]} />
+        <IconGroup value={d.objectFit || "cover"} onChange={(v) => onChange({ ...data, objectFit: v })} options={ICON_OBJECT_FIT} />
       </div>
       <TextInput value={d.alt || ""} onChange={(v) => onChange({ ...data, alt: v })} placeholder="Alt text" />
       <TextInput value={d.caption || ""} onChange={(v) => onChange({ ...data, caption: v })} placeholder="Chú thích ảnh" />
@@ -290,11 +503,15 @@ export function VideoEditor({ data, onChange }: EditorProps) {
   return (
     <div className={styles.editorBody}>
       <Field label="Media ID (YouTube)"><MediaPicker value={d.mediaId || ""} onChange={(v) => onChange({ ...data, mediaId: v })} filter="video" /></Field>
-      <Select value={d.aspectRatio || "16:9"} onChange={(v) => onChange({ ...data, aspectRatio: v })} options={[
-        { label: "16:9", value: "16:9" }, { label: "4:3", value: "4:3" }, { label: "9:16", value: "9:16" }, { label: "1:1", value: "1:1" },
-      ]} />
-      <Select value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ROUNDED_OPTIONS} />
-      <Select value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={SHADOW_OPTIONS} />
+      <FieldGroup title="Tỷ lệ">
+        <IconGroup value={d.aspectRatio || "16:9"} onChange={(v) => onChange({ ...data, aspectRatio: v })} options={ICON_ASPECT} />
+      </FieldGroup>
+      <FieldGroup title="Bo góc">
+        <IconGroup value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ICON_ROUNDED} />
+      </FieldGroup>
+      <FieldGroup title="Đổ bóng">
+        <LabelGroup value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={ICON_SHADOW_OPTS} />
+      </FieldGroup>
       <div className={styles.inlineRow}>
         <Toggle label="Autoplay" value={d.autoplay || false} onChange={(v) => onChange({ ...data, autoplay: v })} />
         <Toggle label="Loop" value={d.loop || false} onChange={(v) => onChange({ ...data, loop: v })} />
@@ -309,29 +526,38 @@ export function VideoEditor({ data, onChange }: EditorProps) {
 export function GalleryEditor({ data, onChange }: EditorProps) {
   const d = data as { images: { mediaId: string; caption?: string }[]; columns: number; gap: string; layout: string; rounded: string; shadow: string; hoverZoom: boolean; lightbox: boolean };
   const add = () => onChange({ ...data, images: [...d.images, { mediaId: "" }] });
+  const addBatch = (urls: string) => {
+    const parsed = urls.split("\n").filter(Boolean).map((u) => ({ mediaId: u, caption: "" }));
+    if (parsed.length > 0) onChange({ ...data, images: [...d.images, ...parsed] });
+  };
   const upd = (i: number, img: typeof d.images[0]) => { const images = [...d.images]; images[i] = img; onChange({ ...data, images }); };
   const del = (i: number) => onChange({ ...data, images: d.images.filter((_, idx) => idx !== i) });
   return (
     <div className={styles.editorBody}>
       <div className={styles.inlineRow}>
-        <Select value={String(d.columns || 3)} onChange={(v) => onChange({ ...data, columns: Number(v) })} options={[{ label: "2 cột", value: "2" }, { label: "3 cột", value: "3" }, { label: "4 cột", value: "4" }]} />
-        <Select value={d.gap || "md"} onChange={(v) => onChange({ ...data, gap: v })} options={[{ label: "Nhỏ", value: "sm" }, { label: "Vừa", value: "md" }, { label: "Lớn", value: "lg" }]} />
-        <Select value={d.layout || "grid"} onChange={(v) => onChange({ ...data, layout: v })} options={[{ label: "Lưới", value: "grid" }, { label: "Masonry", value: "masonry" }]} />
+        <IconGroup value={String(d.columns || 3)} onChange={(v) => onChange({ ...data, columns: Number(v) })} options={ICON_COLUMNS} />
+        <IconGroup value={d.gap || "md"} onChange={(v) => onChange({ ...data, gap: v })} options={ICON_GAP} />
+        <IconGroup value={d.layout || "grid"} onChange={(v) => onChange({ ...data, layout: v })} options={ICON_LAYOUT} />
       </div>
-      <Select value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ROUNDED_OPTIONS} />
-      <Select value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={SHADOW_OPTIONS} />
+      <FieldGroup title="Bo góc">
+        <IconGroup value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ICON_ROUNDED} />
+      </FieldGroup>
+      <FieldGroup title="Đổ bóng">
+        <LabelGroup value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={ICON_SHADOW_OPTS} />
+      </FieldGroup>
       <div className={styles.inlineRow}>
         <Toggle label="Hover zoom" value={d.hoverZoom || false} onChange={(v) => onChange({ ...data, hoverZoom: v })} />
         <Toggle label="Lightbox" value={d.lightbox ?? true} onChange={(v) => onChange({ ...data, lightbox: v })} />
       </div>
+      <button type="button" className={styles.addBtn} onClick={add}>+ Thêm ảnh đơn</button>
+      <Field label="Chọn nhiều ảnh"><MultiMediaPicker value="" onChange={addBatch} filter="image" /></Field>
       {d.images.map((img, i) => (
         <div key={i} className={styles.galleryItem}>
           <Field label={`Ảnh ${i + 1}`}><MediaPicker value={img.mediaId} onChange={(v) => upd(i, { ...img, mediaId: v })} filter="image" /></Field>
           <TextInput value={img.caption || ""} onChange={(v) => upd(i, { ...img, caption: v })} placeholder="Chú thích" />
-          <button type="button" className={styles.smallBtn} onClick={() => del(i)}>✕ Xóa</button>
+          <button type="button" className={styles.smallBtn} onClick={() => del(i)}><X size={17} /> Xóa</button>
         </div>
       ))}
-      <button type="button" className={styles.addBtn} onClick={add}>+ Thêm ảnh</button>
     </div>
   );
 }
@@ -339,6 +565,10 @@ export function GalleryEditor({ data, onChange }: EditorProps) {
 export function CarouselEditor({ data, onChange }: EditorProps) {
   const d = data as { slides: { mediaId: string; caption?: string }[]; autoplay: boolean; interval: number; showDots: boolean; showArrows: boolean; transition: string; rounded: string; shadow: string; aspectRatio: string; loop: boolean; pauseOnHover: boolean; slidesPerView: number };
   const add = () => onChange({ ...data, slides: [...d.slides, { mediaId: "" }] });
+  const addBatch = (urls: string) => {
+    const parsed = urls.split("\n").filter(Boolean).map((u) => ({ mediaId: u, caption: "" }));
+    if (parsed.length > 0) onChange({ ...data, slides: [...d.slides, ...parsed] });
+  };
   const upd = (i: number, s: typeof d.slides[0]) => { const slides = [...d.slides]; slides[i] = s; onChange({ ...data, slides }); };
   const del = (i: number) => onChange({ ...data, slides: d.slides.filter((_, idx) => idx !== i) });
   return (
@@ -348,30 +578,35 @@ export function CarouselEditor({ data, onChange }: EditorProps) {
         <Toggle label="Loop" value={d.loop ?? true} onChange={(v) => onChange({ ...data, loop: v })} />
       </div>
       {d.autoplay && <Field label="Interval (ms)"><NumberInput value={d.interval || 5000} onChange={(v) => onChange({ ...data, interval: v })} min={1000} /></Field>}
-      <Select value={d.transition || "slide"} onChange={(v) => onChange({ ...data, transition: v })} options={[
-        { label: "Slide", value: "slide" }, { label: "Fade", value: "fade" }, { label: "Cube", value: "cube" },
-      ]} />
-      <Select value={d.slidesPerView != null ? String(d.slidesPerView) : "1"} onChange={(v) => onChange({ ...data, slidesPerView: Number(v) })} options={[
-        { label: "1 slide", value: "1" }, { label: "2 slides", value: "2" }, { label: "3 slides", value: "3" },
-      ]} />
-      <Select value={d.aspectRatio || "16:9"} onChange={(v) => onChange({ ...data, aspectRatio: v })} options={[
-        { label: "16:9", value: "16:9" }, { label: "4:3", value: "4:3" }, { label: "1:1", value: "1:1" }, { label: "Tự động", value: "auto" },
-      ]} />
-      <Select value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ROUNDED_OPTIONS} />
-      <Select value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={SHADOW_OPTIONS} />
+      <FieldGroup title="Transition">
+        <IconGroup value={d.transition || "slide"} onChange={(v) => onChange({ ...data, transition: v })} options={ICON_TRANSITION} />
+      </FieldGroup>
+      <FieldGroup title="Slides hiển thị">
+        <IconGroup value={String(d.slidesPerView ?? 1)} onChange={(v) => onChange({ ...data, slidesPerView: Number(v) })} options={ICON_SLIDES} />
+      </FieldGroup>
+      <FieldGroup title="Tỷ lệ">
+        <IconGroup value={d.aspectRatio || "16:9"} onChange={(v) => onChange({ ...data, aspectRatio: v })} options={ICON_ASPECT} />
+      </FieldGroup>
+      <FieldGroup title="Bo góc">
+        <IconGroup value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ICON_ROUNDED} />
+      </FieldGroup>
+      <FieldGroup title="Đổ bóng">
+        <LabelGroup value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={ICON_SHADOW_OPTS} />
+      </FieldGroup>
       <div className={styles.inlineRow}>
         <Toggle label="Dots" value={d.showDots ?? true} onChange={(v) => onChange({ ...data, showDots: v })} />
         <Toggle label="Mũi tên" value={d.showArrows ?? true} onChange={(v) => onChange({ ...data, showArrows: v })} />
         <Toggle label="Dừng khi hover" value={d.pauseOnHover ?? true} onChange={(v) => onChange({ ...data, pauseOnHover: v })} />
       </div>
+      <button type="button" className={styles.addBtn} onClick={add}>+ Thêm slide đơn</button>
+      <Field label="Chọn nhiều ảnh"><MultiMediaPicker value="" onChange={addBatch} filter="image" /></Field>
       {d.slides.map((s, i) => (
         <div key={i} className={styles.galleryItem}>
           <Field label={`Slide ${i + 1}`}><MediaPicker value={s.mediaId} onChange={(v) => upd(i, { ...s, mediaId: v })} filter="image" /></Field>
           <TextInput value={s.caption || ""} onChange={(v) => upd(i, { ...s, caption: v })} placeholder="Chú thích" />
-          <button type="button" className={styles.smallBtn} onClick={() => del(i)}>✕ Xóa</button>
+          <button type="button" className={styles.smallBtn} onClick={() => del(i)}><X size={17} /> Xóa</button>
         </div>
       ))}
-      <button type="button" className={styles.addBtn} onClick={add}>+ Thêm slide</button>
     </div>
   );
 }
@@ -382,11 +617,15 @@ export function BeforeAfterEditor({ data, onChange }: EditorProps) {
     <div className={styles.editorBody}>
       <Field label="Ảnh Before"><MediaPicker value={d.beforeMediaId || ""} onChange={(v) => onChange({ ...data, beforeMediaId: v })} filter="image" /></Field>
       <Field label="Ảnh After"><MediaPicker value={d.afterMediaId || ""} onChange={(v) => onChange({ ...data, afterMediaId: v })} filter="image" /></Field>
-      <Select value={d.orientation || "horizontal"} onChange={(v) => onChange({ ...data, orientation: v })} options={[
-        { label: "Ngang", value: "horizontal" }, { label: "Dọc", value: "vertical" },
-      ]} />
-      <Select value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ROUNDED_OPTIONS} />
-      <Select value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={SHADOW_OPTIONS} />
+      <FieldGroup title="Hướng">
+        <IconGroup value={d.orientation || "horizontal"} onChange={(v) => onChange({ ...data, orientation: v })} options={ICON_ORIENTATION} />
+      </FieldGroup>
+      <FieldGroup title="Bo góc">
+        <IconGroup value={d.rounded || "none"} onChange={(v) => onChange({ ...data, rounded: v })} options={ICON_ROUNDED} />
+      </FieldGroup>
+      <FieldGroup title="Đổ bóng">
+        <LabelGroup value={d.shadow || "none"} onChange={(v) => onChange({ ...data, shadow: v })} options={ICON_SHADOW_OPTS} />
+      </FieldGroup>
       <div className={styles.inlineRow}>
         <TextInput value={d.beforeLabel || ""} onChange={(v) => onChange({ ...data, beforeLabel: v })} placeholder="Nhãn Before" />
         <TextInput value={d.afterLabel || ""} onChange={(v) => onChange({ ...data, afterLabel: v })} placeholder="Nhãn After" />
@@ -402,9 +641,12 @@ export function DividerEditor({ data, onChange }: EditorProps) {
   const d = data as { style: string };
   return (
     <div className={styles.editorBody}>
-      <Select value={d.style || "solid"} onChange={(v) => onChange({ ...data, style: v })} options={[
-        { label: "Nét liền", value: "solid" }, { label: "Nét đứt", value: "dashed" }, { label: "Chấm chấm", value: "dotted" }, { label: "Gradient", value: "gradient" },
-      ]} />
+      <FieldGroup title="Kiểu">
+        <LabelGroup value={d.style || "solid"} onChange={(v) => onChange({ ...data, style: v })} options={[
+          { label: "Nét liền", value: "solid" }, { label: "Nét đứt", value: "dashed" },
+          { label: "Chấm chấm", value: "dotted" }, { label: "Gradient", value: "gradient" },
+        ]} />
+      </FieldGroup>
     </div>
   );
 }
@@ -427,16 +669,22 @@ export function ColumnsEditor({ data, onChange }: EditorProps) {
   };
   return (
     <div className={styles.editorBody}>
-      <Select value={String(d.columns || 2)} onChange={(v) => {
-        const n = Number(v);
-        const content = Array.from({ length: n }, (_, i) => d.content[i] || []);
-        onChange({ ...data, columns: n, content });
-      }} options={[{ label: "2 cột", value: "2" }, { label: "3 cột", value: "3" }, { label: "4 cột", value: "4" }]} />
-      <Select value={d.gap || "md"} onChange={(v) => onChange({ ...data, gap: v })} options={[{ label: "Nhỏ", value: "sm" }, { label: "Vừa", value: "md" }, { label: "Lớn", value: "lg" }]} />
-      <Select value={d.columnRatios || "auto"} onChange={(v) => onChange({ ...data, columnRatios: v })} options={[
-        { label: "Tự động", value: "auto" }, { label: "50-50", value: "50-50" }, { label: "33-33-33", value: "33-33-33" },
-        { label: "25-75", value: "25-75" }, { label: "75-25", value: "75-25" }, { label: "33-67", value: "33-67" }, { label: "67-33", value: "67-33" },
-      ]} />
+      <FieldGroup title="Số cột">
+        <IconGroup value={String(d.columns || 2)} onChange={(v) => {
+          const n = Number(v);
+          const content = Array.from({ length: n }, (_, i) => d.content[i] || []);
+          onChange({ ...data, columns: n, content });
+        }} options={ICON_COLUMNS} />
+      </FieldGroup>
+      <FieldGroup title="Khoảng cách">
+        <IconGroup value={d.gap || "md"} onChange={(v) => onChange({ ...data, gap: v })} options={ICON_GAP} />
+      </FieldGroup>
+      <FieldGroup title="Tỷ lệ">
+        <LabelGroup value={d.columnRatios || "auto"} onChange={(v) => onChange({ ...data, columnRatios: v })} options={[
+          { label: "Auto", value: "auto" }, { label: "50-50", value: "50-50" }, { label: "33-33-33", value: "33-33-33" },
+          { label: "25-75", value: "25-75" }, { label: "75-25", value: "75-25" }, { label: "33-67", value: "33-67" }, { label: "67-33", value: "67-33" },
+        ]} />
+      </FieldGroup>
       <div className={styles.nestedZones}>
         {Array.from({ length: d.columns || 2 }, (_, i) => (
           <div key={i} className={styles.nestedZone}>
@@ -456,15 +704,17 @@ export function TabsEditor({ data, onChange }: EditorProps) {
   const delTab = (i: number) => onChange({ ...data, tabs: d.tabs.filter((_, idx) => idx !== i) });
   return (
     <div className={styles.editorBody}>
-      <Select value={d.tabStyle || "top"} onChange={(v) => onChange({ ...data, tabStyle: v })} options={[
-        { label: "Top", value: "top" }, { label: "Pills", value: "pills" }, { label: "Dọc", value: "vertical" },
-      ]} />
+      <FieldGroup title="Kiểu">
+        <LabelGroup value={d.tabStyle || "top"} onChange={(v) => onChange({ ...data, tabStyle: v })} options={[
+          { label: "Top", value: "top" }, { label: "Pills", value: "pills" }, { label: "Dọc", value: "vertical" },
+        ]} />
+      </FieldGroup>
       <Field label="Tab mặc định"><NumberInput value={d.defaultTab ?? 0} onChange={(v) => onChange({ ...data, defaultTab: v })} min={0} /></Field>
       {d.tabs.map((tab, i) => (
         <div key={i} className={styles.nestedZone}>
           <div className={styles.nestedHeader}>
             <TextInput value={tab.label} onChange={(v) => updTab(i, { ...tab, label: v })} placeholder={`Tab ${i + 1}`} />
-            <button type="button" className={styles.smallBtn} onClick={() => delTab(i)}>✕</button>
+            <button type="button" className={styles.smallBtn} onClick={() => delTab(i)}><X size={17} /></button>
           </div>
           <NestedBlockList blocks={tab.content || []} onChange={(b) => updTab(i, { ...tab, content: b })} />
         </div>
@@ -485,15 +735,15 @@ export function AccordionEditor({ data, onChange }: EditorProps) {
     <div className={styles.editorBody}>
       <Toggle label="Cho phép mở nhiều item" value={d.allowMultiple ?? true} onChange={(v) => onChange({ ...data, allowMultiple: v })} />
       <div className={styles.inlineRow}>
-        <Select value={d.iconPosition || "right"} onChange={(v) => onChange({ ...data, iconPosition: v })} options={[{ label: "Trái", value: "left" }, { label: "Phải", value: "right" }]} />
-        <Select value={d.borderStyle || "bordered"} onChange={(v) => onChange({ ...data, borderStyle: v })} options={[{ label: "Có viền", value: "bordered" }, { label: "Không viền", value: "borderless" }]} />
+        <LabelGroup value={d.iconPosition || "right"} onChange={(v) => onChange({ ...data, iconPosition: v })} options={[{ label: "Icon trái", value: "left" }, { label: "Icon phải", value: "right" }]} />
+        <LabelGroup value={d.borderStyle || "bordered"} onChange={(v) => onChange({ ...data, borderStyle: v })} options={[{ label: "Có viền", value: "bordered" }, { label: "Không viền", value: "borderless" }]} />
       </div>
       <Field label="Mở mặc định (index)"><NumberInput value={d.defaultOpenIndex ?? -1} onChange={(v) => onChange({ ...data, defaultOpenIndex: v })} min={-1} /></Field>
       {d.items.map((item, i) => (
         <div key={i} className={styles.nestedZone}>
           <div className={styles.nestedHeader}>
             <TextInput value={item.title} onChange={(v) => upd(i, { ...item, title: v })} placeholder={`Item ${i + 1}`} />
-            <button type="button" className={styles.smallBtn} onClick={() => del(i)}>✕</button>
+            <button type="button" className={styles.smallBtn} onClick={() => del(i)}><X size={17} /></button>
           </div>
           <NestedBlockList blocks={item.content || []} onChange={(b) => upd(i, { ...item, content: b })} />
         </div>
@@ -510,7 +760,7 @@ export function CollapseEditor({ data, onChange }: EditorProps) {
       <TextInput value={d.title || ""} onChange={(v) => onChange({ ...data, title: v })} placeholder="Tiêu đề thu gọn" />
       <div className={styles.inlineRow}>
         <Toggle label="Mở mặc định" value={d.defaultOpen || false} onChange={(v) => onChange({ ...data, defaultOpen: v })} />
-        <Select value={d.iconPosition || "right"} onChange={(v) => onChange({ ...data, iconPosition: v })} options={[{ label: "Trái", value: "left" }, { label: "Phải", value: "right" }]} />
+        <LabelGroup value={d.iconPosition || "right"} onChange={(v) => onChange({ ...data, iconPosition: v })} options={[{ label: "Trái", value: "left" }, { label: "Phải", value: "right" }]} />
       </div>
       <NestedBlockList blocks={d.content || []} onChange={(b) => onChange({ ...data, content: b })} />
     </div>
@@ -524,16 +774,20 @@ export function TimelineEditor({ data, onChange }: EditorProps) {
   const del = (i: number) => onChange({ ...data, events: d.events.filter((_, idx) => idx !== i) });
   return (
     <div className={styles.editorBody}>
-      <Select value={d.layout || "vertical"} onChange={(v) => onChange({ ...data, layout: v })} options={[
-        { label: "Dọc", value: "vertical" }, { label: "Ngang", value: "horizontal" }, { label: "Xen kẽ", value: "alternating" },
-      ]} />
-      <Field label="Màu đường timeline"><Select value={d.lineColor || "--color-border"} onChange={(v) => onChange({ ...data, lineColor: v })} options={[
-        { label: "Border", value: "--color-border" }, { label: "Primary", value: "--color-primary" }, { label: "Accent", value: "--color-accent" },
-      ]} /></Field>
+      <FieldGroup title="Bố cục">
+        <LabelGroup value={d.layout || "vertical"} onChange={(v) => onChange({ ...data, layout: v })} options={[
+          { label: "Dọc", value: "vertical" }, { label: "Ngang", value: "horizontal" }, { label: "Xen kẽ", value: "alternating" },
+        ]} />
+      </FieldGroup>
+      <FieldGroup title="Màu đường">
+        <LabelGroup value={d.lineColor || "--color-border"} onChange={(v) => onChange({ ...data, lineColor: v })} options={[
+          { label: "Border", value: "--color-border" }, { label: "Primary", value: "--color-primary" }, { label: "Accent", value: "--color-accent" },
+        ]} />
+      </FieldGroup>
       <Field label="Icon mỗi sự kiện"><IconPicker value={d.iconPerEvent ?? null} onChange={(v) => onChange({ ...data, iconPerEvent: v })} /></Field>
       {d.events.map((ev, i) => (
         <div key={i} className={styles.nestedBlock}>
-          <div className={styles.pricingHeader}><span>Sự kiện {i + 1}</span><button type="button" className={styles.smallBtn} onClick={() => del(i)}>✕</button></div>
+          <div className={styles.pricingHeader}><span>Sự kiện {i + 1}</span><button type="button" className={styles.smallBtn} onClick={() => del(i)}><X size={17} /></button></div>
           <TextInput value={ev.date} onChange={(v) => upd(i, { ...ev, date: v })} placeholder="Ngày (vd: 2024)" />
           <TextInput value={ev.title} onChange={(v) => upd(i, { ...ev, title: v })} placeholder="Tiêu đề" />
           <TextArea value={ev.description} onChange={(v) => upd(i, { ...ev, description: v })} placeholder="Mô tả" rows={2} />
@@ -545,7 +799,7 @@ export function TimelineEditor({ data, onChange }: EditorProps) {
 }
 
 export function TableEditor({ data, onChange }: EditorProps) {
-  const d = data as { headers: string[]; rows: string[][]; striped: boolean; compact: boolean };
+  const d = data as { headers: string[]; rows: string[][]; striped: boolean; compact: boolean; theme: string };
   const updHdr = (i: number, v: string) => { const headers = [...d.headers]; headers[i] = v; onChange({ ...data, headers }); };
   const addCol = () => onChange({ ...data, headers: [...d.headers, `Cột ${d.headers.length + 1}`], rows: d.rows.map((r) => [...r, ""]) });
   const delCol = (ci: number) => onChange({ ...data, headers: d.headers.filter((_, i) => i !== ci), rows: d.rows.map((r) => r.filter((_, i) => i !== ci)) });
@@ -554,17 +808,26 @@ export function TableEditor({ data, onChange }: EditorProps) {
   const delRow = (ri: number) => onChange({ ...data, rows: d.rows.filter((_, i) => i !== ri) });
   return (
     <div className={styles.editorBody}>
+      <FieldGroup title="Theme">
+        <IconGroup value={d.theme || "classic"} onChange={(v) => onChange({ ...data, theme: v })} options={[
+          { value: "classic", label: "Classic", icon: <span className={styles.themeSwatch} style={{ background: "#2B2B2B" }} /> },
+          { value: "professional", label: "Professional", icon: <span className={styles.themeSwatch} style={{ background: "#1E3A5F" }} /> },
+          { value: "colorful", label: "Colorful", icon: <span className={styles.themeSwatch} style={{ background: "#059669" }} /> },
+          { value: "minimal", label: "Minimal", icon: <span className={styles.themeSwatch} style={{ background: "transparent", border: "1px solid #ccc" }} /> },
+          { value: "dark", label: "Dark", icon: <span className={styles.themeSwatch} style={{ background: "#1F2937" }} /> },
+        ]} />
+      </FieldGroup>
       <div className={styles.inlineRow}>
         <Toggle label="Sọc xen kẽ" value={d.striped ?? true} onChange={(v) => onChange({ ...data, striped: v })} />
         <Toggle label="Thu gọn" value={d.compact || false} onChange={(v) => onChange({ ...data, compact: v })} />
       </div>
       <div className={styles.tableHeaders}>{d.headers.map((h, i) => (
-        <div key={i} className={styles.tableHeaderCell}><input type="text" className={styles.input} value={h} onChange={(e) => updHdr(i, e.target.value)} placeholder={`Cột ${i + 1}`} /><button type="button" className={styles.smallBtn} onClick={() => delCol(i)}>✕</button></div>
+        <div key={i} className={styles.tableHeaderCell}><input type="text" className={styles.input} value={h} onChange={(e) => updHdr(i, e.target.value)} placeholder={`Cột ${i + 1}`} /><button type="button" className={styles.smallBtn} onClick={() => delCol(i)}><X size={17} /></button></div>
       ))}<button type="button" className={styles.addBtn} onClick={addCol}>+ Cột</button></div>
       {d.rows.map((row, ri) => (
         <div key={ri} className={styles.tableRow}>{row.map((cell, ci) => (
           <input key={ci} type="text" className={styles.input} value={cell} onChange={(e) => updCell(ri, ci, e.target.value)} placeholder={`Ô ${ri + 1},${ci + 1}`} />
-        ))}<button type="button" className={styles.smallBtn} onClick={() => delRow(ri)}>✕</button></div>
+        ))}<button type="button" className={styles.smallBtn} onClick={() => delRow(ri)}><X size={17} /></button></div>
       ))}
       <button type="button" className={styles.addBtn} onClick={addRow}>+ Dòng</button>
     </div>
@@ -577,21 +840,28 @@ export function CTABlockEditor({ data, onChange }: EditorProps) {
   const d = data as { heading: string; text?: string; buttonText: string; buttonUrl: string; style: string; backgroundMediaId?: string; buttonStyle: string; buttonSize: string; buttonIcon: string | null };
   return (
     <div className={styles.editorBody}>
-      <Select value={d.style || "primary"} onChange={(v) => onChange({ ...data, style: v })} options={[
-        { label: "Chính", value: "primary" }, { label: "Phụ", value: "secondary" }, { label: "Tối giản", value: "minimal" },
-      ]} />
+      <FieldGroup title="Chủ đề CTA">
+        <IconGroup value={d.style || "blue"} onChange={(v) => onChange({ ...data, style: v })} options={[
+          { value: "blue", label: "Xanh", icon: <span className={styles.themeSwatch} style={{ background: "#1a73e8" }} /> },
+          { value: "green", label: "Lục", icon: <span className={styles.themeSwatch} style={{ background: "#059669" }} /> },
+          { value: "dark", label: "Tối", icon: <span className={styles.themeSwatch} style={{ background: "#0F172A" }} /> },
+          { value: "light", label: "Sáng", icon: <span className={styles.themeSwatch} style={{ background: "#F8FAFC", border: "1px solid #ccc" }} /> },
+          { value: "red", label: "Đỏ", icon: <span className={styles.themeSwatch} style={{ background: "#DC2626" }} /> },
+          { value: "minimal", label: "Minimal", icon: <span className={styles.themeSwatch} style={{ background: "transparent", border: "2px solid #3B82F6" }} /> },
+        ]} />
+      </FieldGroup>
       <TextInput value={d.heading || ""} onChange={(v) => onChange({ ...data, heading: v })} placeholder="Tiêu đề CTA" />
       <TextArea value={d.text || ""} onChange={(v) => onChange({ ...data, text: v })} placeholder="Mô tả" rows={2} />
       <div className={styles.inlineRow}>
         <TextInput value={d.buttonText || ""} onChange={(v) => onChange({ ...data, buttonText: v })} placeholder="Nút" />
         <TextInput value={d.buttonUrl || ""} onChange={(v) => onChange({ ...data, buttonUrl: v })} placeholder="URL" />
       </div>
-      <Select value={d.buttonStyle || "solid"} onChange={(v) => onChange({ ...data, buttonStyle: v })} options={[
-        { label: "Đặc", value: "solid" }, { label: "Viền", value: "outline" }, { label: "Ghost", value: "ghost" },
-      ]} />
-      <Select value={d.buttonSize || "md"} onChange={(v) => onChange({ ...data, buttonSize: v })} options={[
-        { label: "Nhỏ", value: "sm" }, { label: "Vừa", value: "md" }, { label: "Lớn", value: "lg" },
-      ]} />
+      <FieldGroup title="Kiểu nút">
+        <IconGroup value={d.buttonStyle || "solid"} onChange={(v) => onChange({ ...data, buttonStyle: v })} options={ICON_BTN_STYLE} />
+      </FieldGroup>
+      <FieldGroup title="Kích thước nút">
+        <IconGroup value={d.buttonSize || "md"} onChange={(v) => onChange({ ...data, buttonSize: v })} options={ICON_SIZE} />
+      </FieldGroup>
       <Field label="Icon nút"><IconPicker value={d.buttonIcon ?? null} onChange={(v) => onChange({ ...data, buttonIcon: v })} /></Field>
       <Field label="Ảnh nền (tùy chọn)"><MediaPicker value={d.backgroundMediaId || ""} onChange={(v) => onChange({ ...data, backgroundMediaId: v })} filter="image" /></Field>
     </div>
@@ -607,15 +877,15 @@ export function PricingTableEditor({ data, onChange }: EditorProps) {
     <div className={styles.editorBody}>
       <div className={styles.inlineRow}>
         <TextInput value={d.currency || "VNĐ"} onChange={(v) => onChange({ ...data, currency: v })} placeholder="Tiền tệ" />
-        <Select value={d.billingPeriod || "monthly"} onChange={(v) => onChange({ ...data, billingPeriod: v })} options={[{ label: "Tháng", value: "monthly" }, { label: "Năm", value: "yearly" }]} />
-        <Select value={d.layout || "horizontal"} onChange={(v) => onChange({ ...data, layout: v })} options={[{ label: "Ngang", value: "horizontal" }, { label: "Dọc", value: "vertical" }]} />
+        <LabelGroup value={d.billingPeriod || "monthly"} onChange={(v) => onChange({ ...data, billingPeriod: v })} options={[{ label: "Tháng", value: "monthly" }, { label: "Năm", value: "yearly" }]} />
+        <IconGroup value={d.layout || "horizontal"} onChange={(v) => onChange({ ...data, layout: v })} options={ICON_ORIENTATION} />
       </div>
       {d.plans.map((plan, i) => (
         <div key={i} className={styles.pricingPlan}>
           <div className={styles.pricingHeader}>
             <TextInput value={plan.name} onChange={(v) => updPlan(i, { ...plan, name: v })} placeholder="Tên gói" />
             <Toggle label="Nổi bật" value={plan.highlighted} onChange={(v) => updPlan(i, { ...plan, highlighted: v })} />
-            <button type="button" className={styles.smallBtn} onClick={() => delPlan(i)}>✕</button>
+            <button type="button" className={styles.smallBtn} onClick={() => delPlan(i)}><X size={17} /></button>
           </div>
           <div className={styles.inlineRow}>
             <TextInput value={plan.price} onChange={(v) => updPlan(i, { ...plan, price: v })} placeholder="Giá" />
@@ -626,7 +896,7 @@ export function PricingTableEditor({ data, onChange }: EditorProps) {
             {plan.features.map((f, fi) => (
               <div key={fi} className={styles.listRow}>
                 <TextInput value={f} onChange={(v) => { const feats = [...plan.features]; feats[fi] = v; updPlan(i, { ...plan, features: feats }); }} placeholder={`Tính năng ${fi + 1}`} />
-                <button type="button" className={styles.smallBtn} onClick={() => updPlan(i, { ...plan, features: plan.features.filter((_, idx) => idx !== fi) })}>✕</button>
+                <button type="button" className={styles.smallBtn} onClick={() => updPlan(i, { ...plan, features: plan.features.filter((_, idx) => idx !== fi) })}><X size={17} /></button>
               </div>
             ))}
             <button type="button" className={styles.addBtn} onClick={() => updPlan(i, { ...plan, features: [...plan.features, ""] })}>+ Thêm tính năng</button>
@@ -646,26 +916,30 @@ export function TestimonialEditor({ data, onChange }: EditorProps) {
   const d = data as { testimonialId: string; style: string; showAvatar: boolean; showRating: boolean; avatarSize: string; background: string };
   return (
     <div className={styles.editorBody}>
-      <Select value={d.style || "card"} onChange={(v) => onChange({ ...data, style: v })} options={[
-        { label: "Card", value: "card" }, { label: "Inline", value: "inline" }, { label: "Large", value: "large" },
-      ]} />
+      <FieldGroup title="Kiểu">
+        <LabelGroup value={d.style || "card"} onChange={(v) => onChange({ ...data, style: v })} options={[
+          { label: "Card", value: "card" }, { label: "Inline", value: "inline" }, { label: "Large", value: "large" },
+        ]} />
+      </FieldGroup>
       <Field label="Testimonial ID"><TextInput value={d.testimonialId || ""} onChange={(v) => onChange({ ...data, testimonialId: v })} placeholder="ID của testimonial" /></Field>
       <div className={styles.inlineRow}>
         <Toggle label="Hiện avatar" value={d.showAvatar ?? true} onChange={(v) => onChange({ ...data, showAvatar: v })} />
         <Toggle label="Hiện sao" value={d.showRating ?? true} onChange={(v) => onChange({ ...data, showRating: v })} />
       </div>
-      <Select value={d.avatarSize || "md"} onChange={(v) => onChange({ ...data, avatarSize: v })} options={[
-        { label: "Nhỏ", value: "sm" }, { label: "Vừa", value: "md" }, { label: "Lớn", value: "lg" },
-      ]} />
-      <Select value={d.background || "none"} onChange={(v) => onChange({ ...data, background: v })} options={[
-        { label: "Không nền", value: "none" }, { label: "Sáng", value: "light" }, { label: "Tối", value: "dark" }, { label: "Gradient", value: "gradient" },
-      ]} />
+      <FieldGroup title="Kích thước avatar">
+        <IconGroup value={d.avatarSize || "md"} onChange={(v) => onChange({ ...data, avatarSize: v })} options={ICON_SIZE} />
+      </FieldGroup>
+      <FieldGroup title="Nền">
+        <LabelGroup value={d.background || "none"} onChange={(v) => onChange({ ...data, background: v })} options={[
+          { label: "Không nền", value: "none" }, { label: "Sáng", value: "light" }, { label: "Tối", value: "dark" }, { label: "Gradient", value: "gradient" },
+        ]} />
+      </FieldGroup>
     </div>
   );
 }
 
 // ═══════════════════════════════════
-//  NESTED BLOCK LIST (for columns/tabs/accordion/collapse)
+//  NESTED BLOCK LIST
 // ═══════════════════════════════════
 
 const BLOCK_LABELS: Record<string, string> = {
@@ -678,26 +952,58 @@ const BLOCK_LABELS: Record<string, string> = {
 };
 
 function NestedBlockList({ blocks, onChange }: { blocks: any[]; onChange: (blocks: any[]) => void }) {
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const add = useCallback((type: string) => {
     const defaultData = getDefaultDataNested(type);
     onChange([...blocks, { id: crypto.randomUUID(), type, data: defaultData }]);
   }, [blocks, onChange]);
 
   const remove = useCallback((idx: number) => {
+    if (editingIdx === idx) setEditingIdx(null);
     onChange(blocks.filter((_, i) => i !== idx));
+  }, [blocks, onChange, editingIdx]);
+
+  const updateData = useCallback((idx: number, data: Record<string, unknown>) => {
+    const next = [...blocks];
+    next[idx] = { ...next[idx], data };
+    onChange(next);
   }, [blocks, onChange]);
 
   return (
     <div className={styles.nestedBlockList}>
       {blocks.map((b, i) => (
         <div key={b.id || i} className={styles.nestedBlockItem}>
-          <span className={styles.nestedBlockType}>{BLOCK_LABELS[b.type] || b.type}</span>
-          <button type="button" className={styles.smallBtn} onClick={() => remove(i)}>✕</button>
+          <div className={styles.nestedBlockHeader}>
+            <button type="button" className={styles.nestedBlockLabelBtn}
+              onClick={() => setEditingIdx(editingIdx === i ? null : i)}>
+              <span className={styles.nestedBlockType}>{BLOCK_LABELS[b.type] || b.type}</span>
+              <span className={styles.nestedChevron}>{editingIdx === i ? <ChevronDown size={10} /> : <ChevronRight size={10} />}</span>
+            </button>
+            <button type="button" className={styles.smallBtn} onClick={() => remove(i)}><X size={17} /></button>
+          </div>
+          {editingIdx === i && (
+            <div className={styles.nestedBlockEditor}>
+              {NestedBlockMiniEditor({ data: b.data, type: b.type, onChange: (d: Record<string, unknown>) => updateData(i, d) })}
+            </div>
+          )}
         </div>
       ))}
       <AddBlockMenu onSelect={add} />
     </div>
   );
+}
+
+const NESTED_EDITORS: Record<string, React.ComponentType<EditorProps>> = {
+  heading: HeadingEditor, paragraph: ParagraphEditor, quote: QuoteEditor,
+  list: ListEditor, code: CodeEditor, callout: CalloutEditor,
+  image: ImageEditor, video: VideoEditor, divider: DividerEditor,
+  spacer: SpacerEditor, cta: CTABlockEditor,
+};
+
+function NestedBlockMiniEditor({ data, type, onChange }: { data: Record<string, unknown>; type: string; onChange: (data: Record<string, unknown>) => void }) {
+  const Editor = NESTED_EDITORS[type];
+  if (!Editor) return <div className={styles.noConfig}>Không hỗ trợ config block: {type}</div>;
+  return <Editor data={data} onChange={onChange} />;
 }
 
 function AddBlockMenu({ onSelect }: { onSelect: (type: string) => void }) {
@@ -733,7 +1039,6 @@ function AddBlockMenu({ onSelect }: { onSelect: (type: string) => void }) {
 }
 
 function getDefaultDataNested(type: string): Record<string, unknown> {
-  // Simplified defaults — nested blocks don't support further nesting
   switch (type) {
     case "heading": return { level: 2, text: "", alignment: "left", weight: "bold", italic: false, underline: false, color: "inherit" };
     case "paragraph": return { text: "", alignment: "left", dropCap: false, fontSize: "md", lineHeight: "normal", weight: "regular", color: "inherit" };
@@ -745,7 +1050,7 @@ function getDefaultDataNested(type: string): Record<string, unknown> {
     case "video": return { mediaId: "", aspectRatio: "16:9", rounded: "none", shadow: "none", autoplay: false, loop: false, showControls: true, thumbnail: "" };
     case "divider": return { style: "solid" };
     case "spacer": return { height: 40 };
-    case "cta": return { heading: "", buttonText: "", buttonUrl: "", style: "primary", buttonStyle: "solid", buttonSize: "md", buttonIcon: null };
+    case "cta": return { heading: "", buttonText: "", buttonUrl: "", style: "blue", buttonStyle: "solid", buttonSize: "md", buttonIcon: null };
     default: return {};
   }
 }

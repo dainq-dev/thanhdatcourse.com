@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+import { resolveMediaUrl } from "@/lib/media-url";
 import styles from "./ImageBlock.module.scss";
 import type React from "react";
 
@@ -18,19 +22,27 @@ export function ImageBlock({ data }: {
     hoverZoom: boolean; link?: string; objectFit: string;
   };
 }) {
+  const [failed, setFailed] = useState(false);
   const style: React.CSSProperties = {
     borderRadius: ROUNDED_MAP[data.rounded || "none"],
     border: BORDER_MAP[data.border || "none"],
     boxShadow: SHADOW_MAP[data.shadow || "none"],
     overflow: "hidden",
   };
-
+  const src = resolveMediaUrl(data.mediaId, "medium");
+  if (!data.mediaId || failed) {
+    return (
+      <figure className={`${styles.figure} ${styles[data.width || "wide"]}`} style={style}>
+        <div className={styles.placeholder}>Chưa chọn ảnh</div>
+      </figure>
+    );
+  }
   const img = (
     <img className={`${styles.img} ${data.hoverZoom ? styles.hoverZoom : ""}`}
-      src={`/api/media/${data.mediaId}/file`} alt={data.alt || ""} loading="lazy"
-      style={{ objectFit: data.objectFit || "cover" as any }} />
+      src={src} alt={data.alt || ""} loading="lazy"
+      style={{ objectFit: (data.objectFit || "cover") as React.CSSProperties["objectFit"] }}
+      onError={() => setFailed(true)} />
   );
-
   return (
     <figure className={`${styles.figure} ${styles[data.width || "wide"]}`} style={style}>
       {data.link ? <a href={data.link} target="_blank" rel="noopener noreferrer">{img}</a> : img}

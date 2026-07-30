@@ -7,6 +7,7 @@ export function VideoBlock({
     mediaId: string; caption?: string; aspectRatio: string;
     rounded: string; shadow: string; autoplay: boolean; loop: boolean;
     showControls: boolean; thumbnail?: string;
+    source?: string; diskPath?: string;
   };
 }) {
   const ratioClass = {
@@ -16,17 +17,37 @@ export function VideoBlock({
 
   const ROUNDED: Record<string, string> = { none: "0", sm: "4px", md: "8px", lg: "16px", full: "9999px" };
 
-  const youtubeId = data.mediaId;
+  const isYoutube = data.source === "youtube" || (!data.source && !data.diskPath && data.mediaId);
   const query = [data.autoplay && "autoplay=1", data.loop && "loop=1", !data.showControls && "controls=0"].filter(Boolean).join("&");
+
+  if (!data.mediaId) {
+    return (
+      <figure className={styles.figure} style={{ borderRadius: ROUNDED[data.rounded || "none"], overflow: "hidden" }}>
+        <div className={`${styles.wrapper} ${ratioClass}`}>
+          <div className={styles.placeholder}>Chưa chọn video</div>
+        </div>
+      </figure>
+    );
+  }
 
   return (
     <figure className={styles.figure} style={{ borderRadius: ROUNDED[data.rounded || "none"], overflow: "hidden" }}>
       <div className={`${styles.wrapper} ${ratioClass}`}>
-        <iframe className={styles.iframe}
-          src={`https://www.youtube.com/embed/${youtubeId}${query ? `?${query}` : ""}`}
-          title={data.caption || "Video"}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen />
+        {isYoutube ? (
+          <iframe className={styles.iframe}
+            src={`https://www.youtube.com/embed/${data.mediaId}${query ? `?${query}` : ""}`}
+            title={data.caption || "Video"}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen />
+        ) : (
+          <video className={styles.iframe}
+            src={`/raw/${(data.diskPath || "").replace("data/uploads/", "")}`}
+            autoPlay={data.autoplay}
+            loop={data.loop}
+            controls={data.showControls ?? true}
+            poster={data.thumbnail}
+          />
+        )}
       </div>
       {data.caption && <figcaption className={styles.caption}>{data.caption}</figcaption>}
     </figure>

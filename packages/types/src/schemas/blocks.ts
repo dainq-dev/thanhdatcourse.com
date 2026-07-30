@@ -113,7 +113,7 @@ export const CalloutBlock = BaseBlock.extend({
 export const ImageBlock = BaseBlock.extend({
   type: z.literal("image"),
   data: z.object({
-    mediaId: z.string().uuid(),
+    mediaId: z.string(),
     alt: z.string().optional().default(""),
     caption: z.string().optional().default(""),
     width: z.enum(["full", "wide", "contained", "inline"]).default("wide"),
@@ -293,6 +293,7 @@ export const TableBlock = BaseBlock.extend({
     rows: z.array(z.array(z.string())),
     striped: z.boolean().default(true),
     compact: z.boolean().default(false),
+    theme: z.string().default("classic"),
   }),
 });
 
@@ -305,7 +306,7 @@ export const CTABlock = BaseBlock.extend({
     text: z.string().optional().default(""),
     buttonText: z.string(),
     buttonUrl: z.string(),
-    style: z.enum(["primary", "secondary", "minimal"]).default("primary"),
+    style: z.string().default("blue"),
     backgroundMediaId: z.string().optional().default(""),
     buttonStyle: z.enum(["solid", "outline", "ghost"]).default("solid"),
     buttonSize: z.enum(["sm", "md", "lg"]).default("md"),
@@ -549,6 +550,7 @@ export type Block =
         rows: string[][];
         striped: boolean;
         compact: boolean;
+        theme: string;
       };
     }
   | {
@@ -559,7 +561,7 @@ export type Block =
         text?: string;
         buttonText: string;
         buttonUrl: string;
-        style: "primary" | "secondary" | "minimal";
+        style: string;
         backgroundMediaId?: string;
         buttonStyle: "solid" | "outline" | "ghost";
         buttonSize: "sm" | "md" | "lg";

@@ -44,10 +44,10 @@ export function getDefaultData(type: Block["type"]): Record<string, unknown> {
     case "timeline":
       return { events: [{ date: "", title: "", description: "" }], layout: "vertical", iconPerEvent: null, lineColor: "--color-border" };
     case "table":
-      return { headers: ["Cột 1", "Cột 2"], rows: [["", ""]], striped: true, compact: false };
+      return { headers: ["Cột 1", "Cột 2"], rows: [["", ""]], striped: true, compact: false, theme: "classic" };
     // ── Conversion ──
     case "cta":
-      return { heading: "", buttonText: "", buttonUrl: "", style: "primary", buttonStyle: "solid", buttonSize: "md", buttonIcon: null };
+      return { heading: "", buttonText: "", buttonUrl: "", style: "blue", buttonStyle: "solid", buttonSize: "md", buttonIcon: null };
     case "pricingTable":
       return { plans: [], currency: "VNĐ", billingPeriod: "monthly", layout: "horizontal" };
     case "testimonial":

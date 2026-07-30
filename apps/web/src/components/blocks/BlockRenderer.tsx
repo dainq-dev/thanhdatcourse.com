@@ -5,7 +5,7 @@ import { TestimonialBlock } from "./conversion/TestimonialBlock";
 import { AccordionBlock } from "./interactive/AccordionBlock";
 import { CollapseBlock } from "./interactive/CollapseBlock";
 import { TableBlock } from "./interactive/TableBlock";
-import { TabsBlock } from "./interactive/TabsBlock";
+import { TabsBlock } from "./layout/TabsBlock";
 import { TimelineBlock } from "./interactive/TimelineBlock";
 import { ColumnsBlock } from "./layout/ColumnsBlock";
 import { DividerBlock } from "./layout/DividerBlock";

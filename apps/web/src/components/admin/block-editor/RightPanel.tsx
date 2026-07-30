@@ -1,6 +1,9 @@
 "use client";
 
 import type { Block } from "@workspace/types";
+import { BlockRenderer } from "@/components/blocks/BlockRenderer";
+import { ChevronUp, ChevronDown, Copy, Trash2, RotateCcw } from "lucide-react";
+import { getDefaultData } from "./editorState";
 import styles from "./workspace.module.scss";
 import {
   HeadingEditor,
@@ -26,6 +29,7 @@ import {
   AccordionEditor,
   CollapseEditor,
 } from "./block-editors";
+import { BLOCK_LABELS } from "./LeftPanel";
 
 const EDITORS: Record<string, React.ComponentType<{ data: Record<string, unknown>; onChange: (data: Record<string, unknown>) => void }>> = {
   heading: HeadingEditor, paragraph: ParagraphEditor, quote: QuoteEditor,
@@ -46,9 +50,10 @@ interface Props {
   onDuplicate: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onReset: () => void;
 }
 
-export function RightPanel({ block, onChange, onDelete, onDuplicate, onMoveUp, onMoveDown }: Props) {
+export function RightPanel({ block, onChange, onDelete, onDuplicate, onMoveUp, onMoveDown, onReset }: Props) {
   if (!block) {
     return (
       <div className={styles.rightPanel}>
@@ -57,7 +62,6 @@ export function RightPanel({ block, onChange, onDelete, onDuplicate, onMoveUp, o
         </div>
         <div className={styles.panelBody}>
           <div className={styles.noSelection}>
-            <div className={styles.noSelectionIcon}>⚙</div>
             <p>Chọn một block để cấu hình</p>
           </div>
         </div>
@@ -74,12 +78,23 @@ export function RightPanel({ block, onChange, onDelete, onDuplicate, onMoveUp, o
       </div>
       <div className={styles.panelBody}>
         <div className={styles.blockInfo}>
-          <span className={styles.blockInfoType}>{block.type}</span>
+          <span className={styles.blockInfoType}>{BLOCK_LABELS[block.type]}</span>
           <div className={styles.blockInfoActions}>
-            <button type="button" className={styles.iconBtn} onClick={onMoveUp} title="Lên trên">▲</button>
-            <button type="button" className={styles.iconBtn} onClick={onMoveDown} title="Xuống dưới">▼</button>
-            <button type="button" className={styles.iconBtn} onClick={onDuplicate} title="Nhân đôi">⧉</button>
-            <button type="button" className={styles.iconBtnDanger} onClick={onDelete} title="Xóa">✕</button>
+            <button type="button" className={styles.iconBtn} onClick={onMoveUp} title="Di chuyển lên trên">
+              <ChevronUp size={17} />
+            </button>
+            <button type="button" className={styles.iconBtn} onClick={onMoveDown} title="Di chuyển xuống dưới">
+              <ChevronDown size={17} />
+            </button>
+            <button type="button" className={styles.iconBtn} onClick={onDuplicate} title="Nhân đôi block">
+              <Copy size={17} />
+            </button>
+            <button type="button" className={styles.iconBtn} onClick={onReset} title="Reset về mặc định">
+              <RotateCcw size={17} />
+            </button>
+            <button type="button" className={styles.iconBtnDanger} onClick={onDelete} title="Xóa block">
+              <Trash2 size={17} />
+            </button>
           </div>
         </div>
 

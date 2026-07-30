@@ -12,9 +12,10 @@ interface Props {
   filter?: MediaFilter;
   accept?: string;
   value?: string;
+  multi?: boolean;
 }
 
-export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = "all", accept, value }: Props) {
+export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = "all", accept, value, multi }: Props) {
   const [items, setItems] = useState<MediaFile[]>([]);
   const [filter, setFilter] = useState<MediaFilter>(defaultFilter);
   const [search, setSearch] = useState("");
@@ -24,6 +25,7 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [multiSelected, setMultiSelected] = useState<Set<string>>(new Set());
   const [previewFile, setPreviewFile] = useState<MediaFile | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,8 +86,25 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
   };
 
   const handlePick = (file: MediaFile) => {
+    if (multi) {
+      setMultiSelected((prev) => {
+        const next = new Set(prev);
+        if (next.has(file.id)) next.delete(file.id); else next.add(file.id);
+        return next;
+      });
+      return;
+    }
     setSelectedId(file.id);
     onSelect(getMediaUrl(file));
+    onClose();
+  };
+
+  const handleMultiConfirm = () => {
+    if (multiSelected.size === 0) return;
+    const urls = items
+      .filter((f) => multiSelected.has(f.id))
+      .map((f) => getMediaUrl(f));
+    onSelect(urls.join("\n"));
     onClose();
   };
 
@@ -143,6 +162,20 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
 
         {error && <div className={styles.errorBar}>{error}</div>}
 
+        {/* Multi-select bar */}
+        {multi && multiSelected.size > 0 && (
+          <div className={styles.previewBar}>
+            <div className={styles.previewBarInfo}>
+              <strong>Đã chọn {multiSelected.size} file</strong>
+            </div>
+            <div className={styles.previewBarActions}>
+              <button className={styles.actionBtn} onClick={handleMultiConfirm} type="button">
+                ✓ Xác nhận
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Grid */}
         {loading ? (
           <div className={styles.loadingGrid}>
@@ -161,14 +194,14 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
               {items.map((file) => {
                 const url = getMediaUrl(file);
                 const isImage = file.mimeType?.startsWith("image/");
-                const isSelected = selectedId === file.id || value === url;
+                const isSelected = multi ? multiSelected.has(file.id) : selectedId === file.id || value === url;
 
                 return (
                   <button
                     key={file.id}
                     className={`${styles.gridItem} ${isSelected ? styles.gridItemSelected : ""}`}
-                    onClick={() => setPreviewFile(file)}
-                    onDoubleClick={() => handlePick(file)}
+                    onClick={() => multi ? handlePick(file) : setPreviewFile(file)}
+                    onDoubleClick={() => !multi && handlePick(file)}
                     type="button"
                   >
                     {isImage || file.source === "youtube" ? (

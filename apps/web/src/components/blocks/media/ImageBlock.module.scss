@@ -6,3 +6,4 @@
 .contained { max-width: 100%; .img { max-width: 100%; height: auto; } }
 .inline { display: inline-block; max-width: 40%; .img { max-width: 100%; height: auto; } }
 .caption { margin-top: 0.5em; font-size: 0.875em; color: #94A3B8; text-align: center; font-style: italic; }
+.placeholder { display: flex; align-items: center; justify-content: center; min-height: 200px; background: #f1f5f9; color: #94a3b8; font-size: 0.8125rem; border-radius: 4px; }

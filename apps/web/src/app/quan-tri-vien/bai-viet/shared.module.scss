@@ -1,0 +1,21 @@
+.wrapper { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; background: #f0f0f0; }
+.errorBar { background: #FEF2F2; border-bottom: 1px solid #FECACA; color: #C53030; padding: 8px 16px; font-size: 0.85em; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; button { background: none; border: none; color: #c53030; cursor: pointer; font-size: 1em; padding: 2px 6px; } }
+.editorArea { flex: 1; overflow: hidden; }
+.titleArea { padding: 16px 24px 12px; background: #fff; }
+.titleInput { width: 100%; padding: 8px 0; border: none; font-size: 1.5rem; font-weight: 700; color: #1a1a1a; outline: none; font-family: inherit; background: transparent; &::placeholder { color: #ccc; font-weight: 700; } }
+
+.infoPanel { display: flex; flex-direction: column; gap: 14px; }
+.infoField { display: flex; flex-direction: column; gap: 4px; }
+.infoLabel { font-size: 0.7em; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
+.infoInput { width: 100%; padding: 8px 10px; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 0.85em; color: #1a1a1a; outline: none; font-family: inherit; box-sizing: border-box; &:focus { border-color: #06a84c; } &::placeholder { color: #bbb; } }
+.infoInputSm { composes: infoInput; padding: 6px 8px; font-size: 0.8em; }
+.infoTextarea { composes: infoInput; resize: vertical; min-height: 64px; }
+.thumbPreview { margin-top: 6px; max-width: 100%; border-radius: 4px; border: 1px solid #e0e0e0; }
+.infoHint { font-size: 0.7em; color: #aaa; margin-top: 2px; }
+.infoReadonly { font-size: 0.85em; color: #555; padding: 8px 10px; background: #f5f5f3; border-radius: 4px; font-weight: 500; }
+
+.addCatRow { display: flex; gap: 4px; align-items: center; margin-top: 4px; .infoInputSm { flex: 1; } }
+.addCatBtn { padding: 6px 12px; background: #06a84c; color: #fff; border: none; border-radius: 4px; font-size: 1em; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; &:hover:not(:disabled) { background: #059645; } &:disabled { opacity: 0.5; cursor: default; } }
+
+.deleteBtn { width: 100%; padding: 10px 12px; background: #fff; border: 1px solid #FECACA; color: #C53030; border-radius: 6px; font-size: 0.85em; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; &:hover { background: #FEF2F2; } }
+.backBtn { width: 100%; padding: 10px 12px; background: #fff; border: 1px solid #e0e0e0; color: #666; border-radius: 6px; font-size: 0.85em; cursor: pointer; font-family: inherit; margin-top: 8px; transition: all 0.15s; &:hover { border-color: #aaa; color: #333; } }

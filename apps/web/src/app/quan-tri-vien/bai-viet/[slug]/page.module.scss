@@ -5,6 +5,7 @@
 .titleInput { width: 100%; padding: 0.75rem 1rem; background: #1E293B; border: 1px solid #334155; border-radius: 8px; color: #F1F5F9; font-size: 1.125rem; font-family: inherit; font-weight: 600; outline: none; transition: border-color 0.15s; &::placeholder { color: #64748B; } &:focus { border-color: #3B82F6; } }
 .metaRow { display: flex; gap: 8px; }
 .slugInput { padding: 0.5rem 0.75rem; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: #F1F5F9; font-size: 0.75rem; font-family: inherit; outline: none; flex: 1; transition: border-color 0.15s; &::placeholder { color: #64748B; } &:focus { border-color: #3B82F6; } }
+.readTimeDisplay { padding: 0.5rem 0.75rem; color: #94A3B8; font-size: 0.75rem; white-space: nowrap; display: flex; align-items: center; }
 
 .infoField { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
 .infoLabel { font-size: 0.6875rem; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; }

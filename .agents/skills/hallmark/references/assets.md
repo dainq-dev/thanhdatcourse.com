@@ -65,11 +65,11 @@ When imagery is needed *and* the user hasn't supplied real assets, pick from thi
 ```jsx
 // Lucide — React (most common)
 import { ArrowRight, Check, X } from "lucide-react";
-<ArrowRight size={20} strokeWidth={2} />
+<ArrowRight size={17} strokeWidth={2} />
 
 // Phosphor — React, with weight prop
 import { ArrowRight } from "@phosphor-icons/react";
-<ArrowRight size={20} weight="regular" />
+<ArrowRight size={17} weight="regular" />
 
 // Heroicons — React or static HTML
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
