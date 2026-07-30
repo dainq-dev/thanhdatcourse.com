@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const CourseSchema = z.object({
   id: z.string(),
@@ -32,7 +32,7 @@ export const CourseModuleSchema = z.object({
     z.object({
       title: z.string(),
       duration: z.string().optional(),
-    })
+    }),
   ),
 });
 

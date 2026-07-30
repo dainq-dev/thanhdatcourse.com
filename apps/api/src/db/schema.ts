@@ -1,4 +1,10 @@
-import { sqliteTable, text, integer, real, primaryKey } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  primaryKey,
+  real,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 export const siteSettings = sqliteTable("site_settings", {
   key: text("key").primaryKey(),
@@ -8,7 +14,9 @@ export const siteSettings = sqliteTable("site_settings", {
 });
 
 export const users = sqliteTable("users", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash"),
   name: text("name").notNull(),
@@ -19,7 +27,9 @@ export const users = sqliteTable("users", {
 });
 
 export const courses = sqliteTable("courses", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
   subtitle: text("subtitle"),
@@ -46,7 +56,9 @@ export const courses = sqliteTable("courses", {
 });
 
 export const courseModules = sqliteTable("course_modules", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   courseId: text("course_id")
     .notNull()
     .references(() => courses.id, { onDelete: "cascade" }),
@@ -57,7 +69,9 @@ export const courseModules = sqliteTable("course_modules", {
 });
 
 export const courseLessons = sqliteTable("course_lessons", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   moduleId: text("module_id")
     .notNull()
     .references(() => courseModules.id, { onDelete: "cascade" }),
@@ -74,7 +88,9 @@ export const courseLessons = sqliteTable("course_lessons", {
 });
 
 export const courseBonuses = sqliteTable("course_bonuses", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   courseId: text("course_id")
     .notNull()
     .references(() => courses.id, { onDelete: "cascade" }),
@@ -85,7 +101,9 @@ export const courseBonuses = sqliteTable("course_bonuses", {
 });
 
 export const instructors = sqliteTable("instructors", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   title: text("title"),
   bio: text("bio"),
@@ -109,11 +127,13 @@ export const courseInstructors = sqliteTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.courseId, table.instructorId] }),
-  })
+  }),
 );
 
 export const testimonials = sqliteTable("testimonials", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   courseId: text("course_id").references(() => courses.id, {
     onDelete: "set null",
   }),
@@ -129,13 +149,17 @@ export const testimonials = sqliteTable("testimonials", {
 });
 
 export const postCategories = sqliteTable("post_categories", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
 });
 
 export const posts = sqliteTable("posts", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   categoryId: text("category_id").references(() => postCategories.id, {
     onDelete: "set null",
   }),
@@ -155,12 +179,13 @@ export const posts = sqliteTable("posts", {
 });
 
 export const portfolios = sqliteTable("portfolios", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   title: text("title").notNull(),
   description: text("description"),
   category: text("category").notNull(),
   thumbnailUrl: text("thumbnail_url"),
-  previewVideoUrl: text("preview_video_url"),
   fullVideoUrl: text("full_video_url"),
   youtubeVideoId: text("youtube_video_id"),
   isFeaturedOnHome: integer("is_featured_on_home").notNull().default(0),
@@ -169,7 +194,9 @@ export const portfolios = sqliteTable("portfolios", {
 });
 
 export const digitalProducts = sqliteTable("digital_products", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   title: text("title").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(),
@@ -185,7 +212,9 @@ export const digitalProducts = sqliteTable("digital_products", {
 });
 
 export const faqs = sqliteTable("faqs", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   courseId: text("course_id").references(() => courses.id, {
     onDelete: "set null",
   }),
@@ -195,7 +224,9 @@ export const faqs = sqliteTable("faqs", {
 });
 
 export const leads = sqliteTable("leads", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   courseId: text("course_id").references(() => courses.id, {
     onDelete: "set null",
   }),
@@ -209,7 +240,9 @@ export const leads = sqliteTable("leads", {
 });
 
 export const promotions = sqliteTable("promotions", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   courseId: text("course_id").references(() => courses.id, {
     onDelete: "set null",
   }),
@@ -221,7 +254,9 @@ export const promotions = sqliteTable("promotions", {
 });
 
 export const productShowcases = sqliteTable("product_showcases", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   productId: text("product_id")
     .notNull()
     .references(() => digitalProducts.id, { onDelete: "cascade" }),

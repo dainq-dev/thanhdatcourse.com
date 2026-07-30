@@ -1,0 +1,39 @@
+.root {
+  margin: 1em 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1e1e2e;
+  color: #cdd6f4;
+}
+
+.pre {
+  margin: 0;
+  padding: 1em 1.25em;
+  overflow-x: auto;
+  font-family: "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
+  font-size: 0.9em;
+  line-height: 1.6;
+}
+
+.code {
+  display: block;
+}
+
+.lineNumbers {
+  counter-reset: line;
+
+  .code {
+    display: block;
+    counter-increment: line;
+
+    &::before {
+      content: counter(line);
+      display: inline-block;
+      width: 2em;
+      margin-right: 1em;
+      text-align: right;
+      color: #585b70;
+      user-select: none;
+    }
+  }
+}

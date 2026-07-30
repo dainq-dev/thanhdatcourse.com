@@ -1,4 +1,4 @@
-import styles from './TestimonialCard.module.scss';
+import styles from "./TestimonialCard.module.scss";
 
 interface TestimonialCardProps {
   name: string;
@@ -13,12 +13,16 @@ export function TestimonialCard({
   role,
   quote,
   avatar,
-  className = '',
+  className = "",
 }: TestimonialCardProps) {
   return (
     <figure className={`${styles.card} ${className}`}>
       <div className={styles.avatar}>
-        {avatar ? <img src={avatar} alt={name} loading="lazy" /> : name.charAt(0)}
+        {avatar ? (
+          <img src={avatar} alt={name} loading="lazy" />
+        ) : (
+          name.charAt(0)
+        )}
       </div>
       <blockquote className={styles.quote}>"{quote}"</blockquote>
       <figcaption>

@@ -1,14 +1,21 @@
-'use client';
+"use client";
 
-import { useSiteHeader } from './SiteHeader.logic';
-import styles from './SiteHeader.module.scss';
+import { useSiteHeader } from "./SiteHeader.logic";
+import styles from "./SiteHeader.module.scss";
 
 export function SiteHeader() {
-  const { navItems, lmsUrl, pathname, mobileOpen, scrolled, closeMobile, toggleMobile } =
-    useSiteHeader();
+  const {
+    navItems,
+    lmsUrl,
+    pathname,
+    mobileOpen,
+    scrolled,
+    closeMobile,
+    toggleMobile,
+  } = useSiteHeader();
 
   return (
-    <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
+    <header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.inner}>
         <a href="/" className={styles.logo}>
           <img
@@ -18,12 +25,12 @@ export function SiteHeader() {
           />
         </a>
 
-        <nav className={`${styles.nav} ${mobileOpen ? styles.navOpen : ''}`}>
+        <nav className={`${styles.nav} ${mobileOpen ? styles.navOpen : ""}`}>
           {navItems.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
+              className={`${styles.navLink} ${pathname === item.href ? styles.active : ""}`}
               onClick={closeMobile}
             >
               {item.label}
@@ -32,10 +39,16 @@ export function SiteHeader() {
         </nav>
 
         <div className={styles.actions}>
-          <a href={lmsUrl} className={styles.ctaButton} target="_blank" rel="noopener noreferrer">
+          <a
+            href={lmsUrl}
+            className={styles.ctaButton}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             VÀO HỌC
           </a>
           <button
+            type="button"
             className={styles.hamburger}
             onClick={toggleMobile}
             aria-label="Toggle menu"

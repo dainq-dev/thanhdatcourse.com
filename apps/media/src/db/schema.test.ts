@@ -1,16 +1,18 @@
-import { describe, test, expect, beforeAll } from "bun:test";
 import { Database } from "bun:sqlite";
-import { drizzle } from "drizzle-orm/bun-sqlite";
+import { beforeAll, describe, expect, test } from "bun:test";
 import { unlinkSync } from "node:fs";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+
+type RawRow = Record<string, unknown>;
 import { media, mediaVariants } from "./schema";
 
-let db: ReturnType<typeof drizzle>;
+let _db: ReturnType<typeof drizzle>;
 let rawDb: Database;
 
 beforeAll(() => {
   rawDb = new Database(":memory:");
   rawDb.run("PRAGMA foreign_keys = ON");
-  db = drizzle(rawDb, { logger: false });
+  _db = drizzle(rawDb, { logger: false });
 
   rawDb.run(`CREATE TABLE IF NOT EXISTS media (
     id TEXT PRIMARY KEY,
@@ -41,7 +43,9 @@ beforeAll(() => {
     created_at TEXT
   )`);
 
-  rawDb.run(`CREATE UNIQUE INDEX IF NOT EXISTS unique_variant ON media_variants(media_id, name)`);
+  rawDb.run(
+    `CREATE UNIQUE INDEX IF NOT EXISTS unique_variant ON media_variants(media_id, name)`,
+  );
 });
 
 describe("Schema — Table Definitions", () => {
@@ -80,7 +84,7 @@ describe("Schema — Table Definitions", () => {
     const tables = rawDb
       .query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
       .all()
-      .map((r: any) => r.name);
+      .map((r: { name: string }) => r.name);
     expect(tables).toContain("media");
     expect(tables).toContain("media_variants");
   });
@@ -88,8 +92,8 @@ describe("Schema — Table Definitions", () => {
 
 describe("Schema — Table Columns", () => {
   test("media table has correct columns", () => {
-    const cols = rawDb.query("PRAGMA table_info(media)").all() as any[];
-    const colNames = cols.map((c: any) => c.name);
+    const cols = rawDb.query("PRAGMA table_info(media)").all() as RawRow[];
+    const colNames = cols.map((c: { name: string }) => c.name);
     expect(colNames).toContain("id");
     expect(colNames).toContain("original_name");
     expect(colNames).toContain("stored_name");
@@ -107,15 +111,17 @@ describe("Schema — Table Columns", () => {
   });
 
   test("media source column has default 'upload'", () => {
-    const cols = rawDb.query("PRAGMA table_info(media)").all() as any[];
-    const sourceCol = cols.find((c: any) => c.name === "source");
+    const cols = rawDb.query("PRAGMA table_info(media)").all() as RawRow[];
+    const sourceCol = cols.find((c: { name: string }) => c.name === "source");
     expect(sourceCol).toBeDefined();
     expect(sourceCol.dflt_value).toContain("upload");
   });
 
   test("media_variants table has correct columns", () => {
-    const cols = rawDb.query("PRAGMA table_info(media_variants)").all() as any[];
-    const colNames = cols.map((c: any) => c.name);
+    const cols = rawDb
+      .query("PRAGMA table_info(media_variants)")
+      .all() as RawRow[];
+    const colNames = cols.map((c: { name: string }) => c.name);
     expect(colNames).toContain("id");
     expect(colNames).toContain("media_id");
     expect(colNames).toContain("name");
@@ -134,10 +140,20 @@ describe("Schema — Insert + Select", () => {
     rawDb.run(
       `INSERT INTO media (id, original_name, stored_name, mime_type, file_size, width, height, source, disk_path)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id, "photo.jpg", "abc123.webp", "image/webp", 45000, 800, 600, "upload", "/data/uploads/abc123.webp"]
+      [
+        id,
+        "photo.jpg",
+        "abc123.webp",
+        "image/webp",
+        45000,
+        800,
+        600,
+        "upload",
+        "/data/uploads/abc123.webp",
+      ],
     );
 
-    const row = rawDb.query(`SELECT * FROM media WHERE id = ?`).get(id) as any;
+    const row = rawDb.query(`SELECT * FROM media WHERE id = ?`).get(id) as RawRow;
     expect(row).not.toBeNull();
     expect(row.original_name).toBe("photo.jpg");
     expect(row.stored_name).toBe("abc123.webp");
@@ -156,10 +172,19 @@ describe("Schema — Insert + Select", () => {
     rawDb.run(
       `INSERT INTO media (id, original_name, stored_name, mime_type, file_size, source, youtube_id, alt_text, disk_path)
        VALUES (?, ?, ?, ?, ?, 'youtube', ?, ?, ?)`,
-      [id, "video-thumb.jpg", "yt-abc.jpg", "image/jpeg", 12000, "dQw4w9WgXcQ", "Rick Astley", "/data/uploads/yt-abc.jpg"]
+      [
+        id,
+        "video-thumb.jpg",
+        "yt-abc.jpg",
+        "image/jpeg",
+        12000,
+        "dQw4w9WgXcQ",
+        "Rick Astley",
+        "/data/uploads/yt-abc.jpg",
+      ],
     );
 
-    const row = rawDb.query(`SELECT * FROM media WHERE id = ?`).get(id) as any;
+    const row = rawDb.query(`SELECT * FROM media WHERE id = ?`).get(id) as RawRow;
     expect(row).not.toBeNull();
     expect(row.source).toBe("youtube");
     expect(row.youtube_id).toBe("dQw4w9WgXcQ");
@@ -175,16 +200,34 @@ describe("Schema — Insert + Select", () => {
     rawDb.run(
       `INSERT INTO media (id, original_name, stored_name, mime_type, file_size, disk_path)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [mediaId, "img.png", "img.webp", "image/webp", 50000, "/data/uploads/img.webp"]
+      [
+        mediaId,
+        "img.png",
+        "img.webp",
+        "image/webp",
+        50000,
+        "/data/uploads/img.webp",
+      ],
     );
 
     rawDb.run(
       `INSERT INTO media_variants (id, media_id, name, width, height, format, file_size, disk_path)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [variantId, mediaId, "thumbnail", 150, 113, "webp", 8000, "/data/variants/img-thumb.webp"]
+      [
+        variantId,
+        mediaId,
+        "thumbnail",
+        150,
+        113,
+        "webp",
+        8000,
+        "/data/variants/img-thumb.webp",
+      ],
     );
 
-    const row = rawDb.query(`SELECT * FROM media_variants WHERE id = ?`).get(variantId) as any;
+    const row = rawDb
+      .query(`SELECT * FROM media_variants WHERE id = ?`)
+      .get(variantId) as RawRow;
     expect(row).not.toBeNull();
     expect(row.media_id).toBe(mediaId);
     expect(row.name).toBe("thumbnail");
@@ -203,26 +246,35 @@ describe("Schema — Insert + Select", () => {
     rawDb.run(
       `INSERT INTO media (id, original_name, stored_name, mime_type, file_size, disk_path)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [mediaId, "hero.jpg", "hero.webp", "image/webp", 100000, "/data/uploads/hero.webp"]
+      [
+        mediaId,
+        "hero.jpg",
+        "hero.webp",
+        "image/webp",
+        100000,
+        "/data/uploads/hero.webp",
+      ],
     );
 
     rawDb.run(
       `INSERT INTO media_variants (id, media_id, name, width, format, file_size, disk_path)
        VALUES (?, ?, 'thumbnail', 150, 'webp', 5000, '/thumbs/thumb.webp')`,
-      [crypto.randomUUID(), mediaId]
+      [crypto.randomUUID(), mediaId],
     );
     rawDb.run(
       `INSERT INTO media_variants (id, media_id, name, width, format, file_size, disk_path)
        VALUES (?, ?, 'medium', 600, 'webp', 30000, '/thumbs/med.webp')`,
-      [crypto.randomUUID(), mediaId]
+      [crypto.randomUUID(), mediaId],
     );
     rawDb.run(
       `INSERT INTO media_variants (id, media_id, name, width, format, file_size, disk_path)
        VALUES (?, ?, 'large', 1200, 'webp', 80000, '/thumbs/large.webp')`,
-      [crypto.randomUUID(), mediaId]
+      [crypto.randomUUID(), mediaId],
     );
 
-    const rows = rawDb.query(`SELECT * FROM media_variants WHERE media_id = ?`).all(mediaId) as any[];
+    const rows = rawDb
+      .query(`SELECT * FROM media_variants WHERE media_id = ?`)
+      .all(mediaId) as RawRow[];
     expect(rows.length).toBe(3);
 
     rawDb.run(`DELETE FROM media_variants`);
@@ -236,7 +288,7 @@ describe("Schema — Foreign Key Constraints", () => {
       rawDb.run(
         `INSERT INTO media_variants (id, media_id, name, width, format, file_size, disk_path)
          VALUES (?, 'nonexistent', 'thumb', 100, 'webp', 1000, '/tmp/v.webp')`,
-        [crypto.randomUUID()]
+        [crypto.randomUUID()],
       );
     }).toThrow();
   });
@@ -246,16 +298,18 @@ describe("Schema — Foreign Key Constraints", () => {
     rawDb.run(
       `INSERT INTO media (id, original_name, stored_name, mime_type, file_size, disk_path)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [mediaId, "test.jpg", "test.webp", "image/webp", 1000, "/data/test.webp"]
+      [mediaId, "test.jpg", "test.webp", "image/webp", 1000, "/data/test.webp"],
     );
 
     rawDb.run(
       `INSERT INTO media_variants (id, media_id, name, width, format, file_size, disk_path)
        VALUES (?, ?, 'thumb', 100, 'webp', 500, '/tmp/thumb.webp')`,
-      [crypto.randomUUID(), mediaId]
+      [crypto.randomUUID(), mediaId],
     );
 
-    const row = rawDb.query(`SELECT * FROM media_variants WHERE media_id = ?`).get(mediaId) as any;
+    const row = rawDb
+      .query(`SELECT * FROM media_variants WHERE media_id = ?`)
+      .get(mediaId) as RawRow;
     expect(row).not.toBeNull();
 
     rawDb.run(`DELETE FROM media_variants`);
@@ -269,20 +323,31 @@ describe("Schema — Foreign Key Constraints", () => {
     rawDb.run(
       `INSERT INTO media (id, original_name, stored_name, mime_type, file_size, disk_path)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [mediaId, "cascade.jpg", "cascade.webp", "image/webp", 1000, "/data/cascade.webp"]
+      [
+        mediaId,
+        "cascade.jpg",
+        "cascade.webp",
+        "image/webp",
+        1000,
+        "/data/cascade.webp",
+      ],
     );
     rawDb.run(
       `INSERT INTO media_variants (id, media_id, name, width, format, file_size, disk_path)
        VALUES (?, ?, 'thumb', 100, 'webp', 500, '/tmp/c-thumb.webp')`,
-      [variantId, mediaId]
+      [variantId, mediaId],
     );
 
-    let rows = rawDb.query(`SELECT * FROM media_variants WHERE media_id = ?`).all(mediaId) as any[];
+    let rows = rawDb
+      .query(`SELECT * FROM media_variants WHERE media_id = ?`)
+      .all(mediaId) as RawRow[];
     expect(rows.length).toBe(1);
 
     rawDb.run(`DELETE FROM media WHERE id = ?`, [mediaId]);
 
-    rows = rawDb.query(`SELECT * FROM media_variants WHERE id = ?`).all(variantId) as any[];
+    rows = rawDb
+      .query(`SELECT * FROM media_variants WHERE id = ?`)
+      .all(variantId) as RawRow[];
     expect(rows.length).toBe(0);
   });
 });
@@ -294,20 +359,20 @@ describe("Schema — Unique Constraint", () => {
     rawDb.run(
       `INSERT INTO media (id, original_name, stored_name, mime_type, file_size, disk_path)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [mediaId, "dup.jpg", "dup.webp", "image/webp", 1000, "/data/dup.webp"]
+      [mediaId, "dup.jpg", "dup.webp", "image/webp", 1000, "/data/dup.webp"],
     );
 
     rawDb.run(
       `INSERT INTO media_variants (id, media_id, name, width, format, file_size, disk_path)
        VALUES (?, ?, 'og', 1200, 'webp', 50000, '/tmp/og.webp')`,
-      [crypto.randomUUID(), mediaId]
+      [crypto.randomUUID(), mediaId],
     );
 
     expect(() => {
       rawDb.run(
         `INSERT INTO media_variants (id, media_id, name, width, format, file_size, disk_path)
          VALUES (?, ?, 'og', 800, 'avif', 30000, '/tmp/og2.avif')`,
-        [crypto.randomUUID(), mediaId]
+        [crypto.randomUUID(), mediaId],
       );
     }).toThrow();
 
@@ -323,20 +388,32 @@ describe("Schema — WAL Mode", () => {
     fileDb.run("PRAGMA busy_timeout = 5000");
     fileDb.run("PRAGMA foreign_keys = ON");
 
-    const walRow = fileDb.query(`PRAGMA journal_mode`).get() as { journal_mode: string };
+    const walRow = fileDb.query(`PRAGMA journal_mode`).get() as {
+      journal_mode: string;
+    };
     expect(walRow.journal_mode).toBe("wal");
 
-    const fkRow = fileDb.query(`PRAGMA foreign_keys`).get() as { foreign_keys: number };
+    const fkRow = fileDb.query(`PRAGMA foreign_keys`).get() as {
+      foreign_keys: number;
+    };
     expect(fkRow.foreign_keys).toBe(1);
 
     fileDb.close();
-    try { unlinkSync("/tmp/test-media-wal.db"); } catch (_) {}
-    try { unlinkSync("/tmp/test-media-wal.db-wal"); } catch (_) {}
-    try { unlinkSync("/tmp/test-media-wal.db-shm"); } catch (_) {}
+    try {
+      unlinkSync("/tmp/test-media-wal.db");
+    } catch (_) {}
+    try {
+      unlinkSync("/tmp/test-media-wal.db-wal");
+    } catch (_) {}
+    try {
+      unlinkSync("/tmp/test-media-wal.db-shm");
+    } catch (_) {}
   });
 
   test("foreign_keys are enabled on in-memory DB", () => {
-    const row = rawDb.query(`PRAGMA foreign_keys`).get() as { foreign_keys: number };
+    const row = rawDb.query(`PRAGMA foreign_keys`).get() as {
+      foreign_keys: number;
+    };
     expect(row.foreign_keys).toBe(1);
   });
 });

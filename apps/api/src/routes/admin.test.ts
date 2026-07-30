@@ -1,8 +1,8 @@
-import { expect, test, describe, beforeAll, afterAll } from "bun:test";
-import app from "../index";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
-import { eq } from "drizzle-orm";
+import app from "../index";
 
 describe("Admin Stats Routes", () => {
   let adminToken: string;
@@ -10,7 +10,10 @@ describe("Admin Stats Routes", () => {
 
   beforeAll(async () => {
     await db.delete(users).where(eq(users.email, testEmail));
-    const adminHash = await Bun.password.hash("admin123", { algorithm: "bcrypt", cost: 12 });
+    const adminHash = await Bun.password.hash("admin123", {
+      algorithm: "bcrypt",
+      cost: 12,
+    });
     await db
       .insert(users)
       .values({

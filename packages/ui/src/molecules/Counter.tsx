@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import styles from './Counter.module.scss';
-import { useCounterAnimation } from './Counter.logic';
+import { useCounterAnimation } from "./Counter.logic";
+import styles from "./Counter.module.scss";
 
 interface CounterProps {
   label: string;
@@ -10,12 +10,19 @@ interface CounterProps {
   className?: string;
 }
 
-export function Counter({ label, value, duration = 2, className = '' }: CounterProps) {
+export function Counter({
+  label,
+  value,
+  duration = 2,
+  className = "",
+}: CounterProps) {
   const { ref, numberRef } = useCounterAnimation(value, duration);
 
   return (
     <div ref={ref} className={`${styles.counter} ${className}`}>
-      <span ref={numberRef} className={styles.number}>0</span>
+      <span ref={numberRef} className={styles.number}>
+        0
+      </span>
       <span className={styles.label}>{label}</span>
     </div>
   );

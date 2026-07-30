@@ -1,29 +1,29 @@
-import { describe, test, expect } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import {
-  HeadingBlock,
-  ParagraphBlock,
-  QuoteBlock,
-  ListBlock,
-  CodeBlock,
-  CalloutBlock,
-  ImageBlock,
-  VideoBlock,
-  GalleryBlock,
-  CarouselBlock,
-  BeforeAfterBlock,
-  DividerBlock,
-  SpacerBlock,
-  ColumnsBlock,
-  TabsBlock,
   AccordionBlock,
-  CollapseBlock,
-  TimelineBlock,
-  TableBlock,
-  CTABlock,
-  PricingTableBlock,
-  TestimonialBlock,
+  BeforeAfterBlock,
   BlockSchema,
+  CalloutBlock,
+  CarouselBlock,
+  CodeBlock,
+  CollapseBlock,
+  ColumnsBlock,
   ContentSchema,
+  CTABlock,
+  DividerBlock,
+  GalleryBlock,
+  HeadingBlock,
+  ImageBlock,
+  ListBlock,
+  ParagraphBlock,
+  PricingTableBlock,
+  QuoteBlock,
+  SpacerBlock,
+  TableBlock,
+  TabsBlock,
+  TestimonialBlock,
+  TimelineBlock,
+  VideoBlock,
 } from "./blocks";
 
 const uuid = "550e8400-e29b-41d4-a716-446655440000";
@@ -162,12 +162,8 @@ describe("BlockSchemas — each block type parses valid data", () => {
       data: {
         columns: 2,
         content: [
-          [
-            { id: uuid2, type: "heading", data: { level: 1, text: "Col 1" } },
-          ],
-          [
-            { id: uuid3, type: "paragraph", data: { text: "Col 2" } },
-          ],
+          [{ id: uuid2, type: "heading", data: { level: 1, text: "Col 1" } }],
+          [{ id: uuid3, type: "paragraph", data: { text: "Col 2" } }],
         ],
       },
     });
@@ -182,7 +178,9 @@ describe("BlockSchemas — each block type parses valid data", () => {
         tabs: [
           {
             label: "Tab 1",
-            content: [{ id: uuid2, type: "paragraph", data: { text: "Hello" } }],
+            content: [
+              { id: uuid2, type: "paragraph", data: { text: "Hello" } },
+            ],
           },
         ],
       },
@@ -198,12 +196,14 @@ describe("BlockSchemas — each block type parses valid data", () => {
         items: [
           {
             title: "FAQ 1",
-            content: [{ id: uuid2, type: "paragraph", data: { text: "Answer" } }],
+            content: [
+              { id: uuid2, type: "paragraph", data: { text: "Answer" } },
+            ],
           },
         ],
       },
     });
-    expect(result.data.items[0]!.title).toBe("FAQ 1");
+    expect(result.data.items[0]?.title).toBe("FAQ 1");
   });
 
   test("collapse", () => {
@@ -212,7 +212,9 @@ describe("BlockSchemas — each block type parses valid data", () => {
       type: "collapse",
       data: {
         title: "Details",
-        content: [{ id: uuid2, type: "paragraph", data: { text: "Hidden text" } }],
+        content: [
+          { id: uuid2, type: "paragraph", data: { text: "Hidden text" } },
+        ],
         defaultOpen: true,
       },
     });
@@ -272,7 +274,7 @@ describe("BlockSchemas — each block type parses valid data", () => {
         ],
       },
     });
-    expect(result.data.plans[0]!.highlighted).toBe(true);
+    expect(result.data.plans[0]?.highlighted).toBe(true);
   });
 
   test("testimonial", () => {
@@ -288,7 +290,7 @@ describe("BlockSchemas — each block type parses valid data", () => {
 describe("Invalid block type is rejected", () => {
   test("BlockSchema rejects unknown type", () => {
     expect(() =>
-      BlockSchema.parse({ id: uuid, type: "unknown_block", data: {} })
+      BlockSchema.parse({ id: uuid, type: "unknown_block", data: {} }),
     ).toThrow();
   });
 });
@@ -310,10 +312,18 @@ describe("Recursive nested structure", () => {
                   columns: 2,
                   content: [
                     [
-                      { id: uuid3, type: "heading", data: { level: 3, text: "Left" } },
+                      {
+                        id: uuid3,
+                        type: "heading",
+                        data: { level: 3, text: "Left" },
+                      },
                     ],
                     [
-                      { id: "660e8400-e29b-41d4-a716-446655440010", type: "paragraph", data: { text: "Right" } },
+                      {
+                        id: "660e8400-e29b-41d4-a716-446655440010",
+                        type: "paragraph",
+                        data: { text: "Right" },
+                      },
                     ],
                   ],
                 },

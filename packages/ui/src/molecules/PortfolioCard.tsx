@@ -1,4 +1,4 @@
-import styles from './PortfolioCard.module.scss';
+import styles from "./PortfolioCard.module.scss";
 
 interface PortfolioCardProps {
   title: string;
@@ -14,8 +14,8 @@ export function PortfolioCard({
   description,
   thumbnail,
   category,
-  href = '#',
-  className = '',
+  href = "#",
+  className = "",
 }: PortfolioCardProps) {
   return (
     <article className={`${styles.card} ${className}`}>

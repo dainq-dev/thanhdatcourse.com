@@ -1,0 +1,21 @@
+@use '../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.about {
+  @include section;
+  background: $clr-bg;
+}
+
+.inner {
+  @include container;
+  max-width: 48rem;
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.text {
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  color: $clr-text;
+}

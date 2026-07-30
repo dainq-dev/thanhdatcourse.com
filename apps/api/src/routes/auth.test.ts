@@ -1,18 +1,21 @@
-import { expect, test, describe, beforeAll, afterAll } from "bun:test";
-import app from "../index";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
-import { eq } from "drizzle-orm";
+import app from "../index";
 
 describe("Auth Routes", () => {
   const testEmail = "test-auth@example.com";
   let adminToken: string;
-  let userToken: string;
+  let _userToken: string;
 
   beforeAll(async () => {
     await db.delete(users).where(eq(users.email, testEmail));
 
-    const adminHash = await Bun.password.hash("admin123", { algorithm: "bcrypt", cost: 12 });
+    const adminHash = await Bun.password.hash("admin123", {
+      algorithm: "bcrypt",
+      cost: 12,
+    });
     await db
       .insert(users)
       .values({
@@ -76,7 +79,7 @@ describe("Auth Routes", () => {
     const data = await res.json();
     expect(data.token).toBeString();
     expect(data.user.role).toBe("USER");
-    userToken = data.token;
+    _userToken = data.token;
   });
 
   test("POST /api/auth/register — duplicate email", async () => {
@@ -113,7 +116,12 @@ describe("Auth Routes", () => {
     });
     if (res.status !== 200) {
       const errData = await res.json();
-      console.log("GET /me failed:", errData, "token:", adminToken?.substring(0, 40));
+      console.log(
+        "GET /me failed:",
+        errData,
+        "token:",
+        adminToken?.substring(0, 40),
+      );
     }
     expect(res.status).toBe(200);
     const data = await res.json();
@@ -134,10 +142,13 @@ describe("Auth Routes", () => {
   });
 
   test("Admin user has bcrypt hashed password in DB", async () => {
-    const [user] = await db.select().from(users).where(eq(users.email, testEmail));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, testEmail));
     expect(user).toBeDefined();
-    expect(user!.passwordHash).not.toBe("admin123");
-    expect(user!.passwordHash!.startsWith("$2")).toBe(true);
+    expect(user?.passwordHash).not.toBe("admin123");
+    expect(user?.passwordHash?.startsWith("$2")).toBe(true);
   });
 
   test("Login response time is under 200ms", async () => {

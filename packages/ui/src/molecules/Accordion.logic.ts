@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useAccordion(defaultOpen: boolean = false) {
   const [open, setOpen] = useState(defaultOpen);
@@ -8,7 +8,7 @@ export function useAccordion(defaultOpen: boolean = false) {
     if (panelRef.current) {
       panelRef.current.style.maxHeight = open
         ? `${panelRef.current.scrollHeight}px`
-        : '0px';
+        : "0px";
     }
   }, [open]);
 

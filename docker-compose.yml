@@ -1,0 +1,43 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - media_data:/data/variants:ro
+    depends_on:
+      - web
+      - api
+      - media
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:3001
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    environment:
+      - JWT_SECRET=change-this-in-production
+    volumes:
+      - api_data:/app/apps/api/data
+
+  media:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.media
+    environment:
+      - JWT_SECRET=change-this-in-production
+    volumes:
+      - media_data:/app/apps/media/data
+
+volumes:
+  api_data:
+  media_data:

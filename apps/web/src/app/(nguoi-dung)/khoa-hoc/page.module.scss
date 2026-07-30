@@ -1,0 +1,253 @@
+@use '../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+$clr-hero-border: #192134;
+$clr-card-border: #192134;
+
+.page {
+  background: $clr-bg;
+}
+
+/* ── Hero ── */
+.hero {
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 150px 50px 70px;
+  border-top: 1px solid $clr-hero-border;
+  position: relative;
+  overflow: hidden;
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOpgf3Q1yJ0Ji_Puju3NziTGLw1OdEl16oW9fvKqGFl9E6cyWYG9mTLRY&s=10');
+  background-position: 0px 1px;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(66, 220, 231, 0.2);
+    z-index: 0;
+  }
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  @include container;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.heroInner {
+  @include container;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.heroTitle {
+  font-size: 48px;
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0;
+  text-transform: none;
+  font-family: var(--ff-display);
+  position: relative;
+  z-index: 1;
+}
+
+.heroTrust {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: var(--fs-sm);
+  @include text-muted;
+  margin-top: $space-3;
+  position: relative;
+  z-index: 1;
+}
+
+.trustIcon {
+  width: 104px;
+  height: auto;
+  display: block;
+}
+
+/* ── Course Section ── */
+.courseSection {
+  padding: 70px 10px;
+}
+
+.courseGrid {
+  @include container;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $space-8;
+}
+/* ── Single Course Card ── */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-2;
+  border: 1px solid $clr-card-border;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(223, 215, 215, 0.322);
+  background: #203644;
+}
+
+.cardThumb {
+  height: 270px;
+  width: 100%;
+  overflow: hidden;
+  
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit:cover;
+    border: 1px solid $clr-card-border;
+  }
+}
+
+.cardBody {
+  padding: $space-2 $space-4;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  min-width: 0;
+  flex: 1;
+}
+
+.cardRating {
+  font-size: 14px;
+  font-weight: $fw-light;
+  color: $clr-primary-tint;
+}
+
+.cardTitle {
+  font-size: 28px;
+  font-weight: $fw-bold;
+  color: $clr-text;
+  line-height: 1.3;
+  margin: 0;
+  font-family: var(--ff-display);
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: $clr-primary;
+    }
+  }
+}
+
+.cardDesc {
+  font-size: var(--fs-body);
+  @include text-muted;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cardPrice {
+  font-size: 40px;
+  font-weight: $fw-normal;
+  color: $clr-text;
+}
+
+.cardBtnRow {
+  display: flex;
+}
+
+.btnBuy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 30px;
+  font-size: 22px;
+  font-weight: $fw-semibold;
+  color: $clr-white;
+  background: $clr-primary-dark;
+  border-radius: 7px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background $duration-normal $ease-out-expo;
+
+  &:hover {
+    background: $clr-primary;
+  }
+}
+
+.btnDisabled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 30px;
+  font-size: 22px;
+  font-weight: $fw-semibold;
+  color: $clr-white;
+  background: #5F5F5F;
+  border-radius: 7px;
+  text-transform: uppercase;
+  cursor: not-allowed;
+}
+
+/* ── Brand Section ── */
+.brandSection {
+  text-align: center;
+  padding: 70px 30px;
+  border-top: 1px solid $clr-hero-border;
+}
+
+.brandTitle {
+  font-size: var(--fs-h3);
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  text-transform: uppercase;
+  margin: 0 0 $space-8;
+}
+
+.brandGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $space-8;
+  opacity: 0.5;
+
+  span {
+    font-size: var(--fs-sm);
+    @include text-muted;
+    font-weight: $fw-semibold;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* ── FAQ Section ── */
+.faqSection {
+  padding: 70px 30px;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid $clr-hero-border;
+}
+
+.faqWatermark {
+  font-size: clamp(120px, 15vw, 240px);
+  font-weight: $fw-extrabold;
+  color: rgba(255, 255, 255, 0.03);
+  line-height: 1;
+  user-select: none;
+  text-align: center;
+  margin: 0;
+}
+
+.faqList {
+  max-width: 800px;
+  margin: 2rem auto 0;
+  padding: 0 1rem;
+}

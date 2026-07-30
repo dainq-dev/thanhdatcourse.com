@@ -1,5 +1,5 @@
-import { formatVND } from '../lib/format';
-import styles from './CourseCard.module.scss';
+import { formatVND } from "../lib/format";
+import styles from "./CourseCard.module.scss";
 
 interface CourseCardProps {
   slug: string;
@@ -29,10 +29,11 @@ export function CourseCard({
   externalCheckoutUrl,
   isComboOnly,
   buttonText,
-  className = '',
+  className = "",
 }: CourseCardProps) {
-  const checkoutUrl = externalCheckoutUrl || `https://go.minhtravel.vn/checkouts/${slug}/`;
-  const btnText = buttonText || 'Mua ngay';
+  const checkoutUrl =
+    externalCheckoutUrl || `https://go.minhtravel.vn/checkouts/${slug}/`;
+  const btnText = buttonText || "Mua ngay";
   const isDisabled = !!isComboOnly;
 
   return (
@@ -51,11 +52,15 @@ export function CourseCard({
         <div className={styles.priceRow}>
           <span className={styles.price}>{formatVND(price)}</span>
           {originalPrice && (
-            <span className={styles.originalPrice}>{formatVND(originalPrice)}</span>
+            <span className={styles.originalPrice}>
+              {formatVND(originalPrice)}
+            </span>
           )}
         </div>
         {isDisabled ? (
-          <span className={`${styles.buyBtn} ${styles.disabled}`}>{btnText}</span>
+          <span className={`${styles.buyBtn} ${styles.disabled}`}>
+            {btnText}
+          </span>
         ) : (
           <a
             href={checkoutUrl}

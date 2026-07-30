@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
-import styles from './Badge.module.scss';
+import type { ReactNode } from "react";
+import styles from "./Badge.module.scss";
 
-type BadgeVariant = 'default' | 'primary' | 'success';
+type BadgeVariant = "default" | "primary" | "success";
 
 interface BadgeProps {
   variant?: BadgeVariant;
@@ -10,9 +10,9 @@ interface BadgeProps {
 }
 
 export function Badge({
-  variant = 'default',
+  variant = "default",
   children,
-  className = '',
+  className = "",
 }: BadgeProps) {
   return (
     <span className={`${styles.badge} ${styles[variant]} ${className}`}>

@@ -10,7 +10,14 @@ const BaseBlock = z.object({
 export const HeadingBlock = BaseBlock.extend({
   type: z.literal("heading"),
   data: z.object({
-    level: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6)]),
+    level: z.union([
+      z.literal(1),
+      z.literal(2),
+      z.literal(3),
+      z.literal(4),
+      z.literal(5),
+      z.literal(6),
+    ]),
     text: z.string().min(1),
     alignment: z.enum(["left", "center", "right"]).default("left"),
   }),
@@ -86,10 +93,12 @@ export const VideoBlock = BaseBlock.extend({
 export const GalleryBlock = BaseBlock.extend({
   type: z.literal("gallery"),
   data: z.object({
-    images: z.array(z.object({
-      mediaId: z.string(),
-      caption: z.string().optional(),
-    })),
+    images: z.array(
+      z.object({
+        mediaId: z.string(),
+        caption: z.string().optional(),
+      }),
+    ),
     columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).default(3),
     gap: z.enum(["sm", "md", "lg"]).default("md"),
     layout: z.enum(["grid", "masonry"]).default("grid"),
@@ -99,10 +108,12 @@ export const GalleryBlock = BaseBlock.extend({
 export const CarouselBlock = BaseBlock.extend({
   type: z.literal("carousel"),
   data: z.object({
-    slides: z.array(z.object({
-      mediaId: z.string(),
-      caption: z.string().optional(),
-    })),
+    slides: z.array(
+      z.object({
+        mediaId: z.string(),
+        caption: z.string().optional(),
+      }),
+    ),
     autoplay: z.boolean().default(false),
     interval: z.number().min(1000).default(5000),
     showDots: z.boolean().default(true),
@@ -155,10 +166,12 @@ export const ColumnsBlock = BaseBlock.extend({
 export const TabsBlock = BaseBlock.extend({
   type: z.literal("tabs"),
   data: z.object({
-    tabs: z.array(z.object({
-      label: z.string(),
-      content: z.array(z.lazy(() => _BlockSchema)),
-    })),
+    tabs: z.array(
+      z.object({
+        label: z.string(),
+        content: z.array(z.lazy(() => _BlockSchema)),
+      }),
+    ),
   }),
 });
 
@@ -167,10 +180,12 @@ export const TabsBlock = BaseBlock.extend({
 export const AccordionBlock = BaseBlock.extend({
   type: z.literal("accordion"),
   data: z.object({
-    items: z.array(z.object({
-      title: z.string(),
-      content: z.array(z.lazy(() => _BlockSchema)),
-    })),
+    items: z.array(
+      z.object({
+        title: z.string(),
+        content: z.array(z.lazy(() => _BlockSchema)),
+      }),
+    ),
     allowMultiple: z.boolean().default(true),
   }),
 });
@@ -187,11 +202,13 @@ export const CollapseBlock = BaseBlock.extend({
 export const TimelineBlock = BaseBlock.extend({
   type: z.literal("timeline"),
   data: z.object({
-    events: z.array(z.object({
-      date: z.string(),
-      title: z.string(),
-      description: z.string(),
-    })),
+    events: z.array(
+      z.object({
+        date: z.string(),
+        title: z.string(),
+        description: z.string(),
+      }),
+    ),
   }),
 });
 
@@ -222,15 +239,17 @@ export const CTABlock = BaseBlock.extend({
 export const PricingTableBlock = BaseBlock.extend({
   type: z.literal("pricingTable"),
   data: z.object({
-    plans: z.array(z.object({
-      name: z.string(),
-      price: z.string(),
-      period: z.string().optional(),
-      description: z.string().optional(),
-      features: z.array(z.string()),
-      cta: z.object({ text: z.string(), url: z.string() }),
-      highlighted: z.boolean().default(false),
-    })),
+    plans: z.array(
+      z.object({
+        name: z.string(),
+        price: z.string(),
+        period: z.string().optional(),
+        description: z.string().optional(),
+        features: z.array(z.string()),
+        cta: z.object({ text: z.string(), url: z.string() }),
+        highlighted: z.boolean().default(false),
+      }),
+    ),
   }),
 });
 
@@ -244,95 +263,186 @@ export const TestimonialBlock = BaseBlock.extend({
 
 // ─── Block discriminated union ─────────────────────
 
-export type Block = {
-  id: string;
-  type: "heading";
-  data: { level: 1 | 2 | 3 | 4 | 5 | 6; text: string; alignment: "left" | "center" | "right" };
-} | {
-  id: string;
-  type: "paragraph";
-  data: { text: string; alignment: "left" | "center" | "right"; dropCap: boolean };
-} | {
-  id: string;
-  type: "quote";
-  data: { text: string; author?: string; style: "default" | "bordered" | "pull" };
-} | {
-  id: string;
-  type: "list";
-  data: { style: "unordered" | "ordered" | "checklist"; items: string[] };
-} | {
-  id: string;
-  type: "code";
-  data: { code: string; language: string; showLineNumbers: boolean };
-} | {
-  id: string;
-  type: "callout";
-  data: { text: string; variant: "info" | "warning" | "tip" | "danger"; icon?: string };
-} | {
-  id: string;
-  type: "image";
-  data: { mediaId: string; alt?: string; caption?: string; width: "full" | "wide" | "contained" | "inline"; border: boolean; rounded: boolean };
-} | {
-  id: string;
-  type: "video";
-  data: { mediaId: string; caption?: string; aspectRatio: "16:9" | "4:3" | "9:16" | "1:1" };
-} | {
-  id: string;
-  type: "gallery";
-  data: { images: { mediaId: string; caption?: string }[]; columns: 2 | 3 | 4; gap: "sm" | "md" | "lg"; layout: "grid" | "masonry" };
-} | {
-  id: string;
-  type: "carousel";
-  data: { slides: { mediaId: string; caption?: string }[]; autoplay: boolean; interval: number; showDots: boolean; showArrows: boolean };
-} | {
-  id: string;
-  type: "beforeAfter";
-  data: { beforeMediaId: string; afterMediaId: string; beforeLabel: string; afterLabel: string; caption?: string };
-} | {
-  id: string;
-  type: "divider";
-  data: { style: "solid" | "dashed" | "dotted" | "gradient" };
-} | {
-  id: string;
-  type: "spacer";
-  data: { height: number };
-} | {
-  id: string;
-  type: "columns";
-  data: { columns: 2 | 3 | 4; content: Content[]; gap: "sm" | "md" | "lg" };
-} | {
-  id: string;
-  type: "tabs";
-  data: { tabs: { label: string; content: Content }[] };
-} | {
-  id: string;
-  type: "accordion";
-  data: { items: { title: string; content: Content }[]; allowMultiple: boolean };
-} | {
-  id: string;
-  type: "collapse";
-  data: { title: string; content: Content; defaultOpen: boolean };
-} | {
-  id: string;
-  type: "timeline";
-  data: { events: { date: string; title: string; description: string }[] };
-} | {
-  id: string;
-  type: "table";
-  data: { headers: string[]; rows: string[][]; striped: boolean; compact: boolean };
-} | {
-  id: string;
-  type: "cta";
-  data: { heading: string; text?: string; buttonText: string; buttonUrl: string; style: "primary" | "secondary" | "minimal"; backgroundMediaId?: string };
-} | {
-  id: string;
-  type: "pricingTable";
-  data: { plans: { name: string; price: string; period?: string; description?: string; features: string[]; cta: { text: string; url: string }; highlighted: boolean }[] };
-} | {
-  id: string;
-  type: "testimonial";
-  data: { testimonialId: string; style: "card" | "inline" | "large" };
-};
+export type Block =
+  | {
+      id: string;
+      type: "heading";
+      data: {
+        level: 1 | 2 | 3 | 4 | 5 | 6;
+        text: string;
+        alignment: "left" | "center" | "right";
+      };
+    }
+  | {
+      id: string;
+      type: "paragraph";
+      data: {
+        text: string;
+        alignment: "left" | "center" | "right";
+        dropCap: boolean;
+      };
+    }
+  | {
+      id: string;
+      type: "quote";
+      data: {
+        text: string;
+        author?: string;
+        style: "default" | "bordered" | "pull";
+      };
+    }
+  | {
+      id: string;
+      type: "list";
+      data: { style: "unordered" | "ordered" | "checklist"; items: string[] };
+    }
+  | {
+      id: string;
+      type: "code";
+      data: { code: string; language: string; showLineNumbers: boolean };
+    }
+  | {
+      id: string;
+      type: "callout";
+      data: {
+        text: string;
+        variant: "info" | "warning" | "tip" | "danger";
+        icon?: string;
+      };
+    }
+  | {
+      id: string;
+      type: "image";
+      data: {
+        mediaId: string;
+        alt?: string;
+        caption?: string;
+        width: "full" | "wide" | "contained" | "inline";
+        border: boolean;
+        rounded: boolean;
+      };
+    }
+  | {
+      id: string;
+      type: "video";
+      data: {
+        mediaId: string;
+        caption?: string;
+        aspectRatio: "16:9" | "4:3" | "9:16" | "1:1";
+      };
+    }
+  | {
+      id: string;
+      type: "gallery";
+      data: {
+        images: { mediaId: string; caption?: string }[];
+        columns: 2 | 3 | 4;
+        gap: "sm" | "md" | "lg";
+        layout: "grid" | "masonry";
+      };
+    }
+  | {
+      id: string;
+      type: "carousel";
+      data: {
+        slides: { mediaId: string; caption?: string }[];
+        autoplay: boolean;
+        interval: number;
+        showDots: boolean;
+        showArrows: boolean;
+      };
+    }
+  | {
+      id: string;
+      type: "beforeAfter";
+      data: {
+        beforeMediaId: string;
+        afterMediaId: string;
+        beforeLabel: string;
+        afterLabel: string;
+        caption?: string;
+      };
+    }
+  | {
+      id: string;
+      type: "divider";
+      data: { style: "solid" | "dashed" | "dotted" | "gradient" };
+    }
+  | {
+      id: string;
+      type: "spacer";
+      data: { height: number };
+    }
+  | {
+      id: string;
+      type: "columns";
+      data: { columns: 2 | 3 | 4; content: Content[]; gap: "sm" | "md" | "lg" };
+    }
+  | {
+      id: string;
+      type: "tabs";
+      data: { tabs: { label: string; content: Content }[] };
+    }
+  | {
+      id: string;
+      type: "accordion";
+      data: {
+        items: { title: string; content: Content }[];
+        allowMultiple: boolean;
+      };
+    }
+  | {
+      id: string;
+      type: "collapse";
+      data: { title: string; content: Content; defaultOpen: boolean };
+    }
+  | {
+      id: string;
+      type: "timeline";
+      data: { events: { date: string; title: string; description: string }[] };
+    }
+  | {
+      id: string;
+      type: "table";
+      data: {
+        headers: string[];
+        rows: string[][];
+        striped: boolean;
+        compact: boolean;
+      };
+    }
+  | {
+      id: string;
+      type: "cta";
+      data: {
+        heading: string;
+        text?: string;
+        buttonText: string;
+        buttonUrl: string;
+        style: "primary" | "secondary" | "minimal";
+        backgroundMediaId?: string;
+      };
+    }
+  | {
+      id: string;
+      type: "pricingTable";
+      data: {
+        plans: {
+          name: string;
+          price: string;
+          period?: string;
+          description?: string;
+          features: string[];
+          cta: { text: string; url: string };
+          highlighted: boolean;
+        }[];
+      };
+    }
+  | {
+      id: string;
+      type: "testimonial";
+      data: { testimonialId: string; style: "card" | "inline" | "large" };
+    };
 
 export const BlockSchema: z.ZodType<Block> = z.discriminatedUnion("type", [
   HeadingBlock as any,
@@ -363,3 +473,8 @@ _BlockSchema = BlockSchema;
 
 export const ContentSchema = z.array(BlockSchema);
 export type Content = Block[];
+
+export type BlockData<T extends Block["type"]> = Extract<
+  Block,
+  { type: T }
+>["data"];

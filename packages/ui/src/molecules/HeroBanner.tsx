@@ -1,5 +1,5 @@
-import { Button } from '../atoms/Button';
-import styles from './HeroBanner.module.scss';
+import { Button } from "../atoms/Button";
+import styles from "./HeroBanner.module.scss";
 
 interface Stat {
   value: string;
@@ -27,7 +27,7 @@ export function HeroBanner({
   secondaryCta,
   stats,
   visual,
-  className = '',
+  className = "",
 }: HeroBannerProps) {
   return (
     <section className={`${styles.hero} ${className}`}>
@@ -45,7 +45,12 @@ export function HeroBanner({
               {primaryCta.label}
             </Button>
             {secondaryCta && (
-              <Button variant="outline" size="lg" as="a" href={secondaryCta.href}>
+              <Button
+                variant="outline"
+                size="lg"
+                as="a"
+                href={secondaryCta.href}
+              >
                 {secondaryCta.label}
               </Button>
             )}

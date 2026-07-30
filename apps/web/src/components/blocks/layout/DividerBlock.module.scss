@@ -1,0 +1,33 @@
+.root {
+  margin: 2em 0;
+  border: none;
+  height: 1px;
+}
+
+.solid {
+  background: #e0e0e0;
+}
+
+.dashed {
+  background: repeating-linear-gradient(
+    90deg,
+    #ccc 0,
+    #ccc 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+.dotted {
+  background: repeating-linear-gradient(
+    90deg,
+    #ccc 0,
+    #ccc 2px,
+    transparent 2px,
+    transparent 6px
+  );
+}
+
+.gradient {
+  background: linear-gradient(90deg, transparent, #999, transparent);
+}

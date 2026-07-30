@@ -1,0 +1,204 @@
+.editorBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fieldLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #AAA;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.inlineRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.input {
+  padding: 0.4375rem 0.625rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #1a1a1a;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: #888;
+  }
+
+  &::placeholder {
+    color: #b0b0b0;
+  }
+}
+
+.textarea {
+  composes: input;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.select {
+  composes: input;
+  cursor: pointer;
+  width: auto;
+  min-width: 120px;
+}
+
+.checkbox {
+  accent-color: #1a1a1a;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #555;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.smallBtn {
+  padding: 0.25rem 0.4375rem;
+  background: none;
+  border: 1px solid #ddd;
+  color: #999;
+  border-radius: 3px;
+  font-size: 0.6875rem;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: #ccc;
+    color: #555;
+  }
+}
+
+.addBtn {
+  padding: 0.375rem 0.75rem;
+  background: #f5f5f3;
+  border: 1px dashed #ccc;
+  color: #666;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: #999;
+    color: #333;
+  }
+}
+
+.listRow {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+.mediaPicker {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+
+  .input {
+    flex: 1;
+  }
+}
+
+.mediaBtn {
+  padding: 0.375rem 1rem;
+  background: #f5f5f3;
+  border: 1px solid #ddd;
+  color: #555;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: #aaa;
+    color: #333;
+  }
+}
+
+.pricingPlan {
+  padding: 0.625rem;
+  background: #f9f9f7;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pricingHeader {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.galleryItem {
+  padding: 0.5rem;
+  background: #f9f9f7;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.tableHeaders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+.tableHeaderCell {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  flex: 1;
+  min-width: 100px;
+
+  .input {
+    flex: 1;
+  }
+}
+
+.tableRow {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+
+  .input {
+    flex: 1;
+    min-width: 80px;
+  }
+}

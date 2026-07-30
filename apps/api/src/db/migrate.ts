@@ -120,13 +120,13 @@ console.log("✓ All 17 tables created/verified");
 const tables = sqlite
   .query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
   .all()
-  .map((r: any) => r.name);
+  .map((r: { name: string }) => r.name);
 console.log(`  Tables: ${tables.join(", ")}`);
 
 const userCols = sqlite
   .query("PRAGMA table_info(users)")
   .all()
-  .map((c: any) => c.name);
+  .map((c: { name: string }) => c.name);
 console.log(`  Users columns: ${userCols.join(", ")}`);
 
 sqlite.close();

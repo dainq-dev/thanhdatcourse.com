@@ -11,10 +11,20 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
-    "start": "turbo start"
+    "start": "turbo start",
+    "lint": "biome lint apps packages",
+    "format": "biome format apps packages --write",
+    "check": "biome check apps packages --write"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@biomejs/biome": "2.2.0"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "web": "^0.0.2"
   }
 }

@@ -1,6 +1,8 @@
-import { describe, test, expect, beforeAll } from "bun:test";
 import { Database } from "bun:sqlite";
+import { beforeAll, describe, expect, test } from "bun:test";
 import { seed } from "./seed";
+
+type SqlRow = Record<string, unknown>;
 
 let sqlite: Database;
 
@@ -79,7 +81,9 @@ describe("Seed — Admin User", () => {
   test("admin user exists with email admin@minhtravel.vn", () => {
     seed(sqlite);
 
-    const row = sqlite.query("SELECT * FROM users WHERE email = ?").get("admin@minhtravel.vn") as any;
+    const row = sqlite
+      .query("SELECT * FROM users WHERE email = ?")
+      .get("admin@minhtravel.vn") as SqlRow;
     expect(row).not.toBeNull();
     expect(row.email).toBe("admin@minhtravel.vn");
     expect(row.name).toBe("Admin");
@@ -89,7 +93,9 @@ describe("Seed — Admin User", () => {
   test("admin password is bcrypt hashed (not plaintext)", () => {
     seed(sqlite);
 
-    const row = sqlite.query("SELECT * FROM users WHERE email = ?").get("admin@minhtravel.vn") as any;
+    const row = sqlite
+      .query("SELECT * FROM users WHERE email = ?")
+      .get("admin@minhtravel.vn") as SqlRow;
     expect(row.password_hash).not.toBe("admin123");
     expect(row.password_hash).toMatch(/^\$2[aby]\$/);
   });
@@ -106,19 +112,27 @@ describe("Seed — Courses", () => {
   test("courses have correct mapped fields", () => {
     seed(sqlite);
 
-    const row = sqlite.query("SELECT * FROM courses WHERE slug = ?").get("30-ngay-sang-tao-video-trieu-view") as any;
+    const row = sqlite
+      .query("SELECT * FROM courses WHERE slug = ?")
+      .get("30-ngay-sang-tao-video-trieu-view") as SqlRow;
     expect(row).not.toBeNull();
-    expect(row.title).toBe("30 Ngày Sáng Tạo Video TikTok Triệu View (Điện thoại)");
+    expect(row.title).toBe(
+      "30 Ngày Sáng Tạo Video TikTok Triệu View (Điện thoại)",
+    );
     expect(row.base_price).toBe(996000);
     expect(row.is_featured_on_home).toBe(1);
     expect(row.rating_count).toBe("99+");
-    expect(row.external_checkout_url).toBe("https://go.minhtravel.vn/checkouts/30-ngay-sang-tao-video-tiktok-trieu-view/");
+    expect(row.external_checkout_url).toBe(
+      "https://go.minhtravel.vn/checkouts/30-ngay-sang-tao-video-tiktok-trieu-view/",
+    );
   });
 
   test("combo-only course has correct flags", () => {
     seed(sqlite);
 
-    const row = sqlite.query("SELECT * FROM courses WHERE slug = ?").get("combo-video-marketing-masterclass") as any;
+    const row = sqlite
+      .query("SELECT * FROM courses WHERE slug = ?")
+      .get("combo-video-marketing-masterclass") as SqlRow;
     expect(row).not.toBeNull();
     expect(row.is_combo_only).toBe(1);
     expect(row.button_text).toBe("Không Bán Rời");
@@ -128,7 +142,9 @@ describe("Seed — Courses", () => {
   test("workshop course has button_text Tư Vấn Miễn Phí", () => {
     seed(sqlite);
 
-    const row = sqlite.query("SELECT * FROM courses WHERE slug = ?").get("khoa-hoc-truc-tiep-11-cung-minh-travel") as any;
+    const row = sqlite
+      .query("SELECT * FROM courses WHERE slug = ?")
+      .get("khoa-hoc-truc-tiep-11-cung-minh-travel") as SqlRow;
     expect(row).not.toBeNull();
     expect(row.button_text).toBe("Tư Vấn Miễn Phí");
   });
@@ -145,21 +161,29 @@ describe("Seed — Articles (Posts)", () => {
   test("articles have correct mapped fields", () => {
     seed(sqlite);
 
-    const row = sqlite.query("SELECT * FROM posts WHERE slug = ?").get("quay-video-bang-dien-thoai-chuyen-nghiep-de-thu-ve-trieu-view-hoan-toan-co-the") as any;
+    const row = sqlite
+      .query("SELECT * FROM posts WHERE slug = ?")
+      .get(
+        "quay-video-bang-dien-thoai-chuyen-nghiep-de-thu-ve-trieu-view-hoan-toan-co-the",
+      ) as SqlRow;
     expect(row).not.toBeNull();
-    expect(row.title).toBe("Quay video bằng điện thoại chuyên nghiệp để thu về triệu view – hoàn toàn có thể!");
+    expect(row.title).toBe(
+      "Quay video bằng điện thoại chuyên nghiệp để thu về triệu view – hoàn toàn có thể!",
+    );
     expect(row.excerpt).toContain("Quay video bằng điện thoại");
     expect(row.author).toBe("minhtravel");
     expect(row.read_time).toBe(8);
     expect(row.is_published).toBe(1);
     expect(row.published_at).toBe("2025-11-25T08:00:00Z");
-    expect(row.thumbnail_url).toBe("https://minhtravel.vn/wp-content/uploads/2025/11/lam-video-chuyen-nghiep3-1024x517.png");
+    expect(row.thumbnail_url).toBe(
+      "https://minhtravel.vn/wp-content/uploads/2025/11/lam-video-chuyen-nghiep3-1024x517.png",
+    );
   });
 
   test("articles have content_blocks as valid JSON with paragraph block", () => {
     seed(sqlite);
 
-    const rows = sqlite.query("SELECT * FROM posts").all() as any[];
+    const rows = sqlite.query("SELECT * FROM posts").all() as SqlRow[];
     for (const row of rows) {
       expect(row.content_blocks).not.toBeNull();
       expect(() => JSON.parse(row.content_blocks)).not.toThrow();
@@ -184,7 +208,9 @@ describe("Seed — Portfolios", () => {
   test("portfolio items have correct fields", () => {
     seed(sqlite);
 
-    const row = sqlite.query("SELECT * FROM portfolios WHERE title LIKE ?").get("%LIFE OF TIBET%") as any;
+    const row = sqlite
+      .query("SELECT * FROM portfolios WHERE title LIKE ?")
+      .get("%LIFE OF TIBET%") as SqlRow;
     expect(row).not.toBeNull();
     expect(row.category).toBe("Travel");
     expect(row.thumbnail_url).toContain("portfolio-tibet");
@@ -202,12 +228,16 @@ describe("Seed — Digital Products (Presets)", () => {
   test("preset products have correct fields", () => {
     seed(sqlite);
 
-    const row = sqlite.query("SELECT * FROM digital_products WHERE title = ?").get("Bộ 7 LUT Wedding") as any;
+    const row = sqlite
+      .query("SELECT * FROM digital_products WHERE title = ?")
+      .get("Bộ 7 LUT Wedding") as SqlRow;
     expect(row).not.toBeNull();
     expect(row.price).toBe(199000);
     expect(row.tag).toBe("LUT");
     expect(row.is_published).toBe(1);
-    expect(row.external_checkout_url).toBe("https://go.minhtravel.vn/?add-to-cart=776");
+    expect(row.external_checkout_url).toBe(
+      "https://go.minhtravel.vn/?add-to-cart=776",
+    );
   });
 });
 
@@ -222,7 +252,7 @@ describe("Seed — FAQs", () => {
   test("FAQs have NULL course_id (global)", () => {
     seed(sqlite);
 
-    const rows = sqlite.query("SELECT * FROM faqs").all() as any[];
+    const rows = sqlite.query("SELECT * FROM faqs").all() as SqlRow[];
     for (const row of rows) {
       expect(row.course_id).toBeNull();
     }
@@ -240,7 +270,7 @@ describe("Seed — Testimonials", () => {
   test("testimonials have NULL course_id (global)", () => {
     seed(sqlite);
 
-    const rows = sqlite.query("SELECT * FROM testimonials").all() as any[];
+    const rows = sqlite.query("SELECT * FROM testimonials").all() as SqlRow[];
     for (const row of rows) {
       expect(row.course_id).toBeNull();
     }
@@ -258,7 +288,7 @@ describe("Seed — Site Settings", () => {
   test("key site settings have expected values", () => {
     seed(sqlite);
 
-    const rows = sqlite.query("SELECT * FROM site_settings").all() as any[];
+    const rows = sqlite.query("SELECT * FROM site_settings").all() as SqlRow[];
     const map: Record<string, string> = {};
     for (const row of rows) {
       map[row.key] = row.value;
@@ -309,7 +339,9 @@ describe("Seed — Idempotency", () => {
     seed(sqlite);
     seed(sqlite);
 
-    const rows = sqlite.query("SELECT * FROM users WHERE email = ?").all("admin@minhtravel.vn");
+    const rows = sqlite
+      .query("SELECT * FROM users WHERE email = ?")
+      .all("admin@minhtravel.vn");
     expect(rows.length).toBe(1);
   });
 });

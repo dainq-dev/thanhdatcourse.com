@@ -1,0 +1,18 @@
+@use '../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.section {
+  @include section;
+  background: $clr-bg;
+}
+
+.counters {
+  @include container;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-8;
+
+  @include respond-to($bp-md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

@@ -1,0 +1,134 @@
+@use '../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.projectList {
+  @include container;
+  @include section;
+  padding-bottom: $space-16;
+}
+
+.projectItem {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-6;
+  margin-bottom: $space-16;
+
+  @include respond-to($bp-md) {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-12;
+    align-items: center;
+  }
+}
+
+.reversed {
+  @include respond-to($bp-md) {
+    direction: rtl;
+
+    .projectInfo {
+      direction: ltr;
+    }
+  }
+}
+
+.projectThumb {
+  position: relative;
+  @include video-thumb;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 280px;
+  background: $clr-bg-card;
+}
+
+.projectOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  transition: background $duration-normal;
+}
+
+.projectThumb:hover .projectOverlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.playIcon {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: $clr-white;
+  opacity: 0.9;
+  transition: transform $duration-normal;
+}
+
+.projectThumb:hover .playIcon {
+  transform: scale(1.15);
+}
+
+.projectInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  padding: $space-4 0;
+}
+
+.projectTitle {
+  font-size: var(--fs-h3);
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0;
+  line-height: 1.3;
+  text-transform: none;
+}
+
+.projectDesc {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #CECECE;
+  margin: 0;
+}
+
+.ctaSection {
+  text-align: center;
+  @include section;
+  @include divider;
+  padding-top: $space-16;
+}
+
+.ctaTitle {
+  font-size: 30px;
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0 0 $space-6;
+  text-transform: none;
+}
+
+.ctaRow {
+  display: flex;
+  gap: $space-4;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaPrimary {
+  @include btn-cta-sm;
+  background: $clr-primary;
+
+  &:hover {
+    background: $clr-primary-dark;
+  }
+}
+
+.ctaSecondary {
+  @include btn-outline;
+  border-color: $clr-primary;
+  color: $clr-text;
+
+  &:hover {
+    background: rgba(255, 0, 90, 0.1);
+  }
+}

@@ -1,4 +1,4 @@
-import styles from './Breadcrumbs.module.scss';
+import styles from "./Breadcrumbs.module.scss";
 
 interface Crumb {
   label: string;
@@ -10,9 +10,12 @@ interface BreadcrumbsProps {
   className?: string;
 }
 
-export function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
   return (
-    <nav aria-label="Breadcrumb" className={`${styles.breadcrumbs} ${className}`}>
+    <nav
+      aria-label="Breadcrumb"
+      className={`${styles.breadcrumbs} ${className}`}
+    >
       {items.map((item, i) => (
         <span key={`${item.label}-${i}`}>
           {i > 0 && <span className={styles.separator}>›</span>}

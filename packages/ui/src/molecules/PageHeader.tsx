@@ -1,4 +1,4 @@
-import styles from './PageHeader.module.scss';
+import styles from "./PageHeader.module.scss";
 
 interface PageHeaderProps {
   title: string;
@@ -6,7 +6,11 @@ interface PageHeaderProps {
   className?: string;
 }
 
-export function PageHeader({ title, subtitle, className = '' }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  subtitle,
+  className = "",
+}: PageHeaderProps) {
   return (
     <header className={`${styles.pageHeader} ${className}`}>
       <h1 className={styles.title}>{title}</h1>

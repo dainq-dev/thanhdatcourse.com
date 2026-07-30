@@ -1,0 +1,23 @@
+.pageTitle { font-size: clamp(1.25rem, 3vw, 1.5rem); font-weight: 700; color: #1A1A1A; margin-bottom: 2rem; letter-spacing: -0.02em; }
+.loading { padding: 2rem; text-align: center; color: #999; font-size: 0.875rem; }
+
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #e0e0e0; margin-bottom: 1.5rem; }
+.tab { padding: 0.625rem 1.25rem; background: none; border: none; color: #999; font-size: 0.8125rem; font-weight: 500; cursor: pointer; font-family: inherit; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+.tab:hover { color: #555; }
+.tabActive { color: #1a1a1a; border-bottom-color: #1a1a1a; }
+
+.tabContent { max-width: 640px; }
+
+.form { display: flex; flex-direction: column; gap: 1.25rem; }
+.error { background: #FEF2F2; border: 1px solid #FECACA; color: #C53030; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.8125rem; }
+
+.field { display: flex; flex-direction: column; gap: 0.25rem; }
+.label { font-size: 0.6875rem; font-weight: 600; color: #AAA; text-transform: uppercase; letter-spacing: 0.05em; }
+.input { padding: 0.625rem 0.75rem; background: #FFFFFF; border: 1px solid #E0E0E0; border-radius: 6px; color: #1A1A1A; font-size: 0.8125rem; font-family: inherit; outline: none; transition: border-color 0.15s; &:focus { border-color: #AAA; } &::placeholder { color: #B0B0B0; } }
+.textarea { composes: input; resize: vertical; min-height: 80px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.toggles { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0; }
+.toggle { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: #444; cursor: pointer; input[type="checkbox"] { accent-color: #1A1A1A; width: 16px; height: 16px; } }
+.actions { display: flex; gap: 0.75rem; padding-top: 0.5rem; }
+.saveBtn { padding: 0.625rem 1.5rem; background: #1A1A1A; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s; &:hover { background: #333; } &:disabled { opacity: 0.4; cursor: not-allowed; } }
+.cancelBtn { padding: 0.625rem 1.5rem; background: #FFFFFF; border: 1px solid #E0E0E0; color: #666; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; &:hover { border-color: #CCC; color: #333; } }

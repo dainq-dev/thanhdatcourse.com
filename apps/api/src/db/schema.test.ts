@@ -1,34 +1,37 @@
-import { describe, test, expect, beforeAll } from "bun:test";
 import { Database } from "bun:sqlite";
-import { drizzle } from "drizzle-orm/bun-sqlite";
+import { beforeAll, describe, expect, test } from "bun:test";
 import { unlinkSync } from "node:fs";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+
+type RawRow = Record<string, unknown>;
+
 import {
-  siteSettings,
-  users,
-  courses,
-  courseModules,
-  courseLessons,
   courseBonuses,
-  instructors,
   courseInstructors,
-  testimonials,
-  postCategories,
-  posts,
-  portfolios,
+  courseLessons,
+  courseModules,
+  courses,
   digitalProducts,
   faqs,
+  instructors,
   leads,
-  promotions,
+  portfolios,
+  postCategories,
+  posts,
   productShowcases,
+  promotions,
+  siteSettings,
+  testimonials,
+  users,
 } from "./schema";
 
-let db: ReturnType<typeof drizzle>;
+let _db: ReturnType<typeof drizzle>;
 let rawDb: Database;
 
 beforeAll(() => {
   rawDb = new Database(":memory:");
   rawDb.run("PRAGMA foreign_keys = ON");
-  db = drizzle(rawDb, { logger: false });
+  _db = drizzle(rawDb, { logger: false });
 
   // Create all tables via raw SQL
   rawDb.run(`CREATE TABLE IF NOT EXISTS site_settings (
@@ -413,33 +416,49 @@ describe("Schema — Relationships & Constraints", () => {
   test("courses.slug has unique constraint", () => {
     const slugCol = courses.slug;
     expect(slugCol).toBeDefined();
-    rawDb.run(`INSERT INTO courses (id, slug, title, description, base_price) VALUES ('c1', 'unique-slug', 'Test', 'Desc', 1000)`);
+    rawDb.run(
+      `INSERT INTO courses (id, slug, title, description, base_price) VALUES ('c1', 'unique-slug', 'Test', 'Desc', 1000)`,
+    );
     expect(() => {
-      rawDb.run(`INSERT INTO courses (id, slug, title, description, base_price) VALUES ('c2', 'unique-slug', 'Test2', 'Desc2', 2000)`);
+      rawDb.run(
+        `INSERT INTO courses (id, slug, title, description, base_price) VALUES ('c2', 'unique-slug', 'Test2', 'Desc2', 2000)`,
+      );
     }).toThrow();
     rawDb.run(`DELETE FROM courses`);
   });
 
   test("users.email has unique constraint", () => {
-    rawDb.run(`INSERT INTO users (id, email, name) VALUES ('u1', 'test@example.com', 'User 1')`);
+    rawDb.run(
+      `INSERT INTO users (id, email, name) VALUES ('u1', 'test@example.com', 'User 1')`,
+    );
     expect(() => {
-      rawDb.run(`INSERT INTO users (id, email, name) VALUES ('u2', 'test@example.com', 'User 2')`);
+      rawDb.run(
+        `INSERT INTO users (id, email, name) VALUES ('u2', 'test@example.com', 'User 2')`,
+      );
     }).toThrow();
     rawDb.run(`DELETE FROM users`);
   });
 
   test("posts.slug has unique constraint", () => {
-    rawDb.run(`INSERT INTO posts (id, title, slug, excerpt) VALUES ('p1', 'Post 1', 'post-slug', 'Excerpt')`);
+    rawDb.run(
+      `INSERT INTO posts (id, title, slug, excerpt) VALUES ('p1', 'Post 1', 'post-slug', 'Excerpt')`,
+    );
     expect(() => {
-      rawDb.run(`INSERT INTO posts (id, title, slug, excerpt) VALUES ('p2', 'Post 2', 'post-slug', 'Excerpt 2')`);
+      rawDb.run(
+        `INSERT INTO posts (id, title, slug, excerpt) VALUES ('p2', 'Post 2', 'post-slug', 'Excerpt 2')`,
+      );
     }).toThrow();
     rawDb.run(`DELETE FROM posts`);
   });
 
   test("post_categories.slug has unique constraint", () => {
-    rawDb.run(`INSERT INTO post_categories (id, name, slug) VALUES ('pc1', 'Cat 1', 'cat-slug')`);
+    rawDb.run(
+      `INSERT INTO post_categories (id, name, slug) VALUES ('pc1', 'Cat 1', 'cat-slug')`,
+    );
     expect(() => {
-      rawDb.run(`INSERT INTO post_categories (id, name, slug) VALUES ('pc2', 'Cat 2', 'cat-slug')`);
+      rawDb.run(
+        `INSERT INTO post_categories (id, name, slug) VALUES ('pc2', 'Cat 2', 'cat-slug')`,
+      );
     }).toThrow();
     rawDb.run(`DELETE FROM post_categories`);
   });
@@ -448,14 +467,22 @@ describe("Schema — Relationships & Constraints", () => {
 describe("Schema — Foreign Key Constraints", () => {
   test("course_modules FK cascade — insert fails without existing course", () => {
     expect(() => {
-      rawDb.run(`INSERT INTO course_modules (id, course_id, title, sort_order) VALUES ('m1', 'nonexistent', 'Module', 0)`);
+      rawDb.run(
+        `INSERT INTO course_modules (id, course_id, title, sort_order) VALUES ('m1', 'nonexistent', 'Module', 0)`,
+      );
     }).toThrow();
   });
 
   test("course_modules FK cascade — works with existing course", () => {
-    rawDb.run(`INSERT INTO courses (id, slug, title, description, base_price) VALUES ('c-fk', 'fk-test', 'FK Test', 'Desc', 1000)`);
-    rawDb.run(`INSERT INTO course_modules (id, course_id, title, sort_order) VALUES ('m-fk', 'c-fk', 'Module', 0)`);
-    const row = rawDb.query(`SELECT * FROM course_modules WHERE id = 'm-fk'`).get();
+    rawDb.run(
+      `INSERT INTO courses (id, slug, title, description, base_price) VALUES ('c-fk', 'fk-test', 'FK Test', 'Desc', 1000)`,
+    );
+    rawDb.run(
+      `INSERT INTO course_modules (id, course_id, title, sort_order) VALUES ('m-fk', 'c-fk', 'Module', 0)`,
+    );
+    const row = rawDb
+      .query(`SELECT * FROM course_modules WHERE id = 'm-fk'`)
+      .get();
     expect(row).not.toBeNull();
     rawDb.run(`DELETE FROM course_modules`);
     rawDb.run(`DELETE FROM courses`);
@@ -463,31 +490,43 @@ describe("Schema — Foreign Key Constraints", () => {
 
   test("course_lessons FK cascade — insert fails without existing module", () => {
     expect(() => {
-      rawDb.run(`INSERT INTO course_lessons (id, module_id, title, sort_order) VALUES ('l1', 'nonexistent', 'Lesson', 0)`);
+      rawDb.run(
+        `INSERT INTO course_lessons (id, module_id, title, sort_order) VALUES ('l1', 'nonexistent', 'Lesson', 0)`,
+      );
     }).toThrow();
   });
 
   test("course_instructors composite PK FK — insert fails without course", () => {
     expect(() => {
-      rawDb.run(`INSERT INTO course_instructors (course_id, instructor_id) VALUES ('bad-course', 'bad-instructor')`);
+      rawDb.run(
+        `INSERT INTO course_instructors (course_id, instructor_id) VALUES ('bad-course', 'bad-instructor')`,
+      );
     }).toThrow();
   });
 
   test("product_showcases FK — insert fails without existing product", () => {
     expect(() => {
-      rawDb.run(`INSERT INTO product_showcases (id, product_id) VALUES ('ps1', 'nonexistent')`);
+      rawDb.run(
+        `INSERT INTO product_showcases (id, product_id) VALUES ('ps1', 'nonexistent')`,
+      );
     }).toThrow();
   });
 
   test("testimonial FK — INSERT with NULL course_id works (global testimonial)", () => {
-    rawDb.run(`INSERT INTO testimonials (id, user_name, content) VALUES ('t-null', 'User', 'Good!')`);
-    const row = rawDb.query(`SELECT * FROM testimonials WHERE id = 't-null'`).get();
+    rawDb.run(
+      `INSERT INTO testimonials (id, user_name, content) VALUES ('t-null', 'User', 'Good!')`,
+    );
+    const row = rawDb
+      .query(`SELECT * FROM testimonials WHERE id = 't-null'`)
+      .get();
     expect(row).not.toBeNull();
     rawDb.run(`DELETE FROM testimonials`);
   });
 
   test("faqs FK — INSERT with NULL course_id works (global FAQ)", () => {
-    rawDb.run(`INSERT INTO faqs (id, question, answer) VALUES ('f-null', 'Q?', 'A.')`);
+    rawDb.run(
+      `INSERT INTO faqs (id, question, answer) VALUES ('f-null', 'Q?', 'A.')`,
+    );
     const row = rawDb.query(`SELECT * FROM faqs WHERE id = 'f-null'`).get();
     expect(row).not.toBeNull();
     rawDb.run(`DELETE FROM faqs`);
@@ -500,26 +539,42 @@ describe("Schema — WAL Mode", () => {
     fileDb.run("PRAGMA journal_mode = WAL");
     fileDb.run("PRAGMA busy_timeout = 5000");
     fileDb.run("PRAGMA foreign_keys = ON");
-    const walRow = fileDb.query(`PRAGMA journal_mode`).get() as { journal_mode: string };
+    const walRow = fileDb.query(`PRAGMA journal_mode`).get() as {
+      journal_mode: string;
+    };
     expect(walRow.journal_mode).toBe("wal");
-    const fkRow = fileDb.query(`PRAGMA foreign_keys`).get() as { foreign_keys: number };
+    const fkRow = fileDb.query(`PRAGMA foreign_keys`).get() as {
+      foreign_keys: number;
+    };
     expect(fkRow.foreign_keys).toBe(1);
     fileDb.close();
-    try { unlinkSync("/tmp/test-wal.db"); } catch (_) {}
-    try { unlinkSync("/tmp/test-wal.db-wal"); } catch (_) {}
-    try { unlinkSync("/tmp/test-wal.db-shm"); } catch (_) {}
+    try {
+      unlinkSync("/tmp/test-wal.db");
+    } catch (_) {}
+    try {
+      unlinkSync("/tmp/test-wal.db-wal");
+    } catch (_) {}
+    try {
+      unlinkSync("/tmp/test-wal.db-shm");
+    } catch (_) {}
   });
 
   test("foreign_keys are enabled on in-memory DB", () => {
-    const row = rawDb.query(`PRAGMA foreign_keys`).get() as { foreign_keys: number };
+    const row = rawDb.query(`PRAGMA foreign_keys`).get() as {
+      foreign_keys: number;
+    };
     expect(row.foreign_keys).toBe(1);
   });
 });
 
 describe("Schema — Insert + Select", () => {
   test("insert and select a site_setting", () => {
-    rawDb.run(`INSERT INTO site_settings (key, value, description) VALUES ('test_key', 'test_value', 'A test setting')`);
-    const row = rawDb.query(`SELECT * FROM site_settings WHERE key = 'test_key'`).get() as any;
+    rawDb.run(
+      `INSERT INTO site_settings (key, value, description) VALUES ('test_key', 'test_value', 'A test setting')`,
+    );
+    const row = rawDb
+      .query(`SELECT * FROM site_settings WHERE key = 'test_key'`)
+      .get() as RawRow;
     expect(row).not.toBeNull();
     expect(row.key).toBe("test_key");
     expect(row.value).toBe("test_value");
@@ -528,8 +583,15 @@ describe("Schema — Insert + Select", () => {
 
   test("insert and select a user", () => {
     const id = crypto.randomUUID();
-    rawDb.run(`INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)`, [id, "test@test.com", "Test User", "USER"]);
-    const row = rawDb.query(`SELECT * FROM users WHERE id = ?`).get(id) as any;
+    rawDb.run(`INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)`, [
+      id,
+      "test@test.com",
+      "Test User",
+      "USER",
+    ]);
+    const row = rawDb
+      .query(`SELECT * FROM users WHERE id = ?`)
+      .get(id) as RawRow;
     expect(row).not.toBeNull();
     expect(row.email).toBe("test@test.com");
     expect(row.role).toBe("USER");
@@ -541,23 +603,41 @@ describe("Schema — Insert + Select", () => {
     const moduleId = crypto.randomUUID();
     const lessonId = crypto.randomUUID();
 
-    rawDb.run(`INSERT INTO courses (id, slug, title, description, base_price, is_published, is_featured_on_home) VALUES (?, ?, ?, ?, ?, 1, 1)`,
-      [courseId, `test-course-${courseId.substring(0, 8)}`, "Test Course", "Description", 500000]);
-    rawDb.run(`INSERT INTO course_modules (id, course_id, title, sort_order) VALUES (?, ?, ?, 0)`,
-      [moduleId, courseId, "Module 1"]);
-    rawDb.run(`INSERT INTO course_lessons (id, module_id, title, type, duration_seconds, sort_order) VALUES (?, ?, ?, 'video', 300, 0)`,
-      [lessonId, moduleId, "Lesson 1"]);
+    rawDb.run(
+      `INSERT INTO courses (id, slug, title, description, base_price, is_published, is_featured_on_home) VALUES (?, ?, ?, ?, ?, 1, 1)`,
+      [
+        courseId,
+        `test-course-${courseId.substring(0, 8)}`,
+        "Test Course",
+        "Description",
+        500000,
+      ],
+    );
+    rawDb.run(
+      `INSERT INTO course_modules (id, course_id, title, sort_order) VALUES (?, ?, ?, 0)`,
+      [moduleId, courseId, "Module 1"],
+    );
+    rawDb.run(
+      `INSERT INTO course_lessons (id, module_id, title, type, duration_seconds, sort_order) VALUES (?, ?, ?, 'video', 300, 0)`,
+      [lessonId, moduleId, "Lesson 1"],
+    );
 
-    const courseRow = rawDb.query(`SELECT * FROM courses WHERE id = ?`).get(courseId) as any;
+    const courseRow = rawDb
+      .query(`SELECT * FROM courses WHERE id = ?`)
+      .get(courseId) as RawRow;
     expect(courseRow).not.toBeNull();
     expect(courseRow.is_published).toBe(1);
     expect(courseRow.is_featured_on_home).toBe(1);
 
-    const moduleRows = rawDb.query(`SELECT * FROM course_modules WHERE course_id = ?`).all(courseId) as any[];
+    const moduleRows = rawDb
+      .query(`SELECT * FROM course_modules WHERE course_id = ?`)
+      .all(courseId) as RawRow[];
     expect(moduleRows.length).toBe(1);
     expect(moduleRows[0].title).toBe("Module 1");
 
-    const lessonRows = rawDb.query(`SELECT * FROM course_lessons WHERE module_id = ?`).all(moduleId) as any[];
+    const lessonRows = rawDb
+      .query(`SELECT * FROM course_lessons WHERE module_id = ?`)
+      .all(moduleId) as RawRow[];
     expect(lessonRows.length).toBe(1);
     expect(lessonRows[0].title).toBe("Lesson 1");
     expect(lessonRows[0].duration_seconds).toBe(300);
@@ -571,11 +651,29 @@ describe("Schema — Insert + Select", () => {
     const catId = crypto.randomUUID();
     const postId = crypto.randomUUID();
 
-    rawDb.run(`INSERT INTO post_categories (id, name, slug) VALUES (?, ?, ?)`, [catId, "Tutorial", "tutorial"]);
-    rawDb.run(`INSERT INTO posts (id, category_id, title, slug, excerpt, content_blocks, thumbnail_url, author, read_time, is_published) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-      [postId, catId, "My Post", "my-post", "An excerpt", "[]", "https://img.com/thumb.jpg", "Author", 10]);
+    rawDb.run(`INSERT INTO post_categories (id, name, slug) VALUES (?, ?, ?)`, [
+      catId,
+      "Tutorial",
+      "tutorial",
+    ]);
+    rawDb.run(
+      `INSERT INTO posts (id, category_id, title, slug, excerpt, content_blocks, thumbnail_url, author, read_time, is_published) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+      [
+        postId,
+        catId,
+        "My Post",
+        "my-post",
+        "An excerpt",
+        "[]",
+        "https://img.com/thumb.jpg",
+        "Author",
+        10,
+      ],
+    );
 
-    const row = rawDb.query(`SELECT * FROM posts WHERE id = ?`).get(postId) as any;
+    const row = rawDb
+      .query(`SELECT * FROM posts WHERE id = ?`)
+      .get(postId) as RawRow;
     expect(row).not.toBeNull();
     expect(row.title).toBe("My Post");
     expect(row.slug).toBe("my-post");
@@ -589,10 +687,14 @@ describe("Schema — Insert + Select", () => {
 
   test("insert and select a portfolio item", () => {
     const id = crypto.randomUUID();
-    rawDb.run(`INSERT INTO portfolios (id, title, description, category, youtube_video_id, is_featured_on_home) VALUES (?, ?, ?, ?, ?, 1)`,
-      [id, "Film 1", "A cool film", "Travel", "abc123"]);
+    rawDb.run(
+      `INSERT INTO portfolios (id, title, description, category, youtube_video_id, is_featured_on_home) VALUES (?, ?, ?, ?, ?, 1)`,
+      [id, "Film 1", "A cool film", "Travel", "abc123"],
+    );
 
-    const row = rawDb.query(`SELECT * FROM portfolios WHERE id = ?`).get(id) as any;
+    const row = rawDb
+      .query(`SELECT * FROM portfolios WHERE id = ?`)
+      .get(id) as RawRow;
     expect(row).not.toBeNull();
     expect(row.category).toBe("Travel");
     expect(row.youtube_video_id).toBe("abc123");
@@ -602,10 +704,14 @@ describe("Schema — Insert + Select", () => {
 
   test("insert and select a digital product", () => {
     const id = crypto.randomUUID();
-    rawDb.run(`INSERT INTO digital_products (id, title, description, price, tag, is_published) VALUES (?, ?, ?, ?, ?, 1)`,
-      [id, "LUT Pack", "Color grading LUTs", 299000, "LUT"]);
+    rawDb.run(
+      `INSERT INTO digital_products (id, title, description, price, tag, is_published) VALUES (?, ?, ?, ?, ?, 1)`,
+      [id, "LUT Pack", "Color grading LUTs", 299000, "LUT"],
+    );
 
-    const row = rawDb.query(`SELECT * FROM digital_products WHERE id = ?`).get(id) as any;
+    const row = rawDb
+      .query(`SELECT * FROM digital_products WHERE id = ?`)
+      .get(id) as RawRow;
     expect(row).not.toBeNull();
     expect(row.tag).toBe("LUT");
     expect(row.price).toBe(299000);
@@ -615,10 +721,14 @@ describe("Schema — Insert + Select", () => {
 
   test("insert a lead with default status", () => {
     const id = crypto.randomUUID();
-    rawDb.run(`INSERT INTO leads (id, customer_name, customer_phone, message) VALUES (?, ?, ?, ?)`,
-      [id, "Customer", "0900123456", "I need help"]);
+    rawDb.run(
+      `INSERT INTO leads (id, customer_name, customer_phone, message) VALUES (?, ?, ?, ?)`,
+      [id, "Customer", "0900123456", "I need help"],
+    );
 
-    const row = rawDb.query(`SELECT * FROM leads WHERE id = ?`).get(id) as any;
+    const row = rawDb
+      .query(`SELECT * FROM leads WHERE id = ?`)
+      .get(id) as RawRow;
     expect(row).not.toBeNull();
     expect(row.status).toBe("NEW");
     rawDb.run(`DELETE FROM leads`);
@@ -627,12 +737,18 @@ describe("Schema — Insert + Select", () => {
   test("insert a promotion linked to a course", () => {
     const courseId = crypto.randomUUID();
     const promoId = crypto.randomUUID();
-    rawDb.run(`INSERT INTO courses (id, slug, title, description, base_price) VALUES (?, ?, ?, ?, ?)`,
-      [courseId, "promo-course", "Promo Course", "Desc", 1000]);
-    rawDb.run(`INSERT INTO promotions (id, course_id, campaign_name, discount_percentage, is_active) VALUES (?, ?, ?, ?, 1)`,
-      [promoId, courseId, "Summer Sale", 30]);
+    rawDb.run(
+      `INSERT INTO courses (id, slug, title, description, base_price) VALUES (?, ?, ?, ?, ?)`,
+      [courseId, "promo-course", "Promo Course", "Desc", 1000],
+    );
+    rawDb.run(
+      `INSERT INTO promotions (id, course_id, campaign_name, discount_percentage, is_active) VALUES (?, ?, ?, ?, 1)`,
+      [promoId, courseId, "Summer Sale", 30],
+    );
 
-    const row = rawDb.query(`SELECT * FROM promotions WHERE id = ?`).get(promoId) as any;
+    const row = rawDb
+      .query(`SELECT * FROM promotions WHERE id = ?`)
+      .get(promoId) as RawRow;
     expect(row).not.toBeNull();
     expect(row.campaign_name).toBe("Summer Sale");
     expect(row.discount_percentage).toBe(30);
@@ -644,12 +760,23 @@ describe("Schema — Insert + Select", () => {
   test("insert product showcases linked to a product", () => {
     const productId = crypto.randomUUID();
     const showcaseId = crypto.randomUUID();
-    rawDb.run(`INSERT INTO digital_products (id, title, description, price) VALUES (?, ?, ?, ?)`,
-      [productId, "Pack", "Desc", 999]);
-    rawDb.run(`INSERT INTO product_showcases (id, product_id, before_image_url, after_image_url, sort_order) VALUES (?, ?, ?, ?, 1)`,
-      [showcaseId, productId, "https://img.com/before.jpg", "https://img.com/after.jpg"]);
+    rawDb.run(
+      `INSERT INTO digital_products (id, title, description, price) VALUES (?, ?, ?, ?)`,
+      [productId, "Pack", "Desc", 999],
+    );
+    rawDb.run(
+      `INSERT INTO product_showcases (id, product_id, before_image_url, after_image_url, sort_order) VALUES (?, ?, ?, ?, 1)`,
+      [
+        showcaseId,
+        productId,
+        "https://img.com/before.jpg",
+        "https://img.com/after.jpg",
+      ],
+    );
 
-    const row = rawDb.query(`SELECT * FROM product_showcases WHERE id = ?`).get(showcaseId) as any;
+    const row = rawDb
+      .query(`SELECT * FROM product_showcases WHERE id = ?`)
+      .get(showcaseId) as RawRow;
     expect(row).not.toBeNull();
     expect(row.before_image_url).toBe("https://img.com/before.jpg");
     expect(row.after_image_url).toBe("https://img.com/after.jpg");
@@ -660,14 +787,22 @@ describe("Schema — Insert + Select", () => {
   test("insert instructor and course_instructor relationship", () => {
     const courseId = crypto.randomUUID();
     const instructorId = crypto.randomUUID();
-    rawDb.run(`INSERT INTO courses (id, slug, title, description, base_price) VALUES (?, ?, ?, ?, ?)`,
-      [courseId, "inst-course", "Inst Course", "Desc", 1000]);
-    rawDb.run(`INSERT INTO instructors (id, name, title, rating) VALUES (?, ?, ?, ?)`,
-      [instructorId, "Minh Travel", "Filmmaker", 4.9]);
-    rawDb.run(`INSERT INTO course_instructors (course_id, instructor_id) VALUES (?, ?)`,
-      [courseId, instructorId]);
+    rawDb.run(
+      `INSERT INTO courses (id, slug, title, description, base_price) VALUES (?, ?, ?, ?, ?)`,
+      [courseId, "inst-course", "Inst Course", "Desc", 1000],
+    );
+    rawDb.run(
+      `INSERT INTO instructors (id, name, title, rating) VALUES (?, ?, ?, ?)`,
+      [instructorId, "Minh Travel", "Filmmaker", 4.9],
+    );
+    rawDb.run(
+      `INSERT INTO course_instructors (course_id, instructor_id) VALUES (?, ?)`,
+      [courseId, instructorId],
+    );
 
-    const rows = rawDb.query(`SELECT * FROM course_instructors WHERE course_id = ?`).all(courseId) as any[];
+    const rows = rawDb
+      .query(`SELECT * FROM course_instructors WHERE course_id = ?`)
+      .all(courseId) as RawRow[];
     expect(rows.length).toBe(1);
     expect(rows[0].instructor_id).toBe(instructorId);
     rawDb.run(`DELETE FROM course_instructors`);
@@ -678,16 +813,24 @@ describe("Schema — Insert + Select", () => {
   test("CASCADE delete — deleting course removes modules", () => {
     const courseId = crypto.randomUUID();
     const moduleId = crypto.randomUUID();
-    rawDb.run(`INSERT INTO courses (id, slug, title, description, base_price) VALUES (?, ?, ?, ?, ?)`,
-      [courseId, "del-course", "Del Course", "Desc", 1000]);
-    rawDb.run(`INSERT INTO course_modules (id, course_id, title, sort_order) VALUES (?, ?, ?, 0)`,
-      [moduleId, courseId, "Mod"]);
+    rawDb.run(
+      `INSERT INTO courses (id, slug, title, description, base_price) VALUES (?, ?, ?, ?, ?)`,
+      [courseId, "del-course", "Del Course", "Desc", 1000],
+    );
+    rawDb.run(
+      `INSERT INTO course_modules (id, course_id, title, sort_order) VALUES (?, ?, ?, 0)`,
+      [moduleId, courseId, "Mod"],
+    );
 
-    let rows = rawDb.query(`SELECT * FROM course_modules WHERE course_id = ?`).all(courseId) as any[];
+    let rows = rawDb
+      .query(`SELECT * FROM course_modules WHERE course_id = ?`)
+      .all(courseId) as RawRow[];
     expect(rows.length).toBe(1);
 
     rawDb.run(`DELETE FROM courses WHERE id = ?`, [courseId]);
-    rows = rawDb.query(`SELECT * FROM course_modules WHERE id = ?`).all(moduleId) as any[];
+    rows = rawDb
+      .query(`SELECT * FROM course_modules WHERE id = ?`)
+      .all(moduleId) as RawRow[];
     expect(rows.length).toBe(0);
   });
 });

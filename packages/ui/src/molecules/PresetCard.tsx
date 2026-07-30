@@ -1,5 +1,5 @@
-import { formatVND } from '../lib/format';
-import styles from './PresetCard.module.scss';
+import { formatVND } from "../lib/format";
+import styles from "./PresetCard.module.scss";
 
 interface PresetCardProps {
   name: string;
@@ -16,11 +16,11 @@ export function PresetCard({
   price,
   thumbnail,
   tag,
-  className = '',
+  className = "",
 }: PresetCardProps) {
   return (
     <article className={`${styles.card} ${className}`}>
-      <div className={styles.thumbnail} style={{ position: 'relative' }}>
+      <div className={styles.thumbnail} style={{ position: "relative" }}>
         <img src={thumbnail} alt={name} loading="lazy" />
         {tag && <span className={styles.tag}>{tag}</span>}
       </div>

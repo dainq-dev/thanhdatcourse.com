@@ -1,0 +1,13 @@
+.wrapper { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; background: #f0f0f0; }
+.errorBar { background: #FEF2F2; border-bottom: 1px solid #FECACA; color: #C53030; padding: 8px 16px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; button { background: none; border: none; color: #c53030; cursor: pointer; font-size: 0.875rem; padding: 2px 6px; } }
+.editorArea { flex: 1; overflow: hidden; }
+.titleArea { padding: 16px 24px 12px; background: #fff; }
+.titleInput { width: 100%; padding: 8px 0; border: none; font-size: 1.5rem; font-weight: 700; color: #1a1a1a; outline: none; font-family: inherit; background: transparent; &::placeholder { color: #ccc; font-weight: 700; } }
+.backBtn { width: 100%; padding: 8px 12px; background: #fff; border: 1px solid #e0e0e0; color: #666; border-radius: 6px; font-size: 0.8125rem; cursor: pointer; font-family: inherit; margin-top: 8px; transition: all 0.15s; &:hover { border-color: #aaa; color: #333; } }
+
+.infoPanel { display: flex; flex-direction: column; gap: 14px; }
+.infoField { display: flex; flex-direction: column; gap: 4px; }
+.infoLabel { font-size: 0.6875rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
+.infoInput { width: 100%; padding: 7px 10px; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 0.8125rem; color: #1a1a1a; outline: none; font-family: inherit; box-sizing: border-box; &:focus { border-color: #06a84c; } &::placeholder { color: #bbb; } }
+.infoTextarea { composes: infoInput; resize: vertical; min-height: 60px; }
+.thumbPreview { margin-top: 6px; max-width: 100%; border-radius: 4px; border: 1px solid #e0e0e0; }

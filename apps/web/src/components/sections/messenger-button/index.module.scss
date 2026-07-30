@@ -1,0 +1,45 @@
+.messenger {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #00B2FF, #006AFF);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(0, 106, 255, 0.4);
+  text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: messengerPulse 2s ease-in-out infinite;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 28px rgba(0, 106, 255, 0.5);
+  }
+}
+
+@keyframes messengerPulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(0, 106, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 30px rgba(0, 106, 255, 0.5), 0 0 0 12px rgba(0, 106, 255, 0.1);
+  }
+}
+
+@media (max-width: 767px) {
+  .messenger {
+    bottom: 1rem;
+    right: 1rem;
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+}

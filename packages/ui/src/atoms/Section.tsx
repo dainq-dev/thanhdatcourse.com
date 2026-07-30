@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
-import styles from './Section.module.scss';
+import type { ReactNode } from "react";
+import styles from "./Section.module.scss";
 
-type SectionBg = 'white' | 'muted';
+type SectionBg = "white" | "muted";
 
 interface SectionProps {
   title?: string;
@@ -14,14 +14,12 @@ interface SectionProps {
 export function Section({
   title,
   subtitle,
-  bg = 'white',
+  bg = "white",
   children,
-  className = '',
+  className = "",
 }: SectionProps) {
   return (
-    <section
-      className={`${styles.section} ${styles[`bg-${bg}`]} ${className}`}
-    >
+    <section className={`${styles.section} ${styles[`bg-${bg}`]} ${className}`}>
       <div className={styles.container}>
         {title && <h2 className={styles.title}>{title}</h2>}
         {subtitle && <p className={styles.subtitle}>{subtitle}</p>}

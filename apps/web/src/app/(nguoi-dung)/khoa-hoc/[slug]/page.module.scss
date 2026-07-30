@@ -1,0 +1,318 @@
+@use '../../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.page {
+  background: $clr-bg;
+}
+
+.hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 1rem 4rem;
+  background: linear-gradient(180deg, $clr-bg-card 0%, $clr-bg 100%);
+  overflow: hidden;
+}
+
+.heroBadge {
+  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: $fw-extrabold;
+  color: $clr-primary;
+  margin-bottom: $space-4;
+  padding: $space-2 $space-6;
+  border: 2px solid $clr-primary-dark;
+  border-radius: $radius-sm;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  @include text-muted;
+  margin-bottom: $space-3;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0 0 $space-4;
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+.heroDesc {
+  font-size: var(--fs-lg);
+  @include text-muted;
+  max-width: 600px;
+  margin: 0 auto $space-6;
+  line-height: 1.7;
+}
+
+.heroCta {
+  @include btn-cta;
+}
+
+.heroCtaOutline {
+  @include btn-outline;
+  margin-left: $space-4;
+}
+
+.brandSection {
+  text-align: center;
+  @include section;
+}
+
+.brandTitle {
+  font-size: var(--fs-body);
+  font-weight: $fw-extrabold;
+  text-transform: uppercase;
+  color: $clr-text;
+  margin: 0 0 $space-4;
+}
+
+.brandGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $space-8;
+  padding: 0 $space-4;
+  opacity: 0.5;
+
+  span {
+    font-size: var(--fs-sm);
+    color: $clr-text-muted;
+    font-weight: $fw-semibold;
+    letter-spacing: 0.05em;
+  }
+}
+
+.targetBadges {
+  @include container;
+  @include section;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $space-4;
+}
+
+.targetBadge {
+  font-size: 17px;
+  font-weight: $fw-light;
+  color: $clr-text;
+  padding: $space-4 $space-8;
+  border: 1px solid $clr-border;
+  border-radius: $radius-md;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modulesSection {
+  @include container;
+  @include section;
+}
+
+.modulesTitle {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0 0 $space-4;
+  max-width: 600px;
+}
+
+.modulesSubtitle {
+  font-size: var(--fs-lg);
+  @include text-muted;
+  margin-bottom: $space-12;
+}
+
+.moduleList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.moduleItem {
+  display: flex;
+  gap: $space-6;
+  align-items: flex-start;
+}
+
+.moduleNum {
+  flex-shrink: 0;
+  font-size: 48px;
+  font-weight: $fw-bold;
+  color: $clr-primary;
+  font-weight: $fw-extrabold;
+  line-height: 1;
+}
+
+.moduleTitle {
+  font-size: var(--fs-lg);
+  font-weight: $fw-semibold;
+  color: $clr-text;
+  margin: 0 0 $space-1;
+}
+
+.moduleDesc {
+  font-size: var(--fs-sm);
+  @include text-muted;
+  margin: 0;
+}
+
+.bonusSection {
+  @include container;
+  @include section;
+}
+
+.bonusTitle {
+  font-size: clamp(1.5rem, 3vw, 3rem);
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0 0 $space-12;
+}
+
+.bonusList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.bonusItem {
+  display: flex;
+  gap: $space-6;
+  align-items: flex-start;
+}
+
+.bonusNum {
+  flex-shrink: 0;
+  font-size: 48px;
+  font-weight: $fw-bold;
+  color: $clr-primary;
+  font-weight: $fw-extrabold;
+  line-height: 1;
+}
+
+.bonusName {
+  font-size: 25px;
+  font-weight: $fw-bold;
+  color: $clr-text;
+  margin: 0 0 $space-2;
+}
+
+.bonusValue {
+  font-size: var(--fs-sm);
+  @include text-muted;
+}
+
+.testimonialsSection {
+  @include container;
+  @include section;
+}
+
+.testimonialsTitle {
+  @include heading-section;
+  margin-bottom: $space-12;
+  text-transform: none;
+}
+
+.testimonialGrid {
+  @include grid-cols(300px, $space-8);
+}
+
+.testimonialCard {
+  background: $clr-bg-card;
+  border: 1px solid $clr-border;
+  border-radius: var(--radius-lg);
+  padding: $space-8;
+}
+
+.testimonialTitle {
+  font-size: var(--fs-h3);
+  font-weight: $fw-semibold;
+  color: $clr-text;
+  margin: 0 0 $space-4;
+}
+
+.testimonialQuote {
+  font-size: var(--fs-sm);
+  @include text-muted;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.faqSection {
+  @include section;
+  position: relative;
+  overflow: hidden;
+  background: $clr-bg;
+}
+
+.faqWatermark {
+  @include heading-faq-bg(0.08);
+}
+
+.faqList {
+  max-width: 800px;
+  margin: 2rem auto 0;
+  padding: 0 1rem;
+}
+
+.stickyBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid $clr-border;
+  padding: $space-4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-6;
+  flex-wrap: wrap;
+
+  @include respond-to($bp-md) {
+    padding: $space-4 $space-8;
+  }
+}
+
+.stickyPriceLabel {
+  font-size: var(--fs-h3);
+  font-weight: $fw-bold;
+  color: $clr-text;
+}
+
+.stickyPrice {
+  font-size: var(--fs-h3);
+  font-weight: $fw-bold;
+  color: $clr-primary;
+}
+
+.stickyCta {
+  @include btn-cta-sm;
+}
+
+.bonusBg {
+  background: $clr-bg-card;
+}
+
+.notFound {
+  @include container;
+  @include section;
+  text-align: center;
+}
+
+.notFoundTitle {
+  @include heading-section;
+  margin-bottom: $space-4;
+}
+
+.notFoundDesc {
+  @include text-muted;
+}

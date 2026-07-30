@@ -1,4 +1,4 @@
-import styles from './ArticleCard.module.scss';
+import styles from "./ArticleCard.module.scss";
 
 interface ArticleCardProps {
   slug: string;
@@ -19,7 +19,7 @@ export function ArticleCard({
   author,
   readTime,
   publishedAt,
-  className = '',
+  className = "",
 }: ArticleCardProps) {
   return (
     <article className={`${styles.card} ${className}`}>

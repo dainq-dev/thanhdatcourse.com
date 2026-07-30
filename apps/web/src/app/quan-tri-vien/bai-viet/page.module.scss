@@ -1,0 +1,18 @@
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.pageTitle { font-size: clamp(1.25rem, 3vw, 1.5rem); font-weight: 700; color: #1A1A1A; margin: 0; letter-spacing: -0.02em; }
+.addBtn { padding: 0.5rem 1rem; background: #1A1A1A; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s; white-space: nowrap; &:hover { background: #333; } }
+.filters { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.filter { padding: 0.5rem 0.75rem; background: #FFFFFF; border: 1px solid #E0E0E0; border-radius: 6px; color: #1A1A1A; font-size: 0.8125rem; font-family: inherit; cursor: pointer; outline: none; }
+.table { width: 100%; border-collapse: collapse; background: #FFFFFF; border: 1px solid #EAEAEA; border-radius: 8px; overflow: hidden; th { text-align:left; padding:0.75rem 1rem; font-size:0.7rem; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid #F0F0F0; background:#FAFAFA; } td { padding:0.75rem 1rem; font-size:0.8125rem; color:#444; border-bottom:1px solid #F5F5F3; } tr:last-child td{border-bottom:none} tr:hover td{background:#FAFAFA} }
+.titleCell { display: flex; flex-direction: column; gap: 0.15rem; }
+.postTitle { color: #1A1A1A; font-weight: 500; }
+.slug { font-size: 0.6875rem; color: #AAA; font-family: 'SF Mono', monospace; }
+.badge { padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.published { background: #EDF7ED; color: #2F6B2F; border: 1px solid #C6E6C6; }
+.draft { background: #F5F5F3; color: #999; border: 1px solid #EAEAEA; }
+.date { color: #999; font-size: 0.75rem; }
+.actions { display: flex; gap: 0.5rem; }
+.editBtn { padding: 0.25rem 0.6rem; background: #FFFFFF; border: 1px solid #E0E0E0; color: #666; border-radius: 4px; font-size: 0.7rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; &:hover{border-color:#CCC;color:#333} }
+.deleteBtn { padding: 0.25rem 0.6rem; background: #FEF2F2; border: 1px solid #FECACA; color: #C53030; border-radius: 4px; font-size: 0.7rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; &:hover{background:#FEE2E2} }
+.loading { color: #999; padding: 2rem; font-size: 0.8125rem; }
+.empty { text-align: center; padding: 4rem 2rem; color: #B0B0B0; font-size: 0.8125rem; }

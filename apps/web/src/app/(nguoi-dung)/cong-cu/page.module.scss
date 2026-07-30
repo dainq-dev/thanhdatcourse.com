@@ -1,0 +1,50 @@
+@use '../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.productList {
+  @include container;
+  @include section;
+  padding-bottom: $space-20;
+}
+
+.productItem {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-6;
+  margin-bottom: $space-12;
+  padding-top: $space-12;
+  @include divider;
+
+  @include respond-to($bp-md) {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-8;
+    align-items: center;
+  }
+
+  &:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+.productThumb {
+  @include video-thumb;
+}
+
+.productTitle {
+  font-size: 1.75rem;
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0 0 $space-4;
+}
+
+.productDesc {
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  @include text-muted;
+  margin: 0 0 $space-6;
+}
+
+.buyBtn {
+  @include btn-cta;
+}

@@ -1,0 +1,28 @@
+@use '../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.section {
+  @include section;
+  background: $clr-bg;
+}
+
+.muted {
+  background: $clr-bg-elevated;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.heading {
+  @include heading-section;
+}
+
+.grid {
+  @include container;
+  @include two-col(1.5rem);
+}

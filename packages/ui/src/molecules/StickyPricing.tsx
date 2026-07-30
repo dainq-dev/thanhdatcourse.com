@@ -1,6 +1,6 @@
-import { Button } from '../atoms/Button';
-import { formatVND } from '../lib/format';
-import styles from './StickyPricing.module.scss';
+import { Button } from "../atoms/Button";
+import { formatVND } from "../lib/format";
+import styles from "./StickyPricing.module.scss";
 
 interface StickyPricingProps {
   price: number;
@@ -13,7 +13,7 @@ export function StickyPricing({
   price,
   originalPrice,
   features = [],
-  className = '',
+  className = "",
 }: StickyPricingProps) {
   const savings = originalPrice ? originalPrice - price : 0;
 
@@ -28,7 +28,13 @@ export function StickyPricing({
           <div className={styles.savings}>Tiết kiệm {formatVND(savings)}</div>
         )}
       </div>
-      <Button variant="primary" size="lg" as="a" href="#register" className={styles.cta}>
+      <Button
+        variant="primary"
+        size="lg"
+        as="a"
+        href="#register"
+        className={styles.cta}
+      >
         Đăng ký ngay
       </Button>
       {features.length > 0 && (

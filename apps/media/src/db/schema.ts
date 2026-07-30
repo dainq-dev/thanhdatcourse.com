@@ -1,7 +1,14 @@
-import { sqliteTable, text, integer, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
 export const media = sqliteTable("media", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   originalName: text("original_name").notNull(),
   storedName: text("stored_name").notNull(),
   mimeType: text("mime_type").notNull(),
@@ -17,16 +24,24 @@ export const media = sqliteTable("media", {
   uploadedAt: text("uploaded_at").$defaultFn(() => new Date().toISOString()),
 });
 
-export const mediaVariants = sqliteTable("media_variants", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  mediaId: text("media_id").notNull().references(() => media.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  width: integer("width").notNull(),
-  height: integer("height"),
-  format: text("format").notNull(),
-  fileSize: integer("file_size").notNull(),
-  diskPath: text("disk_path").notNull(),
-  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
-}, (table) => ({
-  uniqueVariant: uniqueIndex("unique_variant").on(table.mediaId, table.name),
-}));
+export const mediaVariants = sqliteTable(
+  "media_variants",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    mediaId: text("media_id")
+      .notNull()
+      .references(() => media.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    width: integer("width").notNull(),
+    height: integer("height"),
+    format: text("format").notNull(),
+    fileSize: integer("file_size").notNull(),
+    diskPath: text("disk_path").notNull(),
+    createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+  },
+  (table) => ({
+    uniqueVariant: uniqueIndex("unique_variant").on(table.mediaId, table.name),
+  }),
+);

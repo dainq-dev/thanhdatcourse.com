@@ -1,16 +1,20 @@
-import type { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from 'react';
-import styles from './Button.module.scss';
+import type {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ReactNode,
+} from "react";
+import styles from "./Button.module.scss";
 
-type ButtonVariant = 'primary' | 'outline' | 'ghost';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = "primary" | "outline" | "ghost";
+type ButtonSize = "sm" | "md" | "lg";
 
 type ButtonAsButton = {
-  as?: 'button';
+  as?: "button";
   href?: undefined;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 type ButtonAsLink = {
-  as: 'a';
+  as: "a";
   href: string;
 } & AnchorHTMLAttributes<HTMLAnchorElement>;
 
@@ -22,20 +26,21 @@ type ButtonProps = (ButtonAsButton | ButtonAsLink) & {
 };
 
 export function Button({
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   isLoading = false,
-  className = '',
+  className = "",
   children,
   as,
   ...rest
 }: ButtonProps) {
   const classes = [styles.btn, styles[variant], styles[size], className]
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 
-  if (as === 'a') {
-    const { href, ...anchorProps } = rest as AnchorHTMLAttributes<HTMLAnchorElement>;
+  if (as === "a") {
+    const { href, ...anchorProps } =
+      rest as AnchorHTMLAttributes<HTMLAnchorElement>;
     return (
       <a href={href} className={classes} {...anchorProps}>
         {children}
@@ -43,7 +48,8 @@ export function Button({
     );
   }
 
-  const { disabled, ...buttonProps } = rest as ButtonHTMLAttributes<HTMLButtonElement>;
+  const { disabled, ...buttonProps } =
+    rest as ButtonHTMLAttributes<HTMLButtonElement>;
   return (
     <button
       className={classes}
@@ -55,4 +61,3 @@ export function Button({
     </button>
   );
 }
-

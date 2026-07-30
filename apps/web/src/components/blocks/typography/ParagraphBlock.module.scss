@@ -1,0 +1,17 @@
+.root {
+  margin: 0 0 1em;
+  line-height: 1.7;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.dropCap::first-letter {
+  float: left;
+  font-size: 3.5em;
+  font-weight: 700;
+  line-height: 0.85;
+  margin-right: 0.12em;
+  margin-top: 0.05em;
+}

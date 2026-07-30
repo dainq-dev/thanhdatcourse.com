@@ -1,14 +1,14 @@
-import { usePathname } from 'next/navigation';
-import { useState, useEffect, useCallback } from 'react';
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 const NAV_ITEMS = [
-  { label: 'Khoá học', href: '/khoa-hoc' },
-  { label: 'SẢN PHẨM', href: '/san-pham' },
-  { label: 'PRESETS & LUTS', href: '/cong-cu' },
-  { label: 'BLOG', href: '/bai-viet' },
+  { label: "Khoá học", href: "/khoa-hoc" },
+  { label: "SẢN PHẨM", href: "/san-pham" },
+  { label: "PRESETS & LUTS", href: "/cong-cu" },
+  { label: "BLOG", href: "/bai-viet" },
 ] as const;
 
-const LMS_URL = 'https://hoc.minhtravel.vn/courses/';
+const LMS_URL = "https://hoc.minhtravel.vn/courses/";
 
 export interface SiteHeaderState {
   navItems: typeof NAV_ITEMS;
@@ -29,8 +29,8 @@ export function useSiteHeader(): SiteHeaderState {
     const onScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const toggleMobile = useCallback(() => setMobileOpen((v) => !v), []);
