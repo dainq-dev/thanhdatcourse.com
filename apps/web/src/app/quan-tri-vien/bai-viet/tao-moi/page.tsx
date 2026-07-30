@@ -7,6 +7,7 @@ import { ApiError, api } from "@/lib/api";
 import { MediaTrigger } from "@/components/admin/media-manager/media-trigger";
 import { BlockEditor } from "@/components/admin/block-editor";
 import { LeftPanel } from "@/components/admin/block-editor/LeftPanel";
+import { getDefaultData } from "@/components/admin/block-editor/editorState";
 import styles from "./page.module.scss";
 
 interface Category {
@@ -38,7 +39,7 @@ export default function CreatePostPage() {
   }, []);
 
   const addBlock = useCallback((type: Block["type"]) => {
-    setBlocks((prev) => [...prev, { id: crypto.randomUUID(), type, data: {} } as Block]);
+    setBlocks((prev) => [...prev, { id: crypto.randomUUID(), type, data: getDefaultData(type) } as Block]);
     setActiveTab("components");
   }, []);
 

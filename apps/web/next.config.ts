@@ -10,6 +10,20 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: false,
   },
+  async redirects() {
+    return [
+      {
+        source: "/quan-tri-vien/bai-viet/tao-bai-viet",
+        destination: "/quan-tri-vien/bai-viet/tao-moi",
+        permanent: true,
+      },
+      {
+        source: "/quan-tri-vien/bai-viet/chinh-sua-bai-viet",
+        destination: "/quan-tri-vien/bai-viet",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

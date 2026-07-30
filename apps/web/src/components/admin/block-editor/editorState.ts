@@ -1,31 +1,59 @@
 import { useCallback, useRef } from "react";
 import type { Block, Content } from "@workspace/types";
 
-function getDefaultData(type: Block["type"]): Record<string, unknown> {
+export function getDefaultData(type: Block["type"]): Record<string, unknown> {
   switch (type) {
-    case "heading": return { level: 2, text: "", alignment: "left" };
-    case "paragraph": return { text: "", alignment: "left", dropCap: false };
-    case "quote": return { text: "", style: "default" };
-    case "list": return { style: "unordered", items: [""] };
-    case "code": return { code: "", language: "plaintext", showLineNumbers: false };
-    case "callout": return { text: "", variant: "info" };
-    case "image": return { mediaId: "", width: "wide", border: false, rounded: false };
-    case "video": return { mediaId: "", aspectRatio: "16:9" };
-    case "gallery": return { images: [], columns: 3, gap: "md", layout: "grid" };
-    case "carousel": return { slides: [], autoplay: false, interval: 5000, showDots: true, showArrows: true };
-    case "beforeAfter": return { beforeMediaId: "", afterMediaId: "", beforeLabel: "Before", afterLabel: "After" };
-    case "divider": return { style: "solid" };
-    case "spacer": return { height: 40 };
-    case "columns": return { columns: 2, content: [[], []], gap: "md" };
-    case "tabs": return { tabs: [{ label: "Tab 1", content: [] }] };
-    case "accordion": return { items: [{ title: "", content: [] }], allowMultiple: true };
-    case "collapse": return { title: "", content: [], defaultOpen: false };
-    case "timeline": return { events: [{ date: "", title: "", description: "" }] };
-    case "table": return { headers: ["Cột 1", "Cột 2"], rows: [["", ""]], striped: true, compact: false };
-    case "cta": return { heading: "", buttonText: "", buttonUrl: "", style: "primary" };
-    case "pricingTable": return { plans: [] };
-    case "testimonial": return { testimonialId: "", style: "card" };
-    default: return {};
+    // ── Typography ──
+    case "heading":
+      return { level: 2, text: "", alignment: "left", weight: "bold", italic: false, underline: false, color: "inherit" };
+    case "paragraph":
+      return { text: "", alignment: "left", dropCap: false, fontSize: "md", lineHeight: "normal", weight: "regular", color: "inherit" };
+    case "quote":
+      return { text: "", style: "default", icon: null };
+    case "list":
+      return { style: "unordered", items: [""] };
+    case "code":
+      return { code: "", language: "plaintext", showLineNumbers: false, theme: "dark", showCopyButton: true };
+    case "callout":
+      return { text: "", variant: "info", icon: null, title: "" };
+    // ── Media ──
+    case "image":
+      return { mediaId: "", width: "wide", rounded: "none", border: "none", shadow: "none", hoverZoom: false, link: "", objectFit: "cover" };
+    case "video":
+      return { mediaId: "", aspectRatio: "16:9", rounded: "none", shadow: "none", autoplay: false, loop: false, showControls: true, thumbnail: "" };
+    case "gallery":
+      return { images: [], columns: 3, gap: "md", layout: "grid", rounded: "none", shadow: "none", hoverZoom: false, lightbox: true };
+    case "carousel":
+      return { slides: [], autoplay: false, interval: 5000, showDots: true, showArrows: true, transition: "slide", rounded: "none", shadow: "none", aspectRatio: "16:9", loop: true, pauseOnHover: true, slidesPerView: 1 };
+    case "beforeAfter":
+      return { beforeMediaId: "", afterMediaId: "", beforeLabel: "Trước", afterLabel: "Sau", orientation: "horizontal", rounded: "none", shadow: "none" };
+    // ── Layout ──
+    case "divider":
+      return { style: "solid" };
+    case "spacer":
+      return { height: 40 };
+    case "columns":
+      return { columns: 2, content: [[], []], gap: "md", columnRatios: "auto" };
+    case "tabs":
+      return { tabs: [{ label: "Tab 1", content: [] }], tabStyle: "top", defaultTab: 0 };
+    // ── Interactive ──
+    case "accordion":
+      return { items: [{ title: "", content: [] }], allowMultiple: true, iconPosition: "right", defaultOpenIndex: -1, borderStyle: "bordered" };
+    case "collapse":
+      return { title: "", content: [], defaultOpen: false, iconPosition: "right" };
+    case "timeline":
+      return { events: [{ date: "", title: "", description: "" }], layout: "vertical", iconPerEvent: null, lineColor: "--color-border" };
+    case "table":
+      return { headers: ["Cột 1", "Cột 2"], rows: [["", ""]], striped: true, compact: false };
+    // ── Conversion ──
+    case "cta":
+      return { heading: "", buttonText: "", buttonUrl: "", style: "primary", buttonStyle: "solid", buttonSize: "md", buttonIcon: null };
+    case "pricingTable":
+      return { plans: [], currency: "VNĐ", billingPeriod: "monthly", layout: "horizontal" };
+    case "testimonial":
+      return { testimonialId: "", style: "card", showAvatar: true, showRating: true, avatarSize: "md", background: "none" };
+    default:
+      return {};
   }
 }
 

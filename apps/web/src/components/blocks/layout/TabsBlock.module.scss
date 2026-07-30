@@ -1,0 +1,8 @@
+.root { margin: 1.5em 0; }
+.nav { display: flex; border-bottom: 1px solid #334155; gap: 0; margin-bottom: 16px; }
+.vertical { display: flex; gap: 0; .nav { flex-direction: column; border-bottom: none; border-right: 1px solid #334155; min-width: 160px; margin-bottom: 0; } .panels { flex: 1; padding-left: 24px; } }
+.pills { border-bottom: none; gap: 8px; .tab { border-radius: 999px; padding: 6px 16px; } .tabActive { background: #3B82F6; color: #fff; border-color: transparent; } }
+.tab { padding: 10px 16px; border: none; background: none; color: #94A3B8; font-size: 0.875rem; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; font-family: inherit; white-space: nowrap; &:hover { color: #E2E8F0; } }
+.tabActive { color: #3B82F6; border-bottom-color: #3B82F6; }
+.panel { display: none; }
+.panelActive { display: block; }

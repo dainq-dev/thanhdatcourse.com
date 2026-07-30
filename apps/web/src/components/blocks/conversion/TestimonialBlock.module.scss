@@ -1,8 +1,11 @@
-.root {
-  padding: 1em;
-  border: 1px dashed #ccc;
-  border-radius: 6px;
-  margin: 1em 0;
-  color: #888;
-  font-style: italic;
-}
+.root { margin: 1.5em 0; padding: 24px; border-radius: 12px; }
+.style_card { border: 1px solid #334155; background: #1E293B; }
+.style_inline { border: none; padding: 16px 0; display: flex; gap: 16px; align-items: flex-start; }
+.style_large { padding: 40px 32px; text-align: center; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; margin-bottom: 12px; }
+.avatar_sm { width: 32px; height: 32px; font-size: 0.875rem; }
+.avatar_md { width: 48px; height: 48px; }
+.avatar_lg { width: 64px; height: 64px; font-size: 1.5rem; }
+.rating { color: #F59E0B; font-size: 1rem; margin-bottom: 8px; }
+.quote { margin: 0; font-size: 0.9375rem; line-height: 1.7; color: #CBD5E1; font-style: italic; }
+.cite { display: block; margin-top: 12px; font-size: 0.8125rem; color: #94A3B8; font-style: normal; font-weight: 600; }

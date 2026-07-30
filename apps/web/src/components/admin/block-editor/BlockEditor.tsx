@@ -4,8 +4,13 @@ import { useCallback, useMemo, useState, type ReactNode } from "react";
 import type { Block, Content } from "@workspace/types";
 import { useBlockEditorState } from "./editorState";
 import { BlockPreview } from "./BlockPreview";
+import { BlockRenderer } from "@/components/blocks/BlockRenderer";
 import { RightPanel } from "./RightPanel";
 import styles from "./workspace.module.scss";
+import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Redo2, Undo2 } from "lucide-react";
 
 export interface BlockEditorProps {
   blocks: Content;
@@ -59,8 +64,8 @@ export function BlockEditor({ blocks, onChange, onSave, onPublish, saving, leftP
     <div className={styles.workspace}>
       <div className={styles.topBar}>
         <div className={styles.topBarLeft}>
-          <button type="button" className={styles.topBarBtn} onClick={editor.undo} disabled={!editor.canUndo} title="Ctrl+Z">↩</button>
-          <button type="button" className={styles.topBarBtn} onClick={editor.redo} disabled={!editor.canRedo} title="Ctrl+Shift+Z">↪</button>
+          <button type="button" className={styles.topBarBtn} onClick={editor.undo} disabled={!editor.canUndo} title="Ctrl+Z"><Undo2 /></button>
+          <button type="button" className={styles.topBarBtn} onClick={editor.redo} disabled={!editor.canRedo} title="Ctrl+Shift+Z"><Redo2 /></button>
           <span className={styles.topBarSep}>|</span>
           <span className={styles.topBarInfo}>{blocks.length} blocks</span>
         </div>
@@ -102,9 +107,7 @@ export function BlockEditor({ blocks, onChange, onSave, onPublish, saving, leftP
   );
 }
 
-import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+
 
 const BLOCK_LABELS: Record<string, string> = {
   heading: "Tiêu đề", paragraph: "Đoạn văn", quote: "Trích dẫn", list: "Danh sách",
@@ -155,8 +158,9 @@ function SortableBlockItem({ block, index, total, isSelected, onSelect, onDelete
       <div className={`${styles.blockItem} ${isSelected ? styles.blockItemSelected : ""}`}
         onClick={(e) => { e.stopPropagation(); onSelect(); }}>
         <div className={styles.blockItemDrag} {...attributes} {...listeners}>⋮⋮</div>
-        <div className={styles.blockItemThumb}><MiniBlockPreview block={block} /></div>
-        <div className={styles.blockItemMeta}><span className={styles.blockItemType}>{BLOCK_LABELS[block.type]}</span></div>
+        <div className={styles.blockItemThumb}>
+          <BlockRenderer blocks={[block]} />
+        </div>
         <div className={styles.blockItemActions}>
           <button type="button" className={styles.blockItemActionBtn} onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Xóa">✕</button>
         </div>
@@ -165,31 +169,3 @@ function SortableBlockItem({ block, index, total, isSelected, onSelect, onDelete
   );
 }
 
-function MiniBlockPreview({ block }: { block: Block }) {
-  const d = block.data as Record<string, unknown>;
-  switch (block.type) {
-    case "heading": return <div className={styles.miniHeading}>{(d as any).text || "Tiêu đề"}</div>;
-    case "paragraph": return <div className={styles.miniPara}>{(d as any).text || "Đoạn văn..."}</div>;
-    case "image": return <div className={styles.miniImg}>🖼 {(d as any).mediaId ? "Ảnh đã chọn" : "Chọn ảnh..."}</div>;
-    case "video": return <div className={styles.miniImg}>▶ {(d as any).mediaId ? "Video đã chọn" : "Chọn video..."}</div>;
-    case "quote": return <div className={styles.miniQuote}>"{(d as any).text || "Trích dẫn..."}"</div>;
-    case "list": return <div className={styles.miniPara}>≡ {((d as any).items as string[] || []).length || 0} mục</div>;
-    case "code": return <div className={styles.miniCode}>{"</>"} {(d as any).language || "code"}</div>;
-    case "callout": return <div className={styles.miniCallout}>! {((d as any).text as string || "").slice(0, 50) || "Callout..."}</div>;
-    case "divider": return <div className={styles.miniDivider}>━━━</div>;
-    case "spacer": return <div className={styles.miniSpacer}>↕ {(d as any).height || 40}px</div>;
-    case "gallery": return <div className={styles.miniImg}>▦ Gallery ({((d as any).images as any[] || []).length} ảnh)</div>;
-    case "carousel": return <div className={styles.miniImg}>◀▶ Carousel ({((d as any).slides as any[] || []).length} slides)</div>;
-    case "beforeAfter": return <div className={styles.miniImg}>⇔ Trước/Sau</div>;
-    case "columns": return <div className={styles.miniColumns}>▤ {((d as any).columns || 2)} cột</div>;
-    case "tabs": return <div className={styles.miniColumns}>📑 {((d as any).tabs as any[] || []).length || 0} tabs</div>;
-    case "accordion": return <div className={styles.miniColumns}>☰ {((d as any).items as any[] || []).length || 0} items</div>;
-    case "collapse": return <div className={styles.miniColumns}>▾ {(d as any).title as string || "Thu gọn"}</div>;
-    case "cta": return <div className={styles.miniCta}>→ {(d as any).heading as string || "CTA"}</div>;
-    case "pricingTable": return <div className={styles.miniCta}>$ {((d as any).plans as any[] || []).length || 0} gói</div>;
-    case "testimonial": return <div className={styles.miniQuote}>★ Đánh giá</div>;
-    case "timeline": return <div className={styles.miniPara}>◉ {((d as any).events as any[] || []).length || 0} sự kiện</div>;
-    case "table": return <div className={styles.miniPara}>⊞ {((d as any).headers as string[] || []).length}×{((d as any).rows as any[][] || []).length}</div>;
-    default: return <div className={styles.miniPara}>{(block as Block).type}</div>;
-  }
-}

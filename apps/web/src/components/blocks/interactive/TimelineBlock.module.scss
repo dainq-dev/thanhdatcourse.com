@@ -1,8 +1,12 @@
-.root {
-  padding: 1em;
-  border: 1px dashed #ccc;
-  border-radius: 6px;
-  margin: 1em 0;
-  color: #888;
-  font-style: italic;
-}
+.root { position: relative; margin: 2em 0; padding-left: 32px; border-left: 2px solid #334155; }
+.horizontal { display: flex; padding-left: 0; border-left: none; border-top: 2px solid #334155; padding-top: 32px; gap: 24px; overflow-x: auto; .event { flex-direction: column; padding: 0; } .marker { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); } }
+.event { position: relative; padding: 0 0 28px 24px; &:last-child { padding-bottom: 0; } }
+.left, .right { width: 50%; }
+.left { padding-right: 24px; padding-left: 0; text-align: right; .marker { left: auto; right: -8px; } }
+.right { margin-left: 50%; }
+.marker { position: absolute; left: -9px; top: 4px; }
+.dot { width: 16px; height: 16px; border-radius: 50%; background: #3B82F6; border: 3px solid #0B0F19; }
+.content {}
+.date { font-size: 0.75rem; color: #3B82F6; font-weight: 600; margin-bottom: 4px; }
+.title { font-size: 0.9375rem; font-weight: 600; color: #E2E8F0; margin-bottom: 4px; }
+.desc { font-size: 0.8125rem; color: #94A3B8; line-height: 1.6; }

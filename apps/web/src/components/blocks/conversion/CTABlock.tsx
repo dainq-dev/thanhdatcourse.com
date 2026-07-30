@@ -1,28 +1,24 @@
 import styles from "./CTABlock.module.scss";
 
+const BUTTON_STYLE_MAP: Record<string, string> = { solid: "", outline: styles.btnOutline, ghost: styles.btnGhost };
+const BUTTON_SIZE_MAP: Record<string, string> = { sm: styles.btnSm, md: "", lg: styles.btnLg };
+
 export function CTABlock({
   data,
 }: {
   data: {
-    heading: string;
-    text?: string;
-    buttonText: string;
-    buttonUrl: string;
-    style: "primary" | "secondary" | "minimal";
-    backgroundMediaId?: string;
+    heading: string; text?: string; buttonText: string; buttonUrl: string;
+    style: string; backgroundMediaId?: string;
+    buttonStyle: string; buttonSize: string; buttonIcon?: string | null;
   };
 }) {
-  const buttonStyleKey =
-    `button${data.style.charAt(0).toUpperCase() + data.style.slice(1)}` as keyof typeof styles;
-
   return (
-    <section className={`${styles.root} ${styles[data.style]}`}>
+    <section className={`${styles.root} ${styles[data.style] || ""}`}>
       <h2 className={styles.heading}>{data.heading}</h2>
       {data.text && <p className={styles.text}>{data.text}</p>}
-      <a
-        className={`${styles.button} ${styles[buttonStyleKey] || styles.button}`}
-        href={data.buttonUrl}
-      >
+      <a className={`${styles.button} ${BUTTON_STYLE_MAP[data.buttonStyle] || ""} ${BUTTON_SIZE_MAP[data.buttonSize] || ""}`}
+        href={data.buttonUrl}>
+        {data.buttonIcon && <span className={styles.btnIcon}>{data.buttonIcon}</span>}
         {data.buttonText}
       </a>
     </section>

@@ -60,8 +60,6 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <h1 className={styles.pageTitle}>Tổng quan</h1>
-
       <div className={styles.grid}>
         <div className={styles.statCard}>
           <div className={styles.statValue}>{stats?.courses.total ?? 0}</div>

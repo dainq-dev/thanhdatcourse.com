@@ -2,7 +2,10 @@
 
 **Status:** Draft
 **Created:** 2026-07-24
-**Ref:** `BLOCK-EDITOR-BRAINSTORMING.md`, `02-block-content-editor.md`
+**Ref:** `BLOCK-EDITOR-BRAINSTORMING.md` (brainstorming), `02-block-content-editor.md` (spec gốc)
+**BRD:** `.docs/brd/11-block-editor-v2-config-renderers.md`
+**Planning:** `.docs/planning/09-block-editor-v2.md`
+**Implementation:** `.docs/plan-implementation/phase-6-block-editor-v2.md`
 
 ---
 

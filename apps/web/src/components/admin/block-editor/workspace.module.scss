@@ -26,6 +26,8 @@
   background: #1e1e1e;
   color: #fff;
   flex-shrink: 0;
+
+  
 }
 
 .topBarLeft {
@@ -53,6 +55,11 @@
 
   &:hover:not(:disabled) { color: #fff; background: rgba(255,255,255,0.1); }
   &:disabled { opacity: 0.3; cursor: default; }
+
+  & > svg {
+    line-height: 0;
+    height: 20px !important
+  }
 }
 
 .topBarSep {
@@ -412,6 +419,33 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
+  max-height: 120px;
+  pointer-events: none;
+  position: relative;
+
+  // Scale real block renderers down to fit in list
+  > div:not(.blockItemBadge) {
+    transform: scale(0.55);
+    transform-origin: top left;
+    width: calc(100% / 0.55);
+    max-height: 200px;
+  }
+}
+
+.blockItemBadge {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 2;
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: #64748B;
+  background: rgba(15, 23, 42, 0.85);
+  padding: 1px 5px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
 }
 
 .blockItemMeta {

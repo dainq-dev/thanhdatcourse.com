@@ -1,22 +1,15 @@
-.pageTitle { font-size: clamp(1.25rem, 3vw, 1.5rem); font-weight: 700; color: #1A1A1A; margin-bottom: 2rem; letter-spacing: -0.02em; }
-.form { display: flex; flex-direction: column; gap: 1.5rem; }
-.error { background: #FEF2F2; border: 1px solid #FECACA; color: #C53030; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.8125rem; }
+.error { background: #FEF2F2; border: 1px solid #FECACA; color: #C53030; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.8125rem; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; button { background: none; border: none; color: #C53030; cursor: pointer; font-size: 1rem; padding: 0 0.25rem; } }
 .loading { padding: 2rem; text-align: center; color: #999; font-size: 0.875rem; }
 
-.metaForm { max-width: 640px; display: flex; flex-direction: column; gap: 1.25rem; }
-.field { display: flex; flex-direction: column; gap: 0.25rem; }
-.label { font-size: 0.6875rem; font-weight: 600; color: #AAA; text-transform: uppercase; letter-spacing: 0.05em; }
-.input { padding: 0.625rem 0.75rem; background: #FFFFFF; border: 1px solid #E0E0E0; border-radius: 6px; color: #1A1A1A; font-size: 0.8125rem; font-family: inherit; outline: none; transition: border-color 0.15s; &:focus { border-color: #AAA; } &::placeholder { color: #B0B0B0; } }
-.textarea { composes: input; resize: vertical; min-height: 80px; }
-.row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.toggles { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0; }
-.toggle { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: #444; cursor: pointer; input[type="checkbox"] { accent-color: #1A1A1A; width: 16px; height: 16px; } }
+.metaInline { display: flex; flex-direction: column; gap: 8px; }
+.titleInput { width: 100%; padding: 0.75rem 1rem; background: #1E293B; border: 1px solid #334155; border-radius: 8px; color: #F1F5F9; font-size: 1.125rem; font-family: inherit; font-weight: 600; outline: none; transition: border-color 0.15s; &::placeholder { color: #64748B; } &:focus { border-color: #3B82F6; } }
+.metaRow { display: flex; gap: 8px; }
+.slugInput { padding: 0.5rem 0.75rem; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: #F1F5F9; font-size: 0.75rem; font-family: inherit; outline: none; flex: 1; transition: border-color 0.15s; &::placeholder { color: #64748B; } &:focus { border-color: #3B82F6; } }
 
-.editorSection { margin-top: 0.5rem; }
-.editorTitle { font-size: 0.9375rem; font-weight: 600; color: #333; margin-bottom: 0.75rem; }
+.infoField { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.infoLabel { font-size: 0.6875rem; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; }
+.infoTextarea { padding: 0.625rem 0.75rem; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: #F1F5F9; font-size: 0.75rem; font-family: inherit; resize: vertical; min-height: 60px; outline: none; transition: border-color 0.15s; &::placeholder { color: #64748B; } &:focus { border-color: #3B82F6; } }
+.infoToggle { display: flex; align-items: center; gap: 8px; font-size: 0.8125rem; color: #E2E8F0; cursor: pointer; input[type="checkbox"] { accent-color: #3B82F6; width: 16px; height: 16px; } }
 
-.actions { display: flex; justify-content: space-between; align-items: center; padding-top: 0.5rem; }
-.actionsRight { display: flex; gap: 0.75rem; }
-.saveBtn { padding: 0.625rem 1.5rem; background: #1A1A1A; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s; &:hover { background: #333; } &:disabled { opacity: 0.4; cursor: not-allowed; } }
-.cancelBtn { padding: 0.625rem 1.5rem; background: #FFFFFF; border: 1px solid #E0E0E0; color: #666; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; &:hover { border-color: #CCC; color: #333; } }
-.deleteActionBtn { padding: 0.625rem 1.5rem; background: none; border: 1px solid #FECACA; color: #C53030; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; &:hover { background: #FEF2F2; } }
+.deleteBtn { width: 100%; padding: 0.5rem 1rem; margin-top: 8px; background: none; border: 1px solid #FECACA; color: #C53030; border-radius: 6px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.15s; &:hover { background: #3B1818; } }
+.backBtn { width: 100%; padding: 0.5rem 1rem; margin-top: 4px; background: none; border: none; color: #64748B; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: color 0.15s; &:hover { color: #94A3B8; } }

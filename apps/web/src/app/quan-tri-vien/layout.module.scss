@@ -1,9 +1,11 @@
 .layout {
   display: flex;
-  min-height: 100dvh;
+  height: 100dvh; 
+  width: 100dvw;
   background: #F8F8F7;
   color: #1A1A1A;
   font-family: inherit;
+  overflow: hidden;
 }
 
 // ── Sidebar ──
@@ -82,7 +84,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  height: 56px;
+  min-height: 56px;
   background: #FFFFFF;
   border-bottom: 1px solid #EAEAEA;
   position: sticky;
@@ -145,7 +147,12 @@
 
 .main {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 // ── Mobile ──

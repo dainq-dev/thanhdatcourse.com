@@ -21,6 +21,10 @@ import {
   GalleryEditor,
   CarouselEditor,
   BeforeAfterEditor,
+  ColumnsEditor,
+  TabsEditor,
+  AccordionEditor,
+  CollapseEditor,
 } from "./block-editors";
 
 const EDITORS: Record<string, React.ComponentType<{ data: Record<string, unknown>; onChange: (data: Record<string, unknown>) => void }>> = {
@@ -31,6 +35,8 @@ const EDITORS: Record<string, React.ComponentType<{ data: Record<string, unknown
   divider: DividerEditor, spacer: SpacerEditor, cta: CTABlockEditor,
   pricingTable: PricingTableEditor, testimonial: TestimonialEditor,
   timeline: TimelineEditor, table: TableEditor,
+  columns: ColumnsEditor, tabs: TabsEditor,
+  accordion: AccordionEditor, collapse: CollapseEditor,
 };
 
 interface Props {

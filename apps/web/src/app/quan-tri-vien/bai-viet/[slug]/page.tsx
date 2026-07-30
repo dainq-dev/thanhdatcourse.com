@@ -1,9 +1,11 @@
 "use client";
 
-import type { Content } from "@workspace/types";
+import type { Block, Content } from "@workspace/types";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { BlockEditor } from "@/components/admin/block-editor";
+import { LeftPanel } from "@/components/admin/block-editor/LeftPanel";
+import { getDefaultData } from "@/components/admin/block-editor/editorState";
 import { ApiError, api } from "@/lib/api";
 import styles from "./page.module.scss";
 
@@ -26,6 +28,7 @@ export default function EditPostPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState<"info" | "components">("info");
   const [postId, setPostId] = useState("");
   const [form, setForm] = useState({
     title: "",
@@ -71,12 +74,12 @@ export default function EditPostPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleBlocksChange = useCallback((newBlocks: Content) => {
-    setBlocks(newBlocks);
+  const addBlock = useCallback((type: Block["type"]) => {
+    setBlocks((prev) => [...prev, { id: crypto.randomUUID(), type, data: getDefaultData(type) } as Block]);
+    setActiveTab("components");
   }, []);
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = useCallback(async () => {
     setError("");
     if (!form.title || form.title.length < 3) {
       setError("Tiêu đề phải có ít nhất 3 ký tự");
@@ -107,7 +110,41 @@ export default function EditPostPage() {
     } finally {
       setSaving(false);
     }
-  };
+  }, [form, blocks, postId, router]);
+
+  const handlePublish = useCallback(async () => {
+    setForm((prev) => ({ ...prev, isPublished: true }));
+    setError("");
+    if (!form.title || form.title.length < 3) {
+      setError("Tiêu đề phải có ít nhất 3 ký tự");
+      return;
+    }
+    if (!form.excerpt) {
+      setError("Vui lòng nhập mô tả ngắn");
+      return;
+    }
+    setSaving(true);
+    try {
+      await api.put(`/api/posts/${postId}`, {
+        title: form.title,
+        slug: form.pathSlug || undefined,
+        excerpt: form.excerpt,
+        author: form.author,
+        readTime: parseInt(form.readTime, 10) || 5,
+        isPublished: true,
+        contentBlocks: JSON.stringify(blocks),
+      });
+      router.push("/quan-tri-vien/bai-viet");
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? (err.detail ?? "Không thể lưu bài viết")
+          : "Không thể kết nối đến máy chủ",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }, [form, blocks, postId, router]);
 
   const handleDelete = async () => {
     if (!confirm("Bạn có chắc muốn xóa bài viết này?")) return;
@@ -125,100 +162,64 @@ export default function EditPostPage() {
 
   return (
     <div>
-      <h1 className={styles.pageTitle}>Chỉnh sửa bài viết</h1>
-      <form onSubmit={handleSave} className={styles.form}>
-        {error && <div className={styles.error}>{error}</div>}
-        <div className={styles.metaForm}>
-          <div className={styles.field}>
-            <label className={styles.label}>Tiêu đề *</label>
-            <input
-              type="text"
-              className={styles.input}
-              value={form.title}
-              onChange={(e) => handleChange("title", e.target.value)}
-              placeholder="Tiêu đề bài viết"
-              required
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label}>Slug</label>
-            <input
-              type="text"
-              className={styles.input}
-              value={form.pathSlug}
-              onChange={(e) => handleChange("pathSlug", e.target.value)}
-              placeholder="Đường dẫn URL"
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label}>Mô tả ngắn *</label>
-            <textarea
-              className={styles.textarea}
-              value={form.excerpt}
-              onChange={(e) => handleChange("excerpt", e.target.value)}
-              rows={3}
-              required
-            />
-          </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label}>Tác giả</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={form.author}
-                onChange={(e) => handleChange("author", e.target.value)}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Thời gian đọc (phút)</label>
-              <input
-                type="number"
-                className={styles.input}
-                value={form.readTime}
-                onChange={(e) => handleChange("readTime", e.target.value)}
-              />
+      {error && <div className={styles.error}>{error}<button type="button" onClick={() => setError("")}>✕</button></div>}
+      <BlockEditor
+        blocks={blocks}
+        onChange={setBlocks}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        saving={saving}
+        titleInput={
+          <div style={{ marginBottom: "16px" }}>
+            <div className={styles.metaInline}>
+              <input type="text" className={styles.titleInput} value={form.title}
+                onChange={(e) => handleChange("title", e.target.value)}
+                placeholder="Tiêu đề bài viết..." />
+              <div className={styles.metaRow}>
+                <input type="text" className={styles.slugInput} value={form.pathSlug}
+                  onChange={(e) => handleChange("pathSlug", e.target.value)} placeholder="slug" />
+                <input type="text" className={styles.slugInput} value={form.author}
+                  onChange={(e) => handleChange("author", e.target.value)} placeholder="Tác giả" />
+                <input type="number" className={styles.slugInput} value={form.readTime}
+                  onChange={(e) => handleChange("readTime", e.target.value)} placeholder="Phút đọc" />
+              </div>
             </div>
           </div>
-          <div className={styles.toggles}>
-            <label className={styles.toggle}>
-              <input
-                type="checkbox"
-                checked={form.isPublished}
-                onChange={(e) => handleChange("isPublished", e.target.checked)}
-              />
-              <span>Xuất bản</span>
-            </label>
-          </div>
-        </div>
-
-        <div className={styles.editorSection}>
-          <h2 className={styles.editorTitle}>Nội dung bài viết</h2>
-          <BlockEditor blocks={blocks} onChange={handleBlocksChange} />
-        </div>
-
-        <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.deleteActionBtn}
-            onClick={handleDelete}
-          >
-            Xóa bài viết
-          </button>
-          <div className={styles.actionsRight}>
-            <button
-              type="button"
-              className={styles.cancelBtn}
-              onClick={() => router.back()}
-            >
-              Hủy
-            </button>
-            <button type="submit" className={styles.saveBtn} disabled={saving}>
-              {saving ? "Đang lưu..." : "Lưu thay đổi"}
-            </button>
-          </div>
-        </div>
-      </form>
+        }
+        leftPanel={
+          <LeftPanel
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onDrop={addBlock}
+            infoPanel={
+              <div>
+                <div className={styles.infoField}>
+                  <label className={styles.infoLabel}>Mô tả ngắn *</label>
+                  <textarea className={styles.infoTextarea} value={form.excerpt}
+                    onChange={(e) => handleChange("excerpt", e.target.value)} rows={3}
+                    placeholder="Mô tả ngắn cho bài viết..." />
+                </div>
+                <div className={styles.infoField}>
+                  <label className={styles.infoLabel}>Trạng thái</label>
+                  <label className={styles.infoToggle}>
+                    <input type="checkbox" checked={form.isPublished}
+                      onChange={(e) => handleChange("isPublished", e.target.checked)} />
+                    <span>Xuất bản</span>
+                  </label>
+                </div>
+                <button type="button" className={styles.deleteBtn}
+                  onClick={handleDelete}>
+                  Xóa bài viết
+                </button>
+                <button type="button" className={styles.backBtn}
+                  onClick={() => router.push("/quan-tri-vien/bai-viet")}>
+                  ← Quay lại danh sách
+                </button>
+              </div>
+            }
+          />
+        }
+      />
     </div>
   );
 }
