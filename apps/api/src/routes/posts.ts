@@ -1,8 +1,8 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, desc, eq, like, sql, type SQL } from "drizzle-orm";
+import { ContentSchema } from "@workspace/types";
+import { and, desc, eq, like, type SQL, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import { ContentSchema } from "@workspace/types";
 import { db } from "../db";
 import { posts } from "../db/schema";
 import { authMiddleware } from "../middleware/auth";
@@ -26,19 +26,22 @@ const PostQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(12),
 });
 
-const contentBlocksSchema = z.string().optional().refine(
-  (val) => {
-    if (!val) return true;
-    try {
-      const parsed = JSON.parse(val);
-      const result = ContentSchema.safeParse(parsed);
-      return result.success;
-    } catch {
-      return false;
-    }
-  },
-  { message: "Invalid content blocks JSON" },
-);
+const contentBlocksSchema = z
+  .string()
+  .optional()
+  .refine(
+    (val) => {
+      if (!val) return true;
+      try {
+        const parsed = JSON.parse(val);
+        const result = ContentSchema.safeParse(parsed);
+        return result.success;
+      } catch {
+        return false;
+      }
+    },
+    { message: "Invalid content blocks JSON" },
+  );
 
 const CreatePostSchema = z.object({
   title: z.string().min(1),

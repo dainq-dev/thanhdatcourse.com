@@ -215,7 +215,9 @@ describe("Lessons Routes", () => {
 
       const listRes = await app.request(`/api/modules/${moduleId}/lessons`);
       const list = await listRes.json();
-      expect(list.find((l: { id: string }) => l.id === lessonId)).toBeUndefined();
+      expect(
+        list.find((l: { id: string }) => l.id === lessonId),
+      ).toBeUndefined();
     });
 
     test("cascade: deleting module removes all its lessons", async () => {

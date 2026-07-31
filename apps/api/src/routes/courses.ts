@@ -1,8 +1,8 @@
 import { zValidator } from "@hono/zod-validator";
+import { ContentSchema } from "@workspace/types";
 import { and, desc, eq, like, type SQL, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import { ContentSchema } from "@workspace/types";
 import { db } from "../db";
 import { courseLessons, courseModules, courses } from "../db/schema";
 import { authMiddleware } from "../middleware/auth";
@@ -24,19 +24,22 @@ const CreateCourseSchema = z.object({
   level: z.enum(["beginner", "intermediate", "advanced", "all"]).optional(),
   isPublished: z.boolean().optional(),
   learningOutcomes: z.array(z.string()).optional(),
-  contentBlocks: z.string().optional().refine(
-    (val) => {
-      if (!val) return true;
-      try {
-        const parsed = JSON.parse(val);
-        const result = ContentSchema.safeParse(parsed);
-        return result.success;
-      } catch {
-        return false;
-      }
-    },
-    { message: "Invalid content blocks JSON" },
-  ),
+  contentBlocks: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        try {
+          const parsed = JSON.parse(val);
+          const result = ContentSchema.safeParse(parsed);
+          return result.success;
+        } catch {
+          return false;
+        }
+      },
+      { message: "Invalid content blocks JSON" },
+    ),
 });
 
 const UpdateCourseSchema = CreateCourseSchema.partial();

@@ -211,8 +211,12 @@ describe("Modules Routes", () => {
 
       const modulesRes = await app.request(`/api/courses/${courseId}/modules`);
       const modules = await modulesRes.json();
-      const m1 = modules.find((m: { id: string; sortOrder: number }) => m.id === moduleId1);
-      const m2 = modules.find((m: { id: string; sortOrder: number }) => m.id === moduleId2);
+      const m1 = modules.find(
+        (m: { id: string; sortOrder: number }) => m.id === moduleId1,
+      );
+      const m2 = modules.find(
+        (m: { id: string; sortOrder: number }) => m.id === moduleId2,
+      );
       expect(m1.sortOrder).toBe(20);
       expect(m2.sortOrder).toBe(10);
     });
@@ -230,7 +234,9 @@ describe("Modules Routes", () => {
 
       const res = await app.request(`/api/courses/${courseId}/modules`);
       const data = await res.json();
-      const mod = data.find((m: { id: string; sortOrder: number }) => m.id === moduleId1);
+      const mod = data.find(
+        (m: { id: string; sortOrder: number }) => m.id === moduleId1,
+      );
       expect(mod.lessons).toBeDefined();
       expect(Array.isArray(mod.lessons)).toBe(true);
       expect(mod.lessons.length).toBe(1);
@@ -249,7 +255,9 @@ describe("Modules Routes", () => {
 
       const listRes = await app.request(`/api/courses/${courseId}/modules`);
       const list = await listRes.json();
-      expect(list.find((m: { id: string; sortOrder: number }) => m.id === moduleId1)).toBeUndefined();
+      expect(
+        list.find((m: { id: string; sortOrder: number }) => m.id === moduleId1),
+      ).toBeUndefined();
     });
   });
 });
