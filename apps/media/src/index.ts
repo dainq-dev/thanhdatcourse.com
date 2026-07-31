@@ -18,12 +18,15 @@ app.use("*", async (c, next) => {
   );
 });
 
-app.use("*", cors({
-  origin: "*",
-  allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowHeaders: ["Content-Type", "Authorization"],
-  maxAge: 86400,
-}));
+app.use(
+  "*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400,
+  }),
+);
 
 app.get("/", (c) =>
   c.json({ service: "thanhdatcomputer Media", version: "1.0.0" }),

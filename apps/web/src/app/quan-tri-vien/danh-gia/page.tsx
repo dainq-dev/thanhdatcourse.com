@@ -31,7 +31,9 @@ export default function AdminTestimonialsPage() {
     setItems(extractData(d));
     setL(false);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const del = async (id: string) => {
     if (!confirm("Xóa?")) return;

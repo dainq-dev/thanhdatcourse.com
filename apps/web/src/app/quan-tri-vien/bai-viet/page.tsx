@@ -38,7 +38,9 @@ export default function AdminPostsPage() {
     }
   };
 
-  useEffect(() => { fetchPosts(); }, [statusFilter]);
+  useEffect(() => {
+    fetchPosts();
+  }, [statusFilter]);
 
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Xóa bài viết "${title}"?`)) return;

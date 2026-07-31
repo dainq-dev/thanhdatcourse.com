@@ -17,7 +17,7 @@ export default function AuthLayout({
         alignItems: "center",
         justifyContent: "center",
         background: "#0B0F19",
-        width: "100%"
+        width: "100%",
       }}
     >
       {children}

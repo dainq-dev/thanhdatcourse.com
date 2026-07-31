@@ -39,9 +39,18 @@ function renderLine(line: string): React.ReactNode[] {
       return <strong key={i}>{part.slice(2, -2)}</strong>;
     }
     if (part.startsWith("==") && part.endsWith("==") && part.length > 4) {
-      return <mark key={i} className={styles.highlight}>{part.slice(2, -2)}</mark>;
+      return (
+        <mark key={i} className={styles.highlight}>
+          {part.slice(2, -2)}
+        </mark>
+      );
     }
-    if (part.startsWith("*") && part.endsWith("*") && !part.startsWith("**") && part.length > 2) {
+    if (
+      part.startsWith("*") &&
+      part.endsWith("*") &&
+      !part.startsWith("**") &&
+      part.length > 2
+    ) {
       return <em key={i}>{part.slice(1, -1)}</em>;
     }
     return <span key={i}>{part}</span>;

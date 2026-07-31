@@ -21,7 +21,8 @@ const WEIGHT_MAP: Record<string, string> = {
 export function HeadingBlock({ data }: { data: BlockData<"heading"> }) {
   const Tag = `h${data.level}` as keyof React.JSX.IntrinsicElements;
   const style: React.CSSProperties = {
-    textAlign: ((data.alignment as string) || "left") as React.CSSProperties["textAlign"],
+    textAlign: ((data.alignment as string) ||
+      "left") as React.CSSProperties["textAlign"],
     fontWeight: WEIGHT_MAP[data.weight || "bold"],
     fontStyle: (data as any).italic ? "italic" : undefined,
     textDecoration: (data as any).underline ? "underline" : undefined,

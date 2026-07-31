@@ -37,7 +37,9 @@ export default function AdminLeadsPage() {
     setLeads(extractData(d) ?? []);
     setLoading(false);
   };
-  useEffect(() => { load(); }, [filter]);
+  useEffect(() => {
+    load();
+  }, [filter]);
 
   const updateStatus = async (id: string, status: string) => {
     await api

@@ -13,11 +13,21 @@ export function TestimonialBlock({ data }: { data: BlockData<"testimonial"> }) {
 
   // Placeholder — real implementation would fetch testimonial by ID
   return (
-    <div className={`${styles.root} ${styles[`style_${d.style || "card"}`]}`}
-      style={{ background: BG_MAP[d.background || "none"] }}>
-      {d.showAvatar && <div className={`${styles.avatar} ${styles[`avatar_${d.avatarSize || "md"}`]}`}>👤</div>}
+    <div
+      className={`${styles.root} ${styles[`style_${d.style || "card"}`]}`}
+      style={{ background: BG_MAP[d.background || "none"] }}
+    >
+      {d.showAvatar && (
+        <div
+          className={`${styles.avatar} ${styles[`avatar_${d.avatarSize || "md"}`]}`}
+        >
+          👤
+        </div>
+      )}
       {d.showRating && <div className={styles.rating}>★★★★★</div>}
-      <blockquote className={styles.quote}>"Đây là một trải nghiệm tuyệt vời..."</blockquote>
+      <blockquote className={styles.quote}>
+        "Đây là một trải nghiệm tuyệt vời..."
+      </blockquote>
       <cite className={styles.cite}>— Học viên</cite>
     </div>
   );

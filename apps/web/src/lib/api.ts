@@ -27,7 +27,13 @@ class ApiClient {
 
   // ── Server-side fetch + auto extract .data ──
 
-  async fetchData<T>(path: string, init?: RequestInit & { next?: NextFetchRequestConfig; cache?: RequestCache }): Promise<T[]> {
+  async fetchData<T>(
+    path: string,
+    init?: RequestInit & {
+      next?: NextFetchRequestConfig;
+      cache?: RequestCache;
+    },
+  ): Promise<T[]> {
     const res = await this.fetch(path, init);
     const json = await res.json();
     return json.data ?? json;

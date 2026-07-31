@@ -4,6 +4,7 @@ import { unlinkSync } from "node:fs";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 
 type RawRow = Record<string, unknown>;
+
 import { media, mediaVariants } from "./schema";
 
 let _db: ReturnType<typeof drizzle>;
@@ -22,6 +23,9 @@ beforeAll(() => {
     file_size INTEGER NOT NULL,
     width INTEGER,
     height INTEGER,
+    original_width INTEGER,
+    original_height INTEGER,
+    blur_data_url TEXT,
     source TEXT NOT NULL DEFAULT 'upload',
     external_url TEXT,
     youtube_id TEXT,
@@ -58,6 +62,9 @@ describe("Schema — Table Definitions", () => {
     expect(Object.keys(media)).toContain("fileSize");
     expect(Object.keys(media)).toContain("width");
     expect(Object.keys(media)).toContain("height");
+    expect(Object.keys(media)).toContain("originalWidth");
+    expect(Object.keys(media)).toContain("originalHeight");
+    expect(Object.keys(media)).toContain("blurDataUrl");
     expect(Object.keys(media)).toContain("source");
     expect(Object.keys(media)).toContain("externalUrl");
     expect(Object.keys(media)).toContain("youtubeId");
@@ -101,6 +108,9 @@ describe("Schema — Table Columns", () => {
     expect(colNames).toContain("file_size");
     expect(colNames).toContain("width");
     expect(colNames).toContain("height");
+    expect(colNames).toContain("original_width");
+    expect(colNames).toContain("original_height");
+    expect(colNames).toContain("blur_data_url");
     expect(colNames).toContain("source");
     expect(colNames).toContain("external_url");
     expect(colNames).toContain("youtube_id");
@@ -153,7 +163,9 @@ describe("Schema — Insert + Select", () => {
       ],
     );
 
-    const row = rawDb.query(`SELECT * FROM media WHERE id = ?`).get(id) as RawRow;
+    const row = rawDb
+      .query(`SELECT * FROM media WHERE id = ?`)
+      .get(id) as RawRow;
     expect(row).not.toBeNull();
     expect(row.original_name).toBe("photo.jpg");
     expect(row.stored_name).toBe("abc123.webp");
@@ -184,7 +196,9 @@ describe("Schema — Insert + Select", () => {
       ],
     );
 
-    const row = rawDb.query(`SELECT * FROM media WHERE id = ?`).get(id) as RawRow;
+    const row = rawDb
+      .query(`SELECT * FROM media WHERE id = ?`)
+      .get(id) as RawRow;
     expect(row).not.toBeNull();
     expect(row.source).toBe("youtube");
     expect(row.youtube_id).toBe("dQw4w9WgXcQ");

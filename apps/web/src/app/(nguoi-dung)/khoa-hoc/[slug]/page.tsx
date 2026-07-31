@@ -61,19 +61,27 @@ interface Promotion {
 
 async function getCourse(slug: string): Promise<Course | null> {
   try {
-    const res = await api.fetch(`/api/courses/${slug}`, { next: { revalidate: 60 } });
+    const res = await api.fetch(`/api/courses/${slug}`, {
+      next: { revalidate: 60 },
+    });
     if (res.status === 404) return null;
     const json = await res.json();
     return json.data || json;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 async function getModules(courseId: string): Promise<Module[]> {
   try {
-    const res = await api.fetch(`/api/courses/${courseId}/modules`, { next: { revalidate: 60 } });
+    const res = await api.fetch(`/api/courses/${courseId}/modules`, {
+      next: { revalidate: 60 },
+    });
     const json = await res.json();
     return json.data || json;
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 async function getBonuses(courseId: string): Promise<Bonus[]> {

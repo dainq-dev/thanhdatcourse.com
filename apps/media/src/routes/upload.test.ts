@@ -234,6 +234,10 @@ describe("POST /upload", () => {
     expect(data.originalName).toBe("test-photo.jpg");
     expect(data.mimeType).toBe("image/webp");
     expect(data.fileSize).toBeGreaterThan(0);
+    expect(data.blurDataUrl).toBeString();
+    expect(data.blurDataUrl).toMatch(/^data:image\/webp;base64,/);
+    expect(data.originalWidth).toBeGreaterThan(0);
+    expect(data.originalHeight).toBeGreaterThan(0);
   });
 
   test("uploaded media exists in database", async () => {
@@ -258,6 +262,9 @@ describe("POST /upload", () => {
     expect(record?.storedName).toMatch(/\.webp$/);
     expect(record?.diskPath).toBeString();
     expect(record?.fileSize).toBeGreaterThan(0);
+    expect(record?.originalWidth).toBeGreaterThan(0);
+    expect(record?.originalHeight).toBeGreaterThan(0);
+    expect(record?.blurDataUrl).toMatch(/^data:image\/webp;base64,/);
   });
 
   test("uploaded file exists on disk", async () => {

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { Hono } from "hono";
 import { lookup } from "node:mime-types";
+import { Hono } from "hono";
 
 export const serveRawFile = new Hono().get("/*", (c) => {
   const filePath = c.req.path.replace("/raw/", "data/uploads/");
@@ -14,9 +14,14 @@ export const serveRawFile = new Hono().get("/*", (c) => {
   const buf = readFileSync(fullPath);
   const ext = filePath.split(".").pop() || "";
   const mimeMap: Record<string, string> = {
-    mp4: "video/mp4", webm: "video/webm", mov: "video/quicktime", mkv: "video/x-matroska",
-    mp3: "audio/mpeg", wav: "audio/wav",
-    pdf: "application/pdf", zip: "application/zip",
+    mp4: "video/mp4",
+    webm: "video/webm",
+    mov: "video/quicktime",
+    mkv: "video/x-matroska",
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    pdf: "application/pdf",
+    zip: "application/zip",
     svg: "image/svg+xml",
   };
 

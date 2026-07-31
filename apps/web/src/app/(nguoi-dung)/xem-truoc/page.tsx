@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { Content } from "@workspace/types";
+import { useEffect, useState } from "react";
 import { BlockRenderer } from "@/components/blocks/BlockRenderer";
 import styles from "./page.module.scss";
 
@@ -24,7 +24,9 @@ export default function XemTruocPage() {
       setBlocks(parsed);
     } catch (e) {
       if (e instanceof DOMException && e.name === "QuotaExceededError") {
-        setError("Nội dung quá lớn, không thể xem trước. Vui lòng lưu nháp và xem từ trang bài viết.");
+        setError(
+          "Nội dung quá lớn, không thể xem trước. Vui lòng lưu nháp và xem từ trang bài viết.",
+        );
       } else {
         setError("Không thể tải nội dung xem trước");
       }
@@ -41,7 +43,11 @@ export default function XemTruocPage() {
   }
 
   if (!blocks) {
-    return <div className={styles.empty}><p>Đang tải...</p></div>;
+    return (
+      <div className={styles.empty}>
+        <p>Đang tải...</p>
+      </div>
+    );
   }
 
   return (

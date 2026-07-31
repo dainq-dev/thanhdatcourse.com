@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { db } from "../db";
 import { media } from "../db/schema";

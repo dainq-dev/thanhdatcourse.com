@@ -48,7 +48,10 @@ export default function RootLayout({
   return (
     <html lang="vi" className={manrope.variable} suppressHydrationWarning>
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Kolker+Brush&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Kolker+Brush&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body>{children}</body>
     </html>

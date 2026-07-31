@@ -29,12 +29,16 @@ export default function EditPostPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get<Post>(`/api/posts/${slug}`)
+    api
+      .get<Post>(`/api/posts/${slug}`)
       .then((post) => {
         setPostId(post.id);
         let blocks: any[] = [];
         if (post.contentBlocks) {
-          try { const p = JSON.parse(post.contentBlocks); if (Array.isArray(p)) blocks = p; } catch {}
+          try {
+            const p = JSON.parse(post.contentBlocks);
+            if (Array.isArray(p)) blocks = p;
+          } catch {}
         }
         setInitialData({
           title: post.title,
@@ -63,8 +67,18 @@ export default function EditPostPage() {
     router.push("/quan-tri-vien/bai-viet");
   };
 
-  if (loading) return <div style={{ padding: "2rem", textAlign: "center", color: "#999" }}>Đang tải...</div>;
-  if (error) return <div style={{ padding: "2rem", textAlign: "center", color: "#C53030" }}>{error}</div>;
+  if (loading)
+    return (
+      <div style={{ padding: "2rem", textAlign: "center", color: "#999" }}>
+        Đang tải...
+      </div>
+    );
+  if (error)
+    return (
+      <div style={{ padding: "2rem", textAlign: "center", color: "#C53030" }}>
+        {error}
+      </div>
+    );
 
   return (
     <SharedPostForm

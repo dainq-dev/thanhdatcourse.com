@@ -80,9 +80,7 @@ export default async function BlogDetailPage({
   if (!post) notFound();
 
   const allPosts = await getPublishedPosts();
-  const relatedArticles = allPosts
-    .filter((p) => p.slug !== slug)
-    .slice(0, 4);
+  const relatedArticles = allPosts.filter((p) => p.slug !== slug).slice(0, 4);
 
   const publishedDate = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString("vi-VN")

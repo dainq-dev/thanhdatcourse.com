@@ -12,5 +12,7 @@ export default function CreatePostPage() {
     router.push("/quan-tri-vien/bai-viet");
   };
 
-  return <SharedPostForm mode="create" onSave={handleSave} onPublish={handleSave} />;
+  return (
+    <SharedPostForm mode="create" onSave={handleSave} onPublish={handleSave} />
+  );
 }

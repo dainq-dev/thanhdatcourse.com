@@ -1,4 +1,4 @@
-import type { BlockData, Block } from "@workspace/types";
+import type { Block, BlockData } from "@workspace/types";
 import { BlockRenderer } from "../BlockRenderer";
 import styles from "./ColumnsBlock.module.scss";
 
@@ -19,11 +19,13 @@ export function ColumnsBlock({ data }: { data: BlockData<"columns"> }) {
   const ratios = RATIO_MAP[d.columnRatios || "auto"] || ["1fr", "1fr"];
 
   return (
-    <div className={styles.root}
+    <div
+      className={styles.root}
       style={{
         gridTemplateColumns: ratios.slice(0, d.columns || 2).join(" "),
         gap: GAP_MAP[d.gap || "md"],
-      }}>
+      }}
+    >
       {Array.from({ length: d.columns || 2 }, (_, i) => (
         <div key={i} className={styles.col}>
           <BlockRenderer blocks={(d.content?.[i] || []) as Block[]} />

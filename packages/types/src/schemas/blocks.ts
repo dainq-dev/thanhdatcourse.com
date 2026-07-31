@@ -12,19 +12,29 @@ const roundedSchema = z.preprocess(
 
 const shadowSchema = z.enum(["none", "sm", "md", "lg", "xl"]).default("none");
 const iconSchema = z.string().nullable().default(null);
-const fontWeightSchema = z.enum(["regular", "medium", "semibold", "bold"]).default("regular");
+const fontWeightSchema = z
+  .enum(["regular", "medium", "semibold", "bold"])
+  .default("regular");
 const fontSizeSchema = z.enum(["sm", "md", "lg"]).default("md");
-const lineHeightSchema = z.enum(["tight", "normal", "relaxed"]).default("normal");
-const alignmentSchema = z.enum(["left", "center", "right", "justify"]).default("left");
-const colorSchema = z.enum([
-  "inherit",
-  "--color-text",
-  "--color-text-muted",
-  "--color-primary",
-  "--color-accent",
-  "--color-border",
-]).default("inherit");
-const cssVarColorSchema = z.enum(["--color-border", "--color-primary", "--color-accent"]).default("--color-border");
+const lineHeightSchema = z
+  .enum(["tight", "normal", "relaxed"])
+  .default("normal");
+const alignmentSchema = z
+  .enum(["left", "center", "right", "justify"])
+  .default("left");
+const colorSchema = z
+  .enum([
+    "inherit",
+    "--color-text",
+    "--color-text-muted",
+    "--color-primary",
+    "--color-accent",
+    "--color-border",
+  ])
+  .default("inherit");
+const cssVarColorSchema = z
+  .enum(["--color-border", "--color-primary", "--color-accent"])
+  .default("--color-border");
 const borderSchema = z.preprocess(
   (val) => {
     if (typeof val === "boolean") return val ? "medium" : "none";
@@ -44,8 +54,12 @@ export const HeadingBlock = BaseBlock.extend({
   type: z.literal("heading"),
   data: z.object({
     level: z.union([
-      z.literal(1), z.literal(2), z.literal(3),
-      z.literal(4), z.literal(5), z.literal(6),
+      z.literal(1),
+      z.literal(2),
+      z.literal(3),
+      z.literal(4),
+      z.literal(5),
+      z.literal(6),
     ]),
     text: z.string().min(1),
     alignment: alignmentSchema,
@@ -222,9 +236,9 @@ export const ColumnsBlock = BaseBlock.extend({
     columns: z.union([z.literal(2), z.literal(3), z.literal(4)]),
     content: z.array(z.array(z.lazy(() => _BlockSchema))),
     gap: z.enum(["sm", "md", "lg"]).default("md"),
-    columnRatios: z.enum([
-      "auto", "50-50", "33-33-33", "25-75", "75-25", "33-67", "67-33",
-    ]).default("auto"),
+    columnRatios: z
+      .enum(["auto", "50-50", "33-33-33", "25-75", "75-25", "33-67", "67-33"])
+      .default("auto"),
   }),
 });
 
@@ -280,7 +294,9 @@ export const TimelineBlock = BaseBlock.extend({
         description: z.string(),
       }),
     ),
-    layout: z.enum(["vertical", "horizontal", "alternating"]).default("vertical"),
+    layout: z
+      .enum(["vertical", "horizontal", "alternating"])
+      .default("vertical"),
     iconPerEvent: iconSchema,
     lineColor: cssVarColorSchema,
   }),
@@ -359,7 +375,13 @@ export type Block =
         weight: "regular" | "medium" | "semibold" | "bold";
         italic: boolean;
         underline: boolean;
-        color: "inherit" | "--color-text" | "--color-text-muted" | "--color-primary" | "--color-accent" | "--color-border";
+        color:
+          | "inherit"
+          | "--color-text"
+          | "--color-text-muted"
+          | "--color-primary"
+          | "--color-accent"
+          | "--color-border";
       };
     }
   | {
@@ -372,7 +394,13 @@ export type Block =
         fontSize: "sm" | "md" | "lg";
         lineHeight: "tight" | "normal" | "relaxed";
         weight: "regular" | "medium" | "semibold" | "bold";
-        color: "inherit" | "--color-text" | "--color-text-muted" | "--color-primary" | "--color-accent" | "--color-border";
+        color:
+          | "inherit"
+          | "--color-text"
+          | "--color-text-muted"
+          | "--color-primary"
+          | "--color-accent"
+          | "--color-border";
       };
     }
   | {
@@ -393,7 +421,13 @@ export type Block =
   | {
       id: string;
       type: "code";
-      data: { code: string; language: string; showLineNumbers: boolean; theme: "dark" | "light"; showCopyButton: boolean };
+      data: {
+        code: string;
+        language: string;
+        showLineNumbers: boolean;
+        theme: "dark" | "light";
+        showCopyButton: boolean;
+      };
     }
   | {
       id: string;
@@ -499,7 +533,14 @@ export type Block =
         columns: 2 | 3 | 4;
         content: Content[];
         gap: "sm" | "md" | "lg";
-        columnRatios: "auto" | "50-50" | "33-33-33" | "25-75" | "75-25" | "33-67" | "67-33";
+        columnRatios:
+          | "auto"
+          | "50-50"
+          | "33-33-33"
+          | "25-75"
+          | "75-25"
+          | "33-67"
+          | "67-33";
       };
     }
   | {

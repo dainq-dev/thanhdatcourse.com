@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { MediaFilter } from "./types";
 import { MediaManager } from "./index";
 import styles from "./index.module.scss";
+import type { MediaFilter } from "./types";
 
 interface Props {
   onSelect: (url: string) => void;
@@ -14,7 +14,14 @@ interface Props {
   showPreview?: boolean;
 }
 
-export function MediaTrigger({ onSelect, value, filter, accept, children, showPreview }: Props) {
+export function MediaTrigger({
+  onSelect,
+  value,
+  filter,
+  accept,
+  children,
+  showPreview,
+}: Props) {
   const [open, setOpen] = useState(false);
 
   return (

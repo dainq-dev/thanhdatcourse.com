@@ -1,7 +1,7 @@
 "use client";
 
+import type { Block, BlockData } from "@workspace/types";
 import { useState } from "react";
-import type { BlockData, Block } from "@workspace/types";
 import { BlockRenderer } from "../BlockRenderer";
 import styles from "./AccordionBlock.module.scss";
 
@@ -9,7 +9,8 @@ export function AccordionBlock({ data }: { data: BlockData<"accordion"> }) {
   const d = data as any;
   const [openIndexes, setOpenIndexes] = useState<Set<number>>(() => {
     const s = new Set<number>();
-    if (d.defaultOpenIndex >= 0 && d.defaultOpenIndex < (d.items || []).length) s.add(d.defaultOpenIndex);
+    if (d.defaultOpenIndex >= 0 && d.defaultOpenIndex < (d.items || []).length)
+      s.add(d.defaultOpenIndex);
     return s;
   });
 
@@ -31,9 +32,15 @@ export function AccordionBlock({ data }: { data: BlockData<"accordion"> }) {
       {(d.items || []).map((item: any, i: number) => {
         const isOpen = openIndexes.has(i);
         return (
-          <div key={i} className={`${styles.item} ${isOpen ? styles.open : ""}`}>
-            <button type="button" className={`${styles.header} ${iconLeft ? styles.headerLeft : ""}`}
-              onClick={() => toggle(i)}>
+          <div
+            key={i}
+            className={`${styles.item} ${isOpen ? styles.open : ""}`}
+          >
+            <button
+              type="button"
+              className={`${styles.header} ${iconLeft ? styles.headerLeft : ""}`}
+              onClick={() => toggle(i)}
+            >
               <span className={styles.arrow}>{isOpen ? "▾" : "▸"}</span>
               <span className={styles.title}>{item.title}</span>
             </button>

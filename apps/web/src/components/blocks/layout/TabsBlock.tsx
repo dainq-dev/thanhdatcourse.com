@@ -1,7 +1,7 @@
 "use client";
 
+import type { Block, BlockData } from "@workspace/types";
 import { useState } from "react";
-import type { BlockData, Block } from "@workspace/types";
 import { BlockRenderer } from "../BlockRenderer";
 import styles from "./TabsBlock.module.scss";
 
@@ -16,16 +16,22 @@ export function TabsBlock({ data }: { data: BlockData<"tabs"> }) {
     <div className={`${styles.root} ${isVertical ? styles.vertical : ""}`}>
       <div className={`${styles.nav} ${isPills ? styles.pills : ""}`}>
         {tabs.map((tab: any, i: number) => (
-          <button key={i} type="button"
+          <button
+            key={i}
+            type="button"
             className={`${styles.tab} ${i === active ? styles.tabActive : ""}`}
-            onClick={() => setActive(i)}>
+            onClick={() => setActive(i)}
+          >
             {tab.label}
           </button>
         ))}
       </div>
       <div className={styles.panels}>
         {tabs.map((tab: any, i: number) => (
-          <div key={i} className={`${styles.panel} ${i === active ? styles.panelActive : ""}`}>
+          <div
+            key={i}
+            className={`${styles.panel} ${i === active ? styles.panelActive : ""}`}
+          >
             <BlockRenderer blocks={(tab.content || []) as Block[]} />
           </div>
         ))}

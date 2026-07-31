@@ -14,6 +14,9 @@ sqlite.exec(`
     file_size INTEGER NOT NULL,
     width INTEGER,
     height INTEGER,
+    original_width INTEGER,
+    original_height INTEGER,
+    blur_data_url TEXT,
     source TEXT NOT NULL DEFAULT 'upload',
     external_url TEXT,
     youtube_id TEXT,
@@ -37,6 +40,24 @@ sqlite.exec(`
 
   CREATE UNIQUE INDEX IF NOT EXISTS unique_variant ON media_variants(media_id, name);
 `);
+
+// SQLite doesn't support IF NOT EXISTS for ALTER TABLE,
+// so we catch and ignore "duplicate column" errors
+const alterColumns = [
+  "ALTER TABLE media ADD COLUMN original_width INTEGER",
+  "ALTER TABLE media ADD COLUMN original_height INTEGER",
+  "ALTER TABLE media ADD COLUMN blur_data_url TEXT",
+];
+for (const alter of alterColumns) {
+  try {
+    sqlite.run(alter);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (!msg.includes("duplicate column")) {
+      console.error(`Migration error: ${msg}`);
+    }
+  }
+}
 
 console.log("✓ Media tables created/verified");
 

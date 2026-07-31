@@ -1,9 +1,8 @@
-import { PageHeader } from "@workspace/ui";
-import { Accordion } from "@workspace/ui";
-import { StaggerReveal } from "@/components/sections/stagger-reveal";
-import { getSiteSettings } from "@/lib/settings";
-import { api } from "@/lib/api";
+import { Accordion, PageHeader } from "@workspace/ui";
 import type { Metadata } from "next";
+import { StaggerReveal } from "@/components/sections/stagger-reveal";
+import { api } from "@/lib/api";
+import { getSiteSettings } from "@/lib/settings";
 import styles from "./page.module.scss";
 
 interface Course {
@@ -119,9 +118,7 @@ export default async function CoursesPage() {
                   </div>
                   <div className={styles.cardBtnRow}>
                     {course.buttonText === "Không Bán Rời" ? (
-                      <span className={styles.btnDisabled}>
-                        Không Bán Rời
-                      </span>
+                      <span className={styles.btnDisabled}>Không Bán Rời</span>
                     ) : (
                       <a
                         href={

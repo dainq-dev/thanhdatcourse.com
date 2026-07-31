@@ -1,9 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { MediaFile, MediaFilter } from "./types";
-import { fetchMediaList, getMediaUrl, uploadFile, deleteMedia } from "./index.logic";
+import {
+  deleteMedia,
+  fetchMediaList,
+  getMediaUrl,
+  uploadFile,
+} from "./index.logic";
 import styles from "./index.module.scss";
+import type { MediaFile, MediaFilter } from "./types";
 
 interface Props {
   open: boolean;
@@ -15,7 +20,15 @@ interface Props {
   multi?: boolean;
 }
 
-export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = "all", accept, value, multi }: Props) {
+export function MediaManager({
+  open,
+  onClose,
+  onSelect,
+  filter: defaultFilter = "all",
+  accept,
+  value,
+  multi,
+}: Props) {
   const [items, setItems] = useState<MediaFile[]>([]);
   const [filter, setFilter] = useState<MediaFilter>(defaultFilter);
   const [search, setSearch] = useState("");
@@ -89,7 +102,8 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
     if (multi) {
       setMultiSelected((prev) => {
         const next = new Set(prev);
-        if (next.has(file.id)) next.delete(file.id); else next.add(file.id);
+        if (next.has(file.id)) next.delete(file.id);
+        else next.add(file.id);
         return next;
       });
       return;
@@ -110,7 +124,11 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
 
   const totalPages = Math.ceil(total / limit);
   const activeFilter = accept
-    ? accept.startsWith("image") ? "image" : accept.startsWith("video") ? "video" : "all"
+    ? accept.startsWith("image")
+      ? "image"
+      : accept.startsWith("video")
+        ? "video"
+        : "all"
     : filter;
 
   if (!open) return null;
@@ -121,22 +139,37 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
         {/* Header */}
         <div className={styles.header}>
           <h2 className={styles.title}>Thư viện ảnh & video</h2>
-          <button className={styles.closeBtn} onClick={onClose} type="button">✕</button>
+          <button className={styles.closeBtn} onClick={onClose} type="button">
+            ✕
+          </button>
         </div>
 
         {/* Toolbar */}
         <div className={styles.toolbar}>
           <div className={styles.filters}>
-            {(["all", "image", "video", "youtube"] as MediaFilter[]).map((t) => (
-              <button
-                key={t}
-                className={activeFilter === t ? styles.filterActive : styles.filterBtn}
-                onClick={() => { setFilter(t); setPage(1); }}
-                type="button"
-              >
-                {t === "all" ? "Tất cả" : t === "image" ? "Ảnh" : t === "video" ? "Video" : "YouTube"}
-              </button>
-            ))}
+            {(["all", "image", "video", "youtube"] as MediaFilter[]).map(
+              (t) => (
+                <button
+                  key={t}
+                  className={
+                    activeFilter === t ? styles.filterActive : styles.filterBtn
+                  }
+                  onClick={() => {
+                    setFilter(t);
+                    setPage(1);
+                  }}
+                  type="button"
+                >
+                  {t === "all"
+                    ? "Tất cả"
+                    : t === "image"
+                      ? "Ảnh"
+                      : t === "video"
+                        ? "Video"
+                        : "YouTube"}
+                </button>
+              ),
+            )}
           </div>
           <div className={styles.toolbarRight}>
             <input
@@ -169,7 +202,11 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
               <strong>Đã chọn {multiSelected.size} file</strong>
             </div>
             <div className={styles.previewBarActions}>
-              <button className={styles.actionBtn} onClick={handleMultiConfirm} type="button">
+              <button
+                className={styles.actionBtn}
+                onClick={handleMultiConfirm}
+                type="button"
+              >
                 ✓ Xác nhận
               </button>
             </div>
@@ -186,7 +223,9 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
         ) : items.length === 0 ? (
           <div className={styles.emptyState}>
             <p>Chưa có file nào</p>
-            <p className={styles.emptyHint}>Tải lên ảnh hoặc video để bắt đầu</p>
+            <p className={styles.emptyHint}>
+              Tải lên ảnh hoặc video để bắt đầu
+            </p>
           </div>
         ) : (
           <>
@@ -194,18 +233,27 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
               {items.map((file) => {
                 const url = getMediaUrl(file);
                 const isImage = file.mimeType?.startsWith("image/");
-                const isSelected = multi ? multiSelected.has(file.id) : selectedId === file.id || value === url;
+                const isSelected = multi
+                  ? multiSelected.has(file.id)
+                  : selectedId === file.id || value === url;
 
                 return (
                   <button
                     key={file.id}
                     className={`${styles.gridItem} ${isSelected ? styles.gridItemSelected : ""}`}
-                    onClick={() => multi ? handlePick(file) : setPreviewFile(file)}
+                    onClick={() =>
+                      multi ? handlePick(file) : setPreviewFile(file)
+                    }
                     onDoubleClick={() => !multi && handlePick(file)}
                     type="button"
                   >
                     {isImage || file.source === "youtube" ? (
-                      <img src={url} alt={file.originalName} className={styles.thumb} loading="lazy" />
+                      <img
+                        src={url}
+                        alt={file.originalName}
+                        className={styles.thumb}
+                        loading="lazy"
+                      />
                     ) : file.mimeType?.startsWith("video/") ? (
                       <div className={styles.videoThumb}>
                         <span className={styles.videoIcon}>▶</span>
@@ -216,7 +264,9 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
                       </div>
                     )}
                     <div className={styles.itemMeta}>
-                      <span className={styles.itemName}>{file.originalName}</span>
+                      <span className={styles.itemName}>
+                        {file.originalName}
+                      </span>
                     </div>
                   </button>
                 );
@@ -257,14 +307,24 @@ export function MediaManager({ open, onClose, onSelect, filter: defaultFilter = 
               <strong>{previewFile.originalName}</strong>
               <span>{(previewFile.fileSize / 1024).toFixed(1)} KB</span>
               {previewFile.width && previewFile.height && (
-                <span>{previewFile.width}×{previewFile.height}</span>
+                <span>
+                  {previewFile.width}×{previewFile.height}
+                </span>
               )}
             </div>
             <div className={styles.previewBarActions}>
-              <button className={styles.actionBtn} onClick={() => handlePick(previewFile)} type="button">
+              <button
+                className={styles.actionBtn}
+                onClick={() => handlePick(previewFile)}
+                type="button"
+              >
                 ✓ Chọn file này
               </button>
-              <button className={styles.deleteBtn} onClick={() => handleDelete(previewFile.id)} type="button">
+              <button
+                className={styles.deleteBtn}
+                onClick={() => handleDelete(previewFile.id)}
+                type="button"
+              >
                 ✕ Xóa
               </button>
             </div>

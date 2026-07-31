@@ -29,7 +29,9 @@ export async function generateVariants(
       .rotate()
       .resize(
         config.width,
-        "height" in config ? (config as { width: number; height: number }).height : undefined,
+        "height" in config
+          ? (config as { width: number; height: number }).height
+          : undefined,
         {
           fit: "inside",
           withoutEnlargement: true,

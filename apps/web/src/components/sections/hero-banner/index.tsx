@@ -6,11 +6,19 @@ import { useHeroAnimation } from "./index.logic";
 import styles from "./index.module.scss";
 
 const DEFAULT_BRANDS = [
-  { name: "sony" }, { name: "lg" }, { name: "apple" }, { name: "canon" },
-  { name: "dji" }, { name: "samsung" }, { name: "panasonic" }, { name: "fujifilm" },
+  { name: "sony" },
+  { name: "lg" },
+  { name: "apple" },
+  { name: "canon" },
+  { name: "dji" },
+  { name: "samsung" },
+  { name: "panasonic" },
+  { name: "fujifilm" },
 ];
 
-interface Props { settings: Record<string, string> }
+interface Props {
+  settings: Record<string, string>;
+}
 
 export function HeroBanner({ settings }: Props) {
   const { sectionRef, videoRef } = useHeroAnimation();
@@ -19,14 +27,19 @@ export function HeroBanner({ settings }: Props) {
   const heroVideoType = settings.hero_video_type || "youtube";
   const youtubeId = settings.hero_youtube_id || "utP7z6_Zcwg";
   const customVideoUrl = settings.hero_video_url || "";
-  const videoTitle = settings.hero_video_title || "THE FORGOTTEN DREAM | CINEMATIC TRAVEL | Minh Travel x Honda Winner X";
+  const videoTitle =
+    settings.hero_video_title ||
+    "THE FORGOTTEN DREAM | CINEMATIC TRAVEL | Minh Travel x Honda Winner X";
 
   // ── Text ──
-  const tagline = settings.hero_tagline || "Kể câu chuyện của bạn qua từng khung hình";
+  const tagline =
+    settings.hero_tagline || "Kể câu chuyện của bạn qua từng khung hình";
 
   // ── Logo: ảnh hoặc text ──
   const logoType = settings.hero_logo_type || "image";
-  const logoUrl = settings.hero_logo_url || "https://minhtravel.vn/wp-content/uploads/2023/12/logo-size-to-1-100x30.png";
+  const logoUrl =
+    settings.hero_logo_url ||
+    "https://minhtravel.vn/wp-content/uploads/2023/12/logo-size-to-1-100x30.png";
   const logoText = settings.hero_logo_text || "Minh Travel";
 
   // ── Buttons ──
@@ -67,7 +80,13 @@ export function HeroBanner({ settings }: Props) {
           <p>{tagline}</p>
         </div>
         <div className={styles.actionGroup}>
-          <a data-hero-btn href={btn1Url} target="_blank" rel="noopener noreferrer" className={styles.btnSecondary}>
+          <a
+            data-hero-btn
+            href={btn1Url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.btnSecondary}
+          >
             {btn1Text}
           </a>
           <a data-hero-btn href={btn2Url} className={styles.btnPrimary}>
@@ -75,7 +94,9 @@ export function HeroBanner({ settings }: Props) {
           </a>
         </div>
         <ul className={styles.brandList}>
-          {brands.map((b: { name: string }, i: number) => <li key={b.name || i}>{b.name}</li>)}
+          {brands.map((b: { name: string }, i: number) => (
+            <li key={b.name || i}>{b.name}</li>
+          ))}
         </ul>
       </div>
     </section>

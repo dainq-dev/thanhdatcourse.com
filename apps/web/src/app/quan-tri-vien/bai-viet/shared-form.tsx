@@ -1,13 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useCallback, useEffect } from "react";
 import type { Block, Content } from "@workspace/types";
-import { ApiError, api } from "@/lib/api";
-import { MediaTrigger } from "@/components/admin/media-manager/media-trigger";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { BlockEditor } from "@/components/admin/block-editor";
-import { LeftPanel } from "@/components/admin/block-editor/LeftPanel";
 import { getDefaultData } from "@/components/admin/block-editor/editorState";
+import { LeftPanel } from "@/components/admin/block-editor/LeftPanel";
+import { MediaTrigger } from "@/components/admin/media-manager/media-trigger";
+import { ApiError, api } from "@/lib/api";
 import styles from "./shared.module.scss";
 
 interface Category {
@@ -37,12 +37,23 @@ function extractText(blocks: Content): string {
       if (typeof d.text === "string") return d.text;
       if (typeof d.heading === "string") return d.heading;
       if (typeof d.code === "string") return d.code;
-      if (Array.isArray(d.items)) return d.items.filter((i: string) => typeof i === "string" && i.trim()).join(" ");
-      if (Array.isArray(d.content)) return d.content.map((c: unknown) => {
-        if (typeof c === "string") return c;
-        if (typeof c === "object" && c && "title" in (c as Record<string, unknown>)) return (c as Record<string, unknown>).title;
-        return "";
-      }).join(" ");
+      if (Array.isArray(d.items))
+        return d.items
+          .filter((i: string) => typeof i === "string" && i.trim())
+          .join(" ");
+      if (Array.isArray(d.content))
+        return d.content
+          .map((c: unknown) => {
+            if (typeof c === "string") return c;
+            if (
+              typeof c === "object" &&
+              c &&
+              "title" in (c as Record<string, unknown>)
+            )
+              return (c as Record<string, unknown>).title;
+            return "";
+          })
+          .join(" ");
       return "";
     })
     .join(" ");
@@ -85,8 +96,12 @@ export function SharedPostForm({
   const [title, setTitle] = useState(initialData?.title || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || "");
-  const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnailUrl || "");
-  const [seoDescription, setSeoDescription] = useState(initialData?.seoDescription || "");
+  const [thumbnailUrl, setThumbnailUrl] = useState(
+    initialData?.thumbnailUrl || "",
+  );
+  const [seoDescription, setSeoDescription] = useState(
+    initialData?.seoDescription || "",
+  );
   const [categoryId, setCategoryId] = useState(initialData?.categoryId || "");
   const [author, setAuthor] = useState(initialData?.author || "minhtravel");
   const [blocks, setBlocks] = useState<Content>(initialData?.blocks || []);
@@ -95,12 +110,15 @@ export function SharedPostForm({
   const [addingCat, setAddingCat] = useState(false);
 
   const loadCategories = useCallback(() => {
-    api.publicGet<{ data: Category[] } | Category[]>("/api/categories")
-      .then((d) => setCategories(Array.isArray(d) ? d : d.data ?? []))
+    api
+      .publicGet<{ data: Category[] } | Category[]>("/api/categories")
+      .then((d) => setCategories(Array.isArray(d) ? d : (d.data ?? [])))
       .catch(() => {});
   }, []);
 
-  useEffect(() => { loadCategories(); }, [loadCategories]);
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 
   useEffect(() => {
     if (title) setSlug(slugify(title));
@@ -110,7 +128,10 @@ export function SharedPostForm({
   const readTime = calcReadTime(excerpt + " " + extractText(blocks));
 
   const addBlock = useCallback((type: Block["type"]) => {
-    setBlocks((prev) => [...prev, { id: crypto.randomUUID(), type, data: getDefaultData(type) } as Block]);
+    setBlocks((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), type, data: getDefaultData(type) } as Block,
+    ]);
     setActiveTab("components");
   }, []);
 
@@ -124,21 +145,35 @@ export function SharedPostForm({
       setCategoryId(created.id);
       setNewCatName("");
     } catch (err) {
-      setError(err instanceof ApiError ? (err.detail ?? "Lỗi thêm danh mục") : "Lỗi thêm danh mục");
+      setError(
+        err instanceof ApiError
+          ? (err.detail ?? "Lỗi thêm danh mục")
+          : "Lỗi thêm danh mục",
+      );
     } finally {
       setAddingCat(false);
     }
   };
 
   const validate = (): boolean => {
-    if (!title || title.length < 3) { setError("Tiêu đề phải có ít nhất 3 ký tự"); return false; }
-    if (!excerpt) { setError("Vui lòng nhập mô tả ngắn"); return false; }
+    if (!title || title.length < 3) {
+      setError("Tiêu đề phải có ít nhất 3 ký tự");
+      return false;
+    }
+    if (!excerpt) {
+      setError("Vui lòng nhập mô tả ngắn");
+      return false;
+    }
     setError("");
     return true;
   };
 
   const buildBody = (published: boolean) => ({
-    title, slug, excerpt, author, readTime,
+    title,
+    slug,
+    excerpt,
+    author,
+    readTime,
     isPublished: published,
     contentBlocks: JSON.stringify(blocks),
     ...(thumbnailUrl ? { thumbnailUrl } : {}),
@@ -184,16 +219,24 @@ export function SharedPostForm({
     <div className={styles.infoPanel}>
       <div className={styles.infoField}>
         <label className={styles.infoLabel}>Slug</label>
-        <input type="text" className={styles.infoInput} value={slug}
+        <input
+          type="text"
+          className={styles.infoInput}
+          value={slug}
           onChange={(e) => setSlug(e.target.value)}
-          placeholder="tu-dong-tu-tieu-de" />
+          placeholder="tu-dong-tu-tieu-de"
+        />
         <span className={styles.infoHint}>Tự động từ tiêu đề</span>
       </div>
       <div className={styles.infoField}>
         <label className={styles.infoLabel}>Mô tả ngắn *</label>
-        <textarea className={styles.infoTextarea} value={excerpt}
-          onChange={(e) => setExcerpt(e.target.value)} rows={3}
-          placeholder="Mô tả ngắn cho bài viết..." />
+        <textarea
+          className={styles.infoTextarea}
+          value={excerpt}
+          onChange={(e) => setExcerpt(e.target.value)}
+          rows={3}
+          placeholder="Mô tả ngắn cho bài viết..."
+        />
       </div>
       <div className={styles.infoField}>
         <label className={styles.infoLabel}>Thời gian đọc</label>
@@ -201,46 +244,82 @@ export function SharedPostForm({
       </div>
       <div className={styles.infoField}>
         <label className={styles.infoLabel}>Ảnh thumbnail</label>
-        <MediaTrigger onSelect={setThumbnailUrl} value={thumbnailUrl} showPreview>
+        <MediaTrigger
+          onSelect={setThumbnailUrl}
+          value={thumbnailUrl}
+          showPreview
+        >
           {thumbnailUrl ? "Đổi ảnh" : "Chọn ảnh thumbnail"}
         </MediaTrigger>
-        {thumbnailUrl && <img src={thumbnailUrl} alt="" className={styles.thumbPreview} />}
+        {thumbnailUrl && (
+          <img src={thumbnailUrl} alt="" className={styles.thumbPreview} />
+        )}
       </div>
       <div className={styles.infoField}>
         <label className={styles.infoLabel}>Danh mục</label>
-        <select className={styles.infoInput} value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}>
+        <select
+          className={styles.infoInput}
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+        >
           <option value="">-- Chọn danh mục --</option>
-          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
         </select>
         <div className={styles.addCatRow}>
-          <input type="text" className={styles.infoInputSm} value={newCatName}
+          <input
+            type="text"
+            className={styles.infoInputSm}
+            value={newCatName}
             onChange={(e) => setNewCatName(e.target.value)}
             placeholder="Tên danh mục mới..."
-            onKeyDown={(e) => { if (e.key === "Enter") handleAddCategory(); }} />
-          <button type="button" className={styles.addCatBtn} onClick={handleAddCategory} disabled={addingCat || !newCatName.trim()}>
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleAddCategory();
+            }}
+          />
+          <button
+            type="button"
+            className={styles.addCatBtn}
+            onClick={handleAddCategory}
+            disabled={addingCat || !newCatName.trim()}
+          >
             {addingCat ? "..." : "+"}
           </button>
         </div>
       </div>
       <div className={styles.infoField}>
         <label className={styles.infoLabel}>Tác giả</label>
-        <input type="text" className={styles.infoInput} value={author}
-          onChange={(e) => setAuthor(e.target.value)} placeholder="minhtravel" />
+        <input
+          type="text"
+          className={styles.infoInput}
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          placeholder="minhtravel"
+        />
       </div>
       <div className={styles.infoField}>
         <label className={styles.infoLabel}>SEO Description</label>
-        <textarea className={styles.infoTextarea} value={seoDescription}
-          onChange={(e) => setSeoDescription(e.target.value)} rows={2}
-          placeholder="SEO meta description..." />
+        <textarea
+          className={styles.infoTextarea}
+          value={seoDescription}
+          onChange={(e) => setSeoDescription(e.target.value)}
+          rows={2}
+          placeholder="SEO meta description..."
+        />
       </div>
       {onDelete && (
         <button type="button" className={styles.deleteBtn} onClick={onDelete}>
           Xóa bài viết
         </button>
       )}
-      <button type="button" className={styles.backBtn}
-        onClick={() => router.push("/quan-tri-vien/bai-viet")}>
+      <button
+        type="button"
+        className={styles.backBtn}
+        onClick={() => router.push("/quan-tri-vien/bai-viet")}
+      >
         ← Quay lại danh sách
       </button>
     </div>
@@ -250,7 +329,12 @@ export function SharedPostForm({
     <>
       <div className={styles.wrapper}>
         {error && (
-          <div className={styles.errorBar}>{error}<button type="button" onClick={() => setError("")}>✕</button></div>
+          <div className={styles.errorBar}>
+            {error}
+            <button type="button" onClick={() => setError("")}>
+              ✕
+            </button>
+          </div>
         )}
         <div className={styles.editorArea}>
           <BlockEditor
@@ -262,9 +346,13 @@ export function SharedPostForm({
             onPreview={handlePreview}
             titleInput={
               <div className={styles.titleArea}>
-                <input type="text" className={styles.titleInput} value={title}
+                <input
+                  type="text"
+                  className={styles.titleInput}
+                  value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Nhập tiêu đề bài viết..." />
+                  placeholder="Nhập tiêu đề bài viết..."
+                />
               </div>
             }
             leftPanel={

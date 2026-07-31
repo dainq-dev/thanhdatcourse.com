@@ -3,7 +3,8 @@ import type { MediaFile, MediaFilter, MediaListResponse } from "./types";
 const MEDIA_BASE = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:3002";
 
 function authHeaders(): Record<string, string> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
   return { Authorization: `Bearer ${token}` };
 }
 

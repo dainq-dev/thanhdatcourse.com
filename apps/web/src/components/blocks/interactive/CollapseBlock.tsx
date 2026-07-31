@@ -1,7 +1,7 @@
 "use client";
 
+import type { Block, BlockData } from "@workspace/types";
 import { useState } from "react";
-import type { BlockData, Block } from "@workspace/types";
 import { BlockRenderer } from "../BlockRenderer";
 import styles from "./CollapseBlock.module.scss";
 
@@ -12,7 +12,11 @@ export function CollapseBlock({ data }: { data: BlockData<"collapse"> }) {
 
   return (
     <div className={styles.root}>
-      <button type="button" className={`${styles.header} ${iconLeft ? styles.headerLeft : ""}`} onClick={() => setOpen(!open)}>
+      <button
+        type="button"
+        className={`${styles.header} ${iconLeft ? styles.headerLeft : ""}`}
+        onClick={() => setOpen(!open)}
+      >
         <span className={styles.arrow}>{open ? "▾" : "▸"}</span>
         <span className={styles.title}>{d.title}</span>
       </button>

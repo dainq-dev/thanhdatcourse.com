@@ -41,7 +41,9 @@ export default function AdminPromotionsPage() {
     setCourses(extractData(cd));
     setL(false);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const del = async (id: string) => {
     if (!confirm("Xóa?")) return;
