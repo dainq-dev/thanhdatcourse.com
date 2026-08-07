@@ -108,13 +108,28 @@ sqlite.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
   CREATE TABLE IF NOT EXISTS promotions (
-    id TEXT PRIMARY KEY, course_id TEXT REFERENCES courses(id) ON DELETE SET NULL,
-    campaign_name TEXT NOT NULL, discount_percentage INTEGER NOT NULL,
-    start_date TEXT, end_date TEXT, is_active INTEGER NOT NULL DEFAULT 0
+    id TEXT PRIMARY KEY, campaign_name TEXT NOT NULL,
+    discount_percentage INTEGER NOT NULL, discount_amount INTEGER,
+    start_date TEXT, end_date TEXT, is_active INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+  CREATE TABLE IF NOT EXISTS promotion_courses (
+    promotion_id TEXT NOT NULL REFERENCES promotions(id) ON DELETE CASCADE,
+    course_id TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    PRIMARY KEY (promotion_id, course_id)
+  );
+  CREATE TABLE IF NOT EXISTS sections (
+    id TEXT PRIMARY KEY, entity_type TEXT NOT NULL, entity_id TEXT NOT NULL,
+    section_type TEXT NOT NULL, title TEXT, config TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_published INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_sections_entity ON sections(entity_type, entity_id, sort_order);
 `);
 
-console.log("✓ All 17 tables created/verified");
+console.log("✓ All 19 tables created/verified");
 
 // Verify
 const tables = sqlite

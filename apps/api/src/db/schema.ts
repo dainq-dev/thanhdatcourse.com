@@ -27,17 +27,15 @@ export const users = sqliteTable("users", {
 });
 
 export const courses = sqliteTable("courses", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
+  id: text("id") .primaryKey() .$defaultFn(() => crypto.randomUUID()),
   slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
   subtitle: text("subtitle"),
   description: text("description").notNull(),
   contentBlocks: text("content_blocks"),
+  thumbnailUrl: text("thumbnail_url"),
   basePrice: integer("base_price").notNull(),
   originalPrice: integer("original_price"),
-  thumbnailUrl: text("thumbnail_url"),
   trailerVideoUrl: text("trailer_video_url"),
   externalCheckoutUrl: text("external_checkout_url"),
   isPublished: integer("is_published").notNull().default(0),
@@ -243,15 +241,29 @@ export const promotions = sqliteTable("promotions", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  courseId: text("course_id").references(() => courses.id, {
-    onDelete: "set null",
-  }),
   campaignName: text("campaign_name").notNull(),
   discountPercentage: integer("discount_percentage").notNull(),
+  discountAmount: integer("discount_amount"),
   startDate: text("start_date"),
   endDate: text("end_date"),
   isActive: integer("is_active").notNull().default(0),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
+
+export const promotionCourses = sqliteTable(
+  "promotion_courses",
+  {
+    promotionId: text("promotion_id")
+      .notNull()
+      .references(() => promotions.id, { onDelete: "cascade" }),
+    courseId: text("course_id")
+      .notNull()
+      .references(() => courses.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.promotionId, table.courseId] }),
+  }),
+);
 
 export const productShowcases = sqliteTable("product_showcases", {
   id: text("id")
@@ -263,4 +275,19 @@ export const productShowcases = sqliteTable("product_showcases", {
   beforeImageUrl: text("before_image_url"),
   afterImageUrl: text("after_image_url"),
   sortOrder: integer("sort_order").notNull().default(0),
+});
+
+export const sections = sqliteTable("sections", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  entityType: text("entity_type").notNull(),
+  entityId: text("entity_id").notNull(),
+  sectionType: text("section_type").notNull(),
+  title: text("title"),
+  config: text("config").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isPublished: integer("is_published").notNull().default(1),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+  updatedAt: text("updated_at").$defaultFn(() => new Date().toISOString()),
 });

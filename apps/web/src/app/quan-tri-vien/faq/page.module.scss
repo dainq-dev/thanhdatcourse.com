@@ -1,12 +1,10 @@
 .title {
   font-size: clamp(1.25rem, 3vw, 1.5rem);
   font-weight: 700;
-  color: #1A1A1A;
+  color: var(--admin-text);
   margin-bottom: 1.5rem;
   letter-spacing: -0.02em;
 }
-
-// ── Form ──
 
 .form {
   display: flex;
@@ -15,68 +13,63 @@
   max-width: 560px;
   margin-bottom: 2.5rem;
   padding: 1.5rem;
-  background: #FFFFFF;
-  border: 1px solid #EAEAEA;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
   border-radius: 8px;
 }
 
 .i {
   padding: 0.5rem 0.75rem;
-  background: #FFFFFF;
-  border: 1px solid #E0E0E0;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
   border-radius: 6px;
-  color: #1A1A1A;
+  color: var(--admin-text);
   font-size: 0.8125rem;
   font-family: inherit;
   resize: vertical;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
 
-  &:focus { border-color: #AAA; }
-
-  &::placeholder { color: #B0B0B0; }
+  &:focus { border-color: var(--admin-accent); }
+  &::placeholder { color: var(--admin-text-secondary); }
 }
 
 .btn {
   padding: 0.5rem 1rem;
-  background: #1A1A1A;
-  color: #FFFFFF;
+  background: var(--admin-accent);
+  color: var(--admin-accent-text);
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
-  transition: background 0.15s;
+  transition: background var(--admin-duration-fast) var(--admin-ease-out);
 
-  &:hover { background: #333; }
+  &:hover { background: var(--admin-accent-hover); }
+  &:active { transform: translateY(1px); }
 }
 
 .btnCancel {
   padding: 0.5rem 1rem;
-  background: #FFFFFF;
-  color: #666;
-  border: 1px solid #E0E0E0;
+  background: var(--admin-surface);
+  color: var(--admin-text-secondary);
+  border: 1px solid var(--admin-border);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
-  transition: all 0.15s;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
 
-  &:hover {
-    border-color: #CCC;
-    color: #333;
-  }
+  &:hover { border-color: var(--admin-border-heavy); color: var(--admin-text); }
 }
-
-// ── Table ──
 
 .tbl {
   width: 100%;
   border-collapse: collapse;
-  background: #FFFFFF;
-  border: 1px solid #EAEAEA;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
   border-radius: 8px;
   overflow: hidden;
 
@@ -85,22 +78,22 @@
     padding: 0.75rem 1rem;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #999;
+    color: var(--admin-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid #F0F0F0;
-    background: #FAFAFA;
+    border-bottom: 1px solid var(--admin-border);
+    background: var(--admin-surface-raised);
   }
 
   td {
     padding: 0.75rem 1rem;
     font-size: 0.8125rem;
-    color: #444;
-    border-bottom: 1px solid #F5F5F3;
+    color: var(--admin-text);
+    border-bottom: 1px solid var(--admin-border);
   }
 
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #FAFAFA; }
+  tr:hover td { background: var(--admin-surface-hover); }
 }
 
 .trunc {
@@ -117,36 +110,39 @@
 
 .editBtn {
   padding: 0.25rem 0.6rem;
-  background: #FFFFFF;
-  border: 1px solid #E0E0E0;
-  color: #666;
+  background: transparent;
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text-secondary);
   border-radius: 4px;
   font-size: 0.7rem;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
 
-  &:hover {
-    border-color: #CCC;
-    color: #333;
-  }
+  &:hover { border-color: var(--admin-border-heavy); color: var(--admin-text); }
 }
 
 .delBtn {
   padding: 0.25rem 0.6rem;
-  background: #FEF2F2;
-  border: 1px solid #FECACA;
-  color: #C53030;
+  background: var(--admin-danger-bg);
+  border: 1px solid var(--admin-danger-border);
+  color: var(--admin-danger);
   border-radius: 4px;
   font-size: 0.7rem;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
 
-  &:hover { background: #FEE2E2; }
+  &:hover { background: rgba(239, 68, 68, 0.18); }
 }
 
-.loading { color: #999; padding: 2rem; font-size: 0.8125rem; }
-.empty { color: #B0B0B0; text-align: center; padding: 4rem; font-size: 0.8125rem; }
+.dateRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.loading { color: var(--admin-text-secondary); padding: 2rem; font-size: 0.8125rem; }
+.empty { color: var(--admin-text-secondary); text-align: center; padding: 4rem; font-size: 0.8125rem; }

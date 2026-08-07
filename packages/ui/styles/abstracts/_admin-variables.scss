@@ -1,0 +1,44 @@
+// ── Admin Theme (light) ──
+@use 'variables' as brand;
+
+// Brand tokens (re-exposed with admin context)
+$admin-bg:              #F5F5F5;
+$admin-surface:         #FFFFFF;
+$admin-surface-raised:  #FFFFFF;
+$admin-surface-hover:   #F0F0F0;
+$admin-border:          rgba(0, 0, 0, 0.08);
+$admin-border-heavy:    rgba(0, 0, 0, 0.14);
+$admin-text:            #1A1A1A;
+$admin-text-secondary:  #6B6B6B;
+$admin-text-disabled:   #B0B0B0;
+$admin-accent:          #FF005A;
+$admin-accent-hover:    #CA004D;
+$admin-accent-text:     #FFFFFF;
+$admin-success:         #057625;
+$admin-success-bg:      rgba(6, 168, 76, 0.10);
+$admin-success-border:  rgba(6, 168, 76, 0.20);
+$admin-danger:          #DC2626;
+$admin-danger-bg:       rgba(220, 38, 38, 0.08);
+$admin-danger-border:   rgba(220, 38, 38, 0.18);
+$admin-warning:         #D97706;
+$admin-warning-bg:      rgba(217, 119, 6, 0.10);
+
+// Sizing
+$admin-sidebar-width:   260px;
+$admin-header-height:   56px;
+$admin-radius-sm:       4px;
+$admin-radius-md:       6px;
+$admin-radius-lg:       8px;
+
+// Typography
+$admin-font-mono:       'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+
+// Shadows (light context)
+$admin-shadow-card:      0 1px 3px rgba(0, 0, 0, 0.08);
+$admin-shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+$admin-shadow-sidebar:   2px 0 16px rgba(0, 0, 0, 0.08);
+
+// Z-index
+$z-admin-sidebar:  60;
+$z-admin-header:   50;
+$z-admin-overlay:  45;

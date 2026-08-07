@@ -134,7 +134,7 @@ describe("BlockSchemas — each block type parses valid data", () => {
       type: "beforeAfter",
       data: { beforeMediaId: uuid2, afterMediaId: uuid3 },
     });
-    expect(result.data.beforeLabel).toBe("Before");
+    expect(result.data.beforeLabel).toBe("Trước");
   });
 
   test("divider", () => {

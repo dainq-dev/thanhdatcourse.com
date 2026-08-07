@@ -19,7 +19,9 @@ import {
   postCategories,
   posts,
   productShowcases,
+  promotionCourses,
   promotions,
+  sections,
   siteSettings,
   testimonials,
   users,
@@ -206,13 +208,32 @@ beforeAll(() => {
   )`);
   rawDb.run(`CREATE TABLE IF NOT EXISTS promotions (
     id TEXT PRIMARY KEY,
-    course_id TEXT REFERENCES courses(id) ON DELETE SET NULL,
     campaign_name TEXT NOT NULL,
     discount_percentage INTEGER NOT NULL,
+    discount_amount INTEGER,
     start_date TEXT,
     end_date TEXT,
-    is_active INTEGER NOT NULL DEFAULT 0
+    is_active INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT
   )`);
+  rawDb.run(`CREATE TABLE IF NOT EXISTS promotion_courses (
+    promotion_id TEXT NOT NULL REFERENCES promotions(id) ON DELETE CASCADE,
+    course_id TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    PRIMARY KEY (promotion_id, course_id)
+  )`);
+  rawDb.run(`CREATE TABLE IF NOT EXISTS sections (
+    id TEXT PRIMARY KEY,
+    entity_type TEXT NOT NULL,
+    entity_id TEXT NOT NULL,
+    section_type TEXT NOT NULL,
+    title TEXT,
+    config TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_published INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT,
+    updated_at TEXT
+  )`);
+  rawDb.run(`CREATE INDEX IF NOT EXISTS idx_sections_entity ON sections(entity_type, entity_id, sort_order)`);
   rawDb.run(`CREATE TABLE IF NOT EXISTS product_showcases (
     id TEXT PRIMARY KEY,
     product_id TEXT NOT NULL REFERENCES digital_products(id) ON DELETE CASCADE,
@@ -248,6 +269,7 @@ describe("Schema — Table Definitions", () => {
     expect(Object.keys(courses)).toContain("slug");
     expect(Object.keys(courses)).toContain("title");
     expect(Object.keys(courses)).toContain("basePrice");
+    expect(Object.keys(courses)).toContain("originalPrice");
     expect(Object.keys(courses)).toContain("isPublished");
     expect(Object.keys(courses)).toContain("isFeaturedOnHome");
     expect(Object.keys(courses)).toContain("isComboOnly");
@@ -394,12 +416,19 @@ describe("Schema — Table Definitions", () => {
   test("promotions table is defined", () => {
     expect(promotions).toBeDefined();
     expect(Object.keys(promotions)).toContain("id");
-    expect(Object.keys(promotions)).toContain("courseId");
     expect(Object.keys(promotions)).toContain("campaignName");
     expect(Object.keys(promotions)).toContain("discountPercentage");
+    expect(Object.keys(promotions)).toContain("discountAmount");
     expect(Object.keys(promotions)).toContain("startDate");
     expect(Object.keys(promotions)).toContain("endDate");
     expect(Object.keys(promotions)).toContain("isActive");
+    expect(Object.keys(promotions)).toContain("createdAt");
+  });
+
+  test("promotion_courses table is defined", () => {
+    expect(promotionCourses).toBeDefined();
+    expect(Object.keys(promotionCourses)).toContain("promotionId");
+    expect(Object.keys(promotionCourses)).toContain("courseId");
   });
 
   test("product_showcases table is defined", () => {
@@ -409,6 +438,20 @@ describe("Schema — Table Definitions", () => {
     expect(Object.keys(productShowcases)).toContain("beforeImageUrl");
     expect(Object.keys(productShowcases)).toContain("afterImageUrl");
     expect(Object.keys(productShowcases)).toContain("sortOrder");
+  });
+
+  test("sections table is defined", () => {
+    expect(sections).toBeDefined();
+    expect(Object.keys(sections)).toContain("id");
+    expect(Object.keys(sections)).toContain("entityType");
+    expect(Object.keys(sections)).toContain("entityId");
+    expect(Object.keys(sections)).toContain("sectionType");
+    expect(Object.keys(sections)).toContain("title");
+    expect(Object.keys(sections)).toContain("config");
+    expect(Object.keys(sections)).toContain("sortOrder");
+    expect(Object.keys(sections)).toContain("isPublished");
+    expect(Object.keys(sections)).toContain("createdAt");
+    expect(Object.keys(sections)).toContain("updatedAt");
   });
 });
 
@@ -742,8 +785,12 @@ describe("Schema — Insert + Select", () => {
       [courseId, "promo-course", "Promo Course", "Desc", 1000],
     );
     rawDb.run(
-      `INSERT INTO promotions (id, course_id, campaign_name, discount_percentage, is_active) VALUES (?, ?, ?, ?, 1)`,
-      [promoId, courseId, "Summer Sale", 30],
+      `INSERT INTO promotions (id, campaign_name, discount_percentage, is_active) VALUES (?, ?, ?, 1)`,
+      [promoId, "Summer Sale", 30],
+    );
+    rawDb.run(
+      `INSERT INTO promotion_courses (promotion_id, course_id) VALUES (?, ?)`,
+      [promoId, courseId],
     );
 
     const row = rawDb
@@ -753,8 +800,35 @@ describe("Schema — Insert + Select", () => {
     expect(row.campaign_name).toBe("Summer Sale");
     expect(row.discount_percentage).toBe(30);
     expect(row.is_active).toBe(1);
+
+    const joinRow = rawDb
+      .query(
+        `SELECT * FROM promotion_courses WHERE promotion_id = ? AND course_id = ?`,
+      )
+      .get(promoId, courseId) as RawRow;
+    expect(joinRow).not.toBeNull();
+    expect(joinRow.course_id).toBe(courseId);
+
+    rawDb.run(`DELETE FROM promotion_courses`);
     rawDb.run(`DELETE FROM promotions`);
     rawDb.run(`DELETE FROM courses`);
+  });
+
+  test("insert a section record", () => {
+    const id = crypto.randomUUID();
+    rawDb.run(
+      `INSERT INTO sections (id, entity_type, entity_id, section_type, config, sort_order) VALUES (?, ?, ?, ?, ?, ?)`,
+      [id, "course", "c-test", "hero_banner", JSON.stringify({ heading: "Test" }), 0],
+    );
+
+    const row = rawDb
+      .query(`SELECT * FROM sections WHERE id = ?`)
+      .get(id) as RawRow;
+    expect(row).not.toBeNull();
+    expect(row.entity_type).toBe("course");
+    expect(row.section_type).toBe("hero_banner");
+    expect(JSON.parse(row.config as string).heading).toBe("Test");
+    rawDb.run(`DELETE FROM sections`);
   });
 
   test("insert product showcases linked to a product", () => {

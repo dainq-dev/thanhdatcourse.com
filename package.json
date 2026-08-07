@@ -14,7 +14,9 @@
     "start": "turbo start",
     "lint": "biome lint apps packages",
     "format": "biome format apps packages --write",
-    "check": "biome check apps packages --write"
+    "check": "biome check apps packages --write",
+"truncate": "bun run --filter @workspace/api truncate && bun run --filter @workspace/media truncate",
+"seed": "bun run --filter @workspace/api seed"
   },
   "devDependencies": {
     "turbo": "^2.0.0",

@@ -22,11 +22,14 @@ export default function AdminPostsPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
 
+  const [search, setSearch] = useState("");
+
   const fetchPosts = async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (statusFilter === "published") params.set("published", "true");
     if (statusFilter === "draft") params.set("draft", "true");
+    if (search) params.set("search", search);
 
     try {
       const d = await api.get<Post[] | { data: Post[] }>(
@@ -40,7 +43,7 @@ export default function AdminPostsPage() {
 
   useEffect(() => {
     fetchPosts();
-  }, [statusFilter]);
+  }, [statusFilter, search]);
 
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Xóa bài viết "${title}"?`)) return;
@@ -61,6 +64,13 @@ export default function AdminPostsPage() {
       </div>
 
       <div className={styles.filters}>
+        <input
+          type="text"
+          className={styles.search}
+          placeholder="Tìm kiếm theo tên..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         <select
           className={styles.filter}
           value={statusFilter}
@@ -73,7 +83,16 @@ export default function AdminPostsPage() {
       </div>
 
       {loading ? (
-        <div className={styles.loading}>Đang tải...</div>
+        <div className={styles.loading}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={`skel-${i}`} className={styles.skeletonRow}>
+              <div className={styles.skeleton} style={{ width: "60%" }} />
+              <div className={styles.skeleton} style={{ width: "25%" }} />
+              <div className={styles.skeleton} style={{ width: "25%" }} />
+              <div className={styles.skeleton} style={{ width: "20%" }} />
+            </div>
+          ))}
+        </div>
       ) : posts.length === 0 ? (
         <div className={styles.empty}>
           <p>Chưa có bài viết nào</p>
@@ -99,7 +118,7 @@ export default function AdminPostsPage() {
                   <span
                     className={`${styles.badge} ${post.isPublished ? styles.published : styles.draft}`}
                   >
-                    {post.isPublished ? "Published" : "Draft"}
+                    {post.isPublished ? "Đã xuất bản" : "Nháp"}
                   </span>
                 </td>
                 <td className={styles.date}>

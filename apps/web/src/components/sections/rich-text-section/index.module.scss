@@ -1,0 +1,57 @@
+.sectionWhite {
+  padding: 60px 0;
+  background: var(--c-white, #fff);
+}
+
+.sectionSoft {
+  padding: 60px 0;
+  background: #f0f5fa;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.block {
+  max-width: 800px;
+  width: 100%;
+}
+
+.title {
+  font-family: "Be Vietnam Pro", "Manrope", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--c-dark, #1e293b);
+  margin: 0 0 24px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.content {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--c-text, #334155);
+
+  strong {
+    font-weight: 600;
+    color: var(--c-dark, #1e293b);
+  }
+
+  p {
+    margin: 0 0 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 22px;
+  }
+}

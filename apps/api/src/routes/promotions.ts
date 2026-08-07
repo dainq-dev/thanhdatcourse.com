@@ -1,44 +1,85 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, asc, eq, gte, lte, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gte, isNull, lte, or } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "../db";
-import { promotions } from "../db/schema";
+import { courses, promotionCourses, promotions } from "../db/schema";
 import { authMiddleware } from "../middleware/auth";
 
-const CreatePromotionSchema = z.object({
-  campaignName: z.string().min(1),
-  discountPercentage: z.number().int().min(1).max(100),
-  courseId: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  isActive: z.boolean().optional().default(false),
-});
+const CreatePromotionSchema = z
+  .object({
+    campaign_name: z.string().min(1),
+    discount_percentage: z.number().int().min(1).max(100),
+    discount_amount: z.number().int().positive().optional(),
+    start_date: z.string().datetime().optional(),
+    end_date: z.string().datetime().optional(),
+    is_active: z.boolean().optional().default(true),
+    course_ids: z.array(z.string()).min(1, "Phải gán ít nhất 1 khóa học"),
+  })
+  .refine(
+    (data) => {
+      if (data.end_date && new Date(data.end_date) <= new Date()) {
+        return false;
+      }
+      return true;
+    },
+    { message: "end_date phải là ngày trong tương lai" },
+  );
 
-const UpdatePromotionSchema = CreatePromotionSchema.partial();
+const UpdatePromotionSchema = z
+  .object({
+    campaign_name: z.string().min(1).optional(),
+    discount_percentage: z.number().int().min(1).max(100).optional(),
+    discount_amount: z.number().int().positive().optional(),
+    start_date: z.string().datetime().optional(),
+    end_date: z.string().datetime().optional(),
+    is_active: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.end_date && new Date(data.end_date) <= new Date()) {
+        return false;
+      }
+      return true;
+    },
+    { message: "end_date phải là ngày trong tương lai" },
+  );
 
-async function checkConflictingActivePromotion(
-  courseId: string | null | undefined,
-  excludeId?: string,
-): Promise<{ conflict: boolean; id?: string }> {
-  const conditions: SQL[] = [eq(promotions.isActive, 1)];
-
-  if (courseId) {
-    conditions.push(eq(promotions.courseId, courseId));
-  }
-
-  const existing = await db
+export async function getActivePromotion(courseId: string) {
+  const now = new Date().toISOString();
+  const promos = await db
     .select()
     .from(promotions)
-    .where(and(...conditions));
+    .innerJoin(promotionCourses, eq(promotions.id, promotionCourses.promotionId))
+    .where(
+      and(
+        eq(promotionCourses.courseId, courseId),
+        eq(promotions.isActive, 1),
+        or(isNull(promotions.startDate), lte(promotions.startDate, now)),
+        or(isNull(promotions.endDate), gte(promotions.endDate, now)),
+      ),
+    )
+    .orderBy(desc(promotions.discountPercentage), desc(promotions.startDate));
 
-  for (const p of existing) {
-    if (p.id !== excludeId) {
-      return { conflict: true, id: p.id };
-    }
+  return promos[0]?.promotions ?? null;
+}
+
+async function assignCoursesToPromotion(
+  promotionId: string,
+  courseIds: string[],
+): Promise<void> {
+  await db
+    .delete(promotionCourses)
+    .where(eq(promotionCourses.promotionId, promotionId));
+
+  if (courseIds.length > 0) {
+    await db.insert(promotionCourses).values(
+      courseIds.map((cid) => ({
+        promotionId,
+        courseId: cid,
+      })),
+    );
   }
-
-  return { conflict: false };
 }
 
 export const promotionRoutes = new Hono()
@@ -47,28 +88,8 @@ export const promotionRoutes = new Hono()
     if (!courseId) {
       return c.json({ error: "course_id is required" }, 400);
     }
-
-    const now = new Date().toISOString();
-
-    const [promotion] = await db
-      .select()
-      .from(promotions)
-      .where(
-        and(
-          eq(promotions.courseId, courseId),
-          eq(promotions.isActive, 1),
-          gte(promotions.endDate!, now),
-          lte(promotions.startDate!, now),
-        ),
-      )
-      .orderBy(asc(promotions.endDate))
-      .limit(1);
-
-    if (!promotion) {
-      return c.json(null);
-    }
-
-    return c.json(promotion);
+    const promo = await getActivePromotion(courseId);
+    return c.json(promo);
   })
   .get("/", authMiddleware("ADMIN"), async (c) => {
     const active = c.req.query("active");
@@ -81,6 +102,25 @@ export const promotionRoutes = new Hono()
     const result = await query.orderBy(asc(promotions.campaignName));
     return c.json(result);
   })
+  .get("/:id", authMiddleware("ADMIN"), async (c) => {
+    const id = c.req.param("id");
+
+    const [promotion] = await db
+      .select()
+      .from(promotions)
+      .where(eq(promotions.id, id));
+    if (!promotion) return c.json({ error: "Not found" }, 404);
+
+    const courseRows = await db
+      .select()
+      .from(promotionCourses)
+      .where(eq(promotionCourses.promotionId, id));
+
+    return c.json({
+      ...promotion,
+      course_ids: courseRows.map((r) => r.courseId),
+    });
+  })
   .post(
     "/",
     authMiddleware("ADMIN"),
@@ -88,14 +128,19 @@ export const promotionRoutes = new Hono()
     async (c) => {
       const data = c.req.valid("json");
 
-      if (data.isActive && data.courseId) {
-        const { conflict } = await checkConflictingActivePromotion(
-          data.courseId,
-        );
-        if (conflict) {
+      if (data.course_ids.length > 0) {
+        const courseRows = await db
+          .select({ id: courses.id })
+          .from(courses)
+          .where(
+            and(
+              ...data.course_ids.map((cid) => eq(courses.id, cid)),
+            ),
+          );
+        if (courseRows.length !== data.course_ids.length) {
           return c.json(
-            { error: "An active promotion already exists for this course" },
-            409,
+            { error: "Một hoặc nhiều course_id không tồn tại" },
+            400,
           );
         }
       }
@@ -103,19 +148,37 @@ export const promotionRoutes = new Hono()
       const id = crypto.randomUUID();
       await db.insert(promotions).values({
         id,
-        campaignName: data.campaignName,
-        discountPercentage: data.discountPercentage,
-        courseId: data.courseId ?? null,
-        startDate: data.startDate ?? null,
-        endDate: data.endDate ?? null,
-        isActive: data.isActive ? 1 : 0,
+        campaignName: data.campaign_name,
+        discountPercentage: data.discount_percentage,
+        discountAmount: data.discount_amount ?? null,
+        startDate: data.start_date ?? null,
+        endDate: data.end_date ?? null,
+        isActive: data.is_active ? 1 : 0,
       });
+
+      if (data.course_ids.length > 0) {
+        await db.insert(promotionCourses).values(
+          data.course_ids.map((cid) => ({
+            promotionId: id,
+            courseId: cid,
+          })),
+        );
+      }
+
+      const courseRows = await db
+        .select()
+        .from(promotionCourses)
+        .where(eq(promotionCourses.promotionId, id));
 
       const [created] = await db
         .select()
         .from(promotions)
         .where(eq(promotions.id, id));
-      return c.json(created, 201);
+
+      return c.json(
+        { ...created, course_ids: courseRows.map((r) => r.courseId) },
+        201,
+      );
     },
   )
   .put(
@@ -132,33 +195,98 @@ export const promotionRoutes = new Hono()
         .where(eq(promotions.id, id));
       if (!existing) return c.json({ error: "Not found" }, 404);
 
-      if (data.isActive !== undefined && data.isActive) {
-        const targetCourseId = data.courseId ?? existing.courseId;
-        if (targetCourseId) {
-          const { conflict } = await checkConflictingActivePromotion(
-            targetCourseId,
-            id,
+      const updates: Record<string, string | number | null> = {};
+      if (data.campaign_name !== undefined)
+        updates.campaignName = data.campaign_name;
+      if (data.discount_percentage !== undefined)
+        updates.discountPercentage = data.discount_percentage;
+      if (data.discount_amount !== undefined)
+        updates.discountAmount = data.discount_amount;
+      if (data.start_date !== undefined)
+        updates.startDate = data.start_date;
+      if (data.end_date !== undefined) updates.endDate = data.end_date;
+      if (data.is_active !== undefined)
+        updates.isActive = data.is_active ? 1 : 0;
+
+      await db.update(promotions).set(updates).where(eq(promotions.id, id));
+
+      const [updated] = await db
+        .select()
+        .from(promotions)
+        .where(eq(promotions.id, id));
+      return c.json(updated);
+    },
+  )
+  .put(
+    "/:id/courses",
+    authMiddleware("ADMIN"),
+    zValidator(
+      "json",
+      z.object({
+        course_ids: z.array(z.string()),
+      }),
+    ),
+    async (c) => {
+      const id = c.req.param("id");
+      const { course_ids } = c.req.valid("json");
+
+      const [promotion] = await db
+        .select()
+        .from(promotions)
+        .where(eq(promotions.id, id));
+      if (!promotion) return c.json({ error: "Not found" }, 404);
+
+      if (course_ids.length > 0) {
+        const courseRows = await db
+          .select({ id: courses.id })
+          .from(courses)
+          .where(
+            and(...course_ids.map((cid) => eq(courses.id, cid))),
           );
-          if (conflict) {
-            return c.json(
-              { error: "An active promotion already exists for this course" },
-              409,
-            );
-          }
+        if (courseRows.length !== course_ids.length) {
+          return c.json(
+            { error: "Một hoặc nhiều course_id không tồn tại" },
+            400,
+          );
         }
       }
 
-      const updates: Record<string, string | number | null> = {};
-      if (data.campaignName !== undefined)
-        updates.campaignName = data.campaignName;
-      if (data.discountPercentage !== undefined)
-        updates.discountPercentage = data.discountPercentage;
-      if (data.courseId !== undefined) updates.courseId = data.courseId;
-      if (data.startDate !== undefined) updates.startDate = data.startDate;
-      if (data.endDate !== undefined) updates.endDate = data.endDate;
-      if (data.isActive !== undefined) updates.isActive = data.isActive ? 1 : 0;
+      await assignCoursesToPromotion(id, course_ids);
 
-      await db.update(promotions).set(updates).where(eq(promotions.id, id));
+      const courseRows = await db
+        .select()
+        .from(promotionCourses)
+        .where(eq(promotionCourses.promotionId, id));
+
+      return c.json({
+        ...promotion,
+        course_ids: courseRows.map((r) => r.courseId),
+      });
+    },
+  )
+  .patch(
+    "/:id/toggle",
+    authMiddleware("ADMIN"),
+    zValidator(
+      "json",
+      z.object({
+        is_active: z.boolean(),
+      }),
+    ),
+    async (c) => {
+      const id = c.req.param("id");
+      const { is_active } = c.req.valid("json");
+
+      const [existing] = await db
+        .select()
+        .from(promotions)
+        .where(eq(promotions.id, id));
+      if (!existing) return c.json({ error: "Not found" }, 404);
+
+      await db
+        .update(promotions)
+        .set({ isActive: is_active ? 1 : 0 })
+        .where(eq(promotions.id, id));
 
       const [updated] = await db
         .select()

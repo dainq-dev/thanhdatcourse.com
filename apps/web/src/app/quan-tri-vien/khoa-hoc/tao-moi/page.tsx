@@ -1,231 +1,89 @@
 "use client";
 
-import type { Content } from "@workspace/types";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-import { BlockEditor } from "@/components/admin/block-editor";
+import { useState } from "react";
+import { MediaTrigger } from "@/components/admin/media-manager/media-trigger";
 import { ApiError, api } from "@/lib/api";
 import styles from "./page.module.scss";
+
+function slugify(t: string) { return t.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").replace(/[^a-z0-9\s-]/g,"").replace(/\s+/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"").slice(0,120); }
 
 export default function CreateCoursePage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState<"info" | "blocks">("info");
-  const [form, setForm] = useState({
-    title: "",
-    slug: "",
-    description: "",
-    basePrice: "",
-    originalPrice: "",
-    level: "all",
-    isPublished: false,
-    isFeaturedOnHome: false,
-    isComboOnly: false,
-    buttonText: "",
-  });
-  const [blocks, setBlocks] = useState<Content>([]);
 
-  const handleChange = (field: string, value: string | boolean) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+  const [f, setF] = useState({ title:"", slug:"", description:"", basePrice:"", thumbnailUrl:"", trailerVideoUrl:"", externalCheckoutUrl:"", level:"all", buttonText:"", isPublished:false, isFeaturedOnHome:false, isComboOnly:false });
+
+  const onChange = (k: string, v: string|boolean) => {
+    if (k === "title" && typeof v === "string") setF(p => ({ ...p, title: v, slug: slugify(v) }));
+    else setF(p => ({ ...p, [k]: v }));
   };
 
-  const handleBlocksChange = useCallback((newBlocks: Content) => {
-    setBlocks(newBlocks);
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSaving(true);
-
-    const body: Record<string, unknown> = {
-      title: form.title,
-      description: form.description,
-      basePrice: parseInt(form.basePrice, 10) || 0,
-      isPublished: form.isPublished,
-      isFeaturedOnHome: form.isFeaturedOnHome,
-      isComboOnly: form.isComboOnly,
-      contentBlocks: JSON.stringify(blocks),
-    };
-
-    if (form.slug) body.slug = form.slug;
-    if (form.originalPrice)
-      body.originalPrice = parseInt(form.originalPrice, 10);
-    if (form.level) body.level = form.level;
-    if (form.buttonText) body.buttonText = form.buttonText;
-
+  const submit = async (e: React.FormEvent) => { e.preventDefault(); setError(""); setSaving(true);
     try {
-      const course = await api.post<{ slug: string }>("/api/courses", body);
-      router.push(`/quan-tri-vien/khoa-hoc/${course.slug}`);
-    } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? (err.detail ?? "Lỗi khi tạo khóa học")
-          : "Lỗi khi tạo khóa học",
-      );
-    } finally {
-      setSaving(false);
-    }
+      const b: Record<string,unknown> = { title:f.title, description:f.description, basePrice:parseInt(f.basePrice,10)||0, thumbnailUrl:f.thumbnailUrl||null, trailerVideoUrl:f.trailerVideoUrl||null, externalCheckoutUrl:f.externalCheckoutUrl||null, level:f.level, buttonText:f.buttonText||null, isPublished:f.isPublished, isFeaturedOnHome:f.isFeaturedOnHome, isComboOnly:f.isComboOnly };
+      if (f.slug) b.slug = f.slug;
+      const r = await api.post<{slug:string}>("/api/courses", b);
+      router.push(`/quan-tri-vien/khoa-hoc/${r.slug}`);
+    } catch (err) { setError(err instanceof ApiError ? (err.detail??"Lỗi") : "Lỗi khi tạo"); }
+    finally { setSaving(false); }
   };
 
   return (
-    <div>
-      <h1 className={styles.pageTitle}>Tạo khóa học mới</h1>
-      <div className={styles.tabs}>
-        <button
-          type="button"
-          className={`${styles.tab} ${activeTab === "info" ? styles.tabActive : ""}`}
-          onClick={() => setActiveTab("info")}
-        >
-          Thông tin
-        </button>
-        <button
-          type="button"
-          className={`${styles.tab} ${activeTab === "blocks" ? styles.tabActive : ""}`}
-          onClick={() => setActiveTab("blocks")}
-        >
-          Giới thiệu (Blocks)
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.error}>{error}</div>}
-
-        {activeTab === "info" && (
-          <div className={styles.tabContent}>
-            <div className={styles.field}>
-              <label className={styles.label}>Tiêu đề *</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={form.title}
-                onChange={(e) => handleChange("title", e.target.value)}
-                placeholder="Tối thiểu 10 ký tự"
-                required
-                minLength={10}
-              />
+    <div className={styles.page}>
+      <div className={styles.panel}>
+        <div className={styles.panelHead}>
+          <h1 className={styles.panelTitle}>Tạo khóa học mới</h1>
+          <div className={styles.panelBtns}>
+            <button type="button" className={styles.cBtn} onClick={() => router.back()}>Hủy</button>
+            <button type="submit" form="create-course-form" className={styles.sBtn} disabled={saving}>{saving?"Đang tạo...":"Tạo khóa học"}</button>
+          </div>
+        </div>
+        {error && <div className={styles.err}>{error}<button type="button" onClick={()=>setError("")} className={styles.errX}>✕</button></div>}
+        <div className={styles.content}>
+          <form id="create-course-form" onSubmit={submit}>
+            <div className={styles.mediaRow}>
+              <div className={styles.fld}><span className={styles.lbl}>Ảnh thumbnail</span><MediaTrigger onSelect={url=>onChange("thumbnailUrl",url)} value={f.thumbnailUrl} showPreview filter="image" accept="image/*">{f.thumbnailUrl?"Đổi ảnh":"Chọn ảnh thumbnail"}</MediaTrigger></div>
+              <div className={styles.fld}><span className={styles.lbl}>Video trailer</span><MediaTrigger onSelect={url=>onChange("trailerVideoUrl",url)} value={f.trailerVideoUrl} filter="video" accept="video/*">{f.trailerVideoUrl?"Đổi video":"Chọn video trailer"}</MediaTrigger></div>
             </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Slug</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={form.slug}
-                onChange={(e) => handleChange("slug", e.target.value)}
-                placeholder="Tự động từ tiêu đề nếu để trống"
-              />
+            <div >
+              <div className={styles.fld}><span className={styles.lbl}>Tiêu đề <span className={styles.req}>*</span></span><input type="text" className={styles.inp} value={f.title} onChange={e=>onChange("title",e.target.value)} required minLength={10} /></div>
+              <p style={{
+                height: 30,
+                width:"100%",
+                color: "#5f5f5fff",
+                fontSize: 12,
+                fontStyle: "italic",
+              }}>{f.slug ? `${window.location.host}/khoa-hoc/${f.slug}` : 'Slug sẽ được tạo tự động'}</p>
             </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Mô tả *</label>
-              <textarea
-                className={styles.textarea}
-                value={form.description}
-                onChange={(e) => handleChange("description", e.target.value)}
-                rows={4}
-                required
-              />
+            <div className={styles.fld}><span className={styles.lbl}>Mô tả <span className={styles.req}>*</span></span><textarea className={styles.txa} value={f.description} onChange={e=>onChange("description",e.target.value)} rows={3} required /></div>
+            <div className={styles.r}>
+              <div className={styles.fld}><span className={styles.lbl}>Giá (VND) <span className={styles.req}>*</span></span><input type="number" className={styles.inp} value={f.basePrice} onChange={e=>onChange("basePrice",e.target.value)} required /></div>
+              <div className={styles.fld}><span className={styles.lbl}>Link thanh toán</span><input type="text" className={styles.inp} value={f.externalCheckoutUrl} onChange={e=>onChange("externalCheckoutUrl",e.target.value)} placeholder="https://go.minhtravel.vn/..." /><span className={styles.hint}>Redirect sang bên thứ 3</span></div>
             </div>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label className={styles.label}>Giá (VND) *</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  value={form.basePrice}
-                  onChange={(e) => handleChange("basePrice", e.target.value)}
-                  required
-                />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>Giá gốc (VND)</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  value={form.originalPrice}
-                  onChange={(e) =>
-                    handleChange("originalPrice", e.target.value)
-                  }
-                />
-              </div>
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Cấp độ</label>
-              <select
-                className={styles.input}
-                value={form.level}
-                onChange={(e) => handleChange("level", e.target.value)}
-              >
-                <option value="all">Tất cả</option>
-                <option value="beginner">Cơ bản</option>
-                <option value="intermediate">Trung cấp</option>
-                <option value="advanced">Nâng cao</option>
-              </select>
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>Text nút CTA (tùy chọn)</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={form.buttonText}
-                onChange={(e) => handleChange("buttonText", e.target.value)}
-                placeholder="Mặc định: Mua ngay"
-              />
+            <div className={styles.r}>
+              <div className={styles.fld}><span className={styles.lbl}>Cấp độ</span><select className={styles.sel} value={f.level} onChange={e=>onChange("level",e.target.value)}><option value="all">Tất cả</option><option value="beginner">Cơ bản</option><option value="intermediate">Trung cấp</option><option value="advanced">Nâng cao</option></select></div>
+              <div className={styles.fld}><span className={styles.lbl}>Nhãn nút mua hàng</span><input type="text" className={styles.inp} value={f.buttonText} onChange={e=>onChange("buttonText",e.target.value)} placeholder="Mua ngay" /></div>
             </div>
             <div className={styles.toggles}>
-              <label className={styles.toggle}>
-                <input
-                  type="checkbox"
-                  checked={form.isPublished}
-                  onChange={(e) =>
-                    handleChange("isPublished", e.target.checked)
-                  }
-                />
-                <span>Xuất bản</span>
-              </label>
-              <label className={styles.toggle}>
-                <input
-                  type="checkbox"
-                  checked={form.isFeaturedOnHome}
-                  onChange={(e) =>
-                    handleChange("isFeaturedOnHome", e.target.checked)
-                  }
-                />
-                <span>Nổi bật trên trang chủ</span>
-              </label>
-              <label className={styles.toggle}>
-                <input
-                  type="checkbox"
-                  checked={form.isComboOnly}
-                  onChange={(e) =>
-                    handleChange("isComboOnly", e.target.checked)
-                  }
-                />
-                <span>Chỉ bán trong combo</span>
-              </label>
+              <label className={styles.toggle}><input type="checkbox" checked={f.isPublished} onChange={e=>onChange("isPublished",e.target.checked)} /><span>Xuất bản</span></label>
+              <label className={styles.toggle}><input type="checkbox" checked={f.isFeaturedOnHome} onChange={e=>onChange("isFeaturedOnHome",e.target.checked)} /><span>Nổi bật trang chủ</span></label>
+              <label className={styles.toggle}><input type="checkbox" checked={f.isComboOnly} onChange={e=>onChange("isComboOnly",e.target.checked)} /><span>Chỉ bán combo</span></label>
             </div>
-          </div>
-        )}
-
-        {activeTab === "blocks" && (
-          <div className={styles.tabContent}>
-            <BlockEditor blocks={blocks} onChange={handleBlocksChange} />
-          </div>
-        )}
-
-        <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.cancelBtn}
-            onClick={() => router.back()}
-          >
-            Hủy
-          </button>
-          <button type="submit" className={styles.saveBtn} disabled={saving}>
-            {saving ? "Đang lưu..." : "Tạo khóa học"}
-          </button>
+          </form>
         </div>
-      </form>
+      </div>
+      <div className={styles.preview}>
+        <div className={styles.previewHead}>
+          <span className={styles.previewBadge}>Xem trước</span>
+        </div>
+        <div className={styles.previewPlaceholder}>
+          <div className={styles.previewPlaceholderIcon}>👁</div>
+          <p className={styles.previewPlaceholderText}>Lưu khóa học để xem preview</p>
+          <p className={styles.previewPlaceholderHint}>Sau khi tạo, bạn sẽ được chuyển đến trang chỉnh sửa với đầy đủ chức năng xem trước</p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "../db";
 import { digitalProducts } from "../db/schema";
-import { authMiddleware } from "../middleware/auth";
+import { authMiddleware, optionalAuth } from "../middleware/auth";
 
 const ProductQuerySchema = z.object({
   published: z.coerce.boolean().optional(),
@@ -24,42 +24,47 @@ const CreateProductSchema = z.object({
 const UpdateProductSchema = CreateProductSchema.partial();
 
 export const productRoutes = new Hono()
-  .get("/", zValidator("query", ProductQuerySchema), async (c) => {
+  .get("/", optionalAuth(), zValidator("query", ProductQuerySchema), async (c) => {
     const { published } = c.req.valid("query");
+    const isAdmin = c.get("user")?.role === "ADMIN";
 
     const conditions = [];
-    if (published !== undefined) {
+    if (published !== undefined && isAdmin) {
       conditions.push(eq(digitalProducts.isPublished, published ? 1 : 0));
-    } else {
+    } else if (!isAdmin) {
       conditions.push(eq(digitalProducts.isPublished, 1));
     }
 
-    const where = and(...conditions);
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
 
     const totalQuery = db
       .select({ count: sql<number>`count(*)` })
       .from(digitalProducts)
-      .$dynamic()
-      .where(where);
+      .$dynamic();
+    if (where) totalQuery.where(where);
     const [totalRow] = await totalQuery;
     const total = Number(totalRow?.count);
 
-    const result = await db
+    const resultQuery = db
       .select()
       .from(digitalProducts)
-      .where(where)
-      .orderBy(desc(digitalProducts.createdAt));
+      .$dynamic();
+    if (where) resultQuery.where(where);
+    const result = await resultQuery.orderBy(desc(digitalProducts.createdAt));
 
     return c.json({ data: result, total });
   })
-  .get("/:id", async (c) => {
+  .get("/:id", optionalAuth(), async (c) => {
     const id = c.req.param("id");
+    const isAdmin = c.get("user")?.role === "ADMIN";
+
+    const conditions = [eq(digitalProducts.id, id)];
+    if (!isAdmin) conditions.push(eq(digitalProducts.isPublished, 1));
+
     const [product] = await db
       .select()
       .from(digitalProducts)
-      .where(
-        and(eq(digitalProducts.id, id), eq(digitalProducts.isPublished, 1)),
-      );
+      .where(and(...conditions));
 
     if (!product) return c.json({ error: "Not found" }, 404);
 

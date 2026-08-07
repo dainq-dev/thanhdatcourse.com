@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { db } from "../db";
 import { courseInstructors, instructors } from "../db/schema";
@@ -46,30 +46,42 @@ export const instructorRoutes = new Hono()
     return c.json({ data: { success: true } });
   });
 
-export const courseInstructorRoutes = new Hono().put(
-  "/api/courses/:courseId/instructors",
-  authMiddleware("ADMIN"),
-  async (c) => {
+export const courseInstructorRoutes = new Hono()
+  .get("/courses/:courseId/instructors", authMiddleware("ADMIN"), async (c) => {
     const courseId = c.req.param("courseId");
-    const body = await c.req.json();
-    const ids: string[] = body.instructorIds || [];
-    // Remove existing
-    await db
-      .delete(courseInstructors)
-      .where(eq(courseInstructors.courseId, courseId));
-    // Add new
-    if (ids.length > 0) {
-      await db
-        .insert(courseInstructors)
-        .values(ids.map((iid) => ({ courseId, instructorId: iid })));
-    }
-    // Return current
     const rows = await db
       .select({ instructorId: courseInstructors.instructorId })
       .from(courseInstructors)
       .where(eq(courseInstructors.courseId, courseId));
-    return c.json({
-      data: { courseId, instructorIds: rows.map((r) => r.instructorId) },
-    });
-  },
-);
+    const instructorIds = rows.map((r) => r.instructorId);
+    if (instructorIds.length === 0) return c.json({ data: [] });
+    const instructorsList = await db
+      .select()
+      .from(instructors)
+      .where(inArray(instructors.id, instructorIds));
+    return c.json({ data: instructorsList });
+  })
+  .put(
+    "/courses/:courseId/instructors",
+    authMiddleware("ADMIN"),
+    async (c) => {
+      const courseId = c.req.param("courseId");
+      const body = await c.req.json();
+      const ids: string[] = body.instructorIds || [];
+      await db
+        .delete(courseInstructors)
+        .where(eq(courseInstructors.courseId, courseId));
+      if (ids.length > 0) {
+        await db
+          .insert(courseInstructors)
+          .values(ids.map((iid) => ({ courseId, instructorId: iid })));
+      }
+      const rows = await db
+        .select({ instructorId: courseInstructors.instructorId })
+        .from(courseInstructors)
+        .where(eq(courseInstructors.courseId, courseId));
+      return c.json({
+        data: { courseId, instructorIds: rows.map((r) => r.instructorId) },
+      });
+    },
+  );

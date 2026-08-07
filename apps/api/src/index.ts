@@ -13,8 +13,10 @@ import { lessonRoutes } from "./routes/lessons";
 import { moduleRoutes } from "./routes/modules";
 import { portfolioRoutes } from "./routes/portfolios";
 import { postsRoutes } from "./routes/posts";
+import { presetsRoutes } from "./routes/presets";
 import { productRoutes } from "./routes/products";
 import { promotionRoutes } from "./routes/promotions";
+import { sectionRoutes } from "./routes/sections";
 import { settingsRoutes } from "./routes/settings";
 import { testimonialRoutes } from "./routes/testimonials";
 
@@ -46,7 +48,10 @@ const app = new Hono()
   .route("/api/testimonials", testimonialRoutes)
   .route("/api/promotions", promotionRoutes)
   .route("/api/instructors", instructorRoutes)
-  .route("/api", courseInstructorRoutes);
+  .route("/api", courseInstructorRoutes)
+  .route("/api/course", sectionRoutes)
+  .route("/api/product", sectionRoutes)
+  .route("/api/presets-page", presetsRoutes);
 
 export default {
   port: 3001,

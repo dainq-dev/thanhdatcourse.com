@@ -1,0 +1,118 @@
+.section {
+  padding: 60px 0;
+  background: #f0f5fa;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.heading {
+  text-align: center;
+  font-family: "Be Vietnam Pro", "Manrope", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--c-dark, #1e293b);
+  margin: 0 0 40px;
+  line-height: 1.4;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.videoCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.iframeWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+}
+
+.iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.nativeVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  object-fit: cover;
+}
+
+.videoTitle {
+  font-family: "Be Vietnam Pro", "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-dark, #1e293b);
+  margin: 12px 0 0;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.carouselHeading {
+  text-align: center;
+  font-family: "Be Vietnam Pro", "Manrope", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--c-dark, #1e293b);
+  margin: 50px 0 20px;
+  line-height: 1.4;
+}
+
+.carousel {
+  display: grid;
+  grid-auto-flow: column;
+  overflow-x: auto;
+  grid-auto-columns: 200px;
+  gap: 14px;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 10px;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--c-border, #d1d5db);
+    border-radius: 3px;
+  }
+}
+
+.carouselImage {
+  width: 200px;
+  height: auto;
+  border-radius: 8px;
+  scroll-snap-align: start;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .heading {
+    font-size: 22px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .carouselHeading {
+    font-size: 20px;
+  }
+}

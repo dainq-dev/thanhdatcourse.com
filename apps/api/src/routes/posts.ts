@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "../db";
 import { posts } from "../db/schema";
-import { authMiddleware } from "../middleware/auth";
+import { authMiddleware, optionalAuth } from "../middleware/auth";
 
 function slugify(text: string): string {
   return text
@@ -59,13 +59,13 @@ const CreatePostSchema = z.object({
 const UpdatePostSchema = CreatePostSchema.partial();
 
 export const postsRoutes = new Hono()
-  .get("/", zValidator("query", PostQuerySchema), async (c) => {
+  .get("/", optionalAuth(), zValidator("query", PostQuerySchema), async (c) => {
     const { published, category, search, page, limit } = c.req.valid("query");
 
     const conditions: SQL[] = [];
-    const isAdminReq = c.req.header("Authorization")?.startsWith("Bearer ");
+    const isAdmin = c.get("user")?.role === "ADMIN";
 
-    if (published || !isAdminReq) {
+    if (published || !isAdmin) {
       conditions.push(eq(posts.isPublished, 1));
     }
     if (category) {
@@ -97,12 +97,12 @@ export const postsRoutes = new Hono()
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   })
-  .get("/:slug", async (c) => {
+  .get("/:slug", optionalAuth(), async (c) => {
     const slug = c.req.param("slug");
 
     const conditions = [eq(posts.slug, slug)];
-    const isAdminReq = c.req.header("Authorization")?.startsWith("Bearer ");
-    if (!isAdminReq) {
+    const isAdmin = c.get("user")?.role === "ADMIN";
+    if (!isAdmin) {
       conditions.push(eq(posts.isPublished, 1));
     }
 

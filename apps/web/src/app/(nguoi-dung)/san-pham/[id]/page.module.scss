@@ -1,0 +1,142 @@
+@use '../../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.page {
+  background: $clr-bg;
+}
+
+.hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 1rem 4rem;
+  background: linear-gradient(180deg, $clr-bg-card 0%, $clr-bg 100%);
+  overflow: hidden;
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: $space-8;
+  border: 1px solid $clr-border;
+}
+
+.videoFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.heroImage {
+  width: 100%;
+  max-width: 960px;
+  border-radius: var(--radius-lg);
+  margin-bottom: $space-8;
+  border: 1px solid $clr-border;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.heroContent {
+  max-width: 800px;
+  padding: 0 1rem;
+}
+
+.categoryBadge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: $fw-semibold;
+  color: $clr-primary;
+  background: rgba(255, 0, 90, 0.1);
+  border: 1px solid rgba(255, 0, 90, 0.25);
+  border-radius: 999px;
+  padding: 0.125rem 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: $space-4;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0 0 $space-4;
+}
+
+.heroDesc {
+  font-size: var(--fs-lg);
+  @include text-muted;
+  max-width: 600px;
+  margin: 0 auto $space-6;
+  line-height: 1.7;
+}
+
+.heroActions {
+  display: flex;
+  gap: $space-4;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: $space-8;
+}
+
+.ctaYoutube {
+  @include btn-cta-sm;
+  background: $clr-primary;
+
+  &:hover {
+    background: $clr-primary-dark;
+  }
+}
+
+.ctaSecondary {
+  @include btn-outline;
+  border-color: $clr-primary;
+  color: $clr-text;
+
+  &:hover {
+    background: rgba(255, 0, 90, 0.1);
+  }
+}
+
+.backLink {
+  display: inline-block;
+  font-size: var(--fs-sm);
+  color: $clr-text-muted;
+  text-decoration: none;
+  transition: color $duration-fast;
+
+  &:hover {
+    color: $clr-primary;
+  }
+}
+
+.notFound {
+  @include container;
+  @include section;
+  text-align: center;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.notFoundTitle {
+  @include heading-section;
+  margin-bottom: $space-4;
+}
+
+.notFoundDesc {
+  @include text-muted;
+  margin-bottom: $space-8;
+}

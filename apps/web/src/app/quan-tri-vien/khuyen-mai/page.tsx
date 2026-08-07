@@ -77,13 +77,13 @@ export default function AdminPromotionsPage() {
       <div className={styles.form}>
         <input
           className={styles.i}
-          placeholder="Tên chiến dịch"
+          placeholder="Tên chiến dịch *"
           value={cn}
           onChange={(e) => setCn(e.target.value)}
         />
         <input
           className={styles.i}
-          placeholder="Giảm giá %"
+          placeholder="Giảm giá % *"
           type="number"
           value={dp}
           onChange={(e) => setDp(e.target.value)}
@@ -100,13 +100,9 @@ export default function AdminPromotionsPage() {
             </option>
           ))}
         </select>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "0.5rem",
-          }}
-        >
+        <div className={styles.dateRow}>
+          <span style={{ fontSize: "0.7rem", color: "var(--admin-text-secondary)", marginBottom: "-0.25rem" }}>Ngày bắt đầu</span>
+          <span style={{ fontSize: "0.7rem", color: "var(--admin-text-secondary)", marginBottom: "-0.25rem" }}>Ngày kết thúc</span>
           <input
             className={styles.i}
             type="date"
@@ -127,15 +123,16 @@ export default function AdminPromotionsPage() {
             display: "flex",
             alignItems: "center",
             gap: "0.5rem",
-            color: "#ccc",
-            fontSize: "0.85rem",
+            color: "var(--admin-text)",
+            fontSize: "0.8125rem",
+            cursor: "pointer",
           }}
         >
           <input
             type="checkbox"
             checked={act}
             onChange={(e) => setAct(e.target.checked)}
-            style={{ accentColor: "#ff005a" }}
+            style={{ accentColor: "var(--admin-accent)", width: 13, height: 13 }}
           />{" "}
           Kích hoạt
         </label>
@@ -180,13 +177,15 @@ export default function AdminPromotionsPage() {
                       borderRadius: "4px",
                       fontSize: "0.7rem",
                       background: p.isActive
-                        ? "rgba(74,222,128,0.1)"
-                        : "rgba(255,255,255,0.05)",
-                      color: p.isActive ? "#4ade80" : "#888",
-                      border: `1px solid ${p.isActive ? "rgba(74,222,128,0.2)" : "rgba(255,255,255,0.1)"}`,
+                        ? "var(--admin-success-bg)"
+                        : "var(--admin-surface-raised)",
+                      color: p.isActive
+                        ? "var(--admin-success)"
+                        : "var(--admin-text-secondary)",
+                      border: `1px solid ${p.isActive ? "var(--admin-success-border)" : "var(--admin-border)"}`,
                     }}
                   >
-                    {p.isActive ? "Active" : "Inactive"}
+                    {p.isActive ? "Đang hoạt động" : "Không hoạt động"}
                   </span>
                 </td>
                 <td className={styles.act}>

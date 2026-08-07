@@ -1,18 +1,24 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { lookup } from "node:mime-types";
+import { resolve, sep } from "node:path";
 import { Hono } from "hono";
 
-export const serveRawFile = new Hono().get("/*", (c) => {
-  const filePath = c.req.path.replace("/raw/", "data/uploads/");
-  const fullPath = `./${filePath}`;
+const UPLOADS_ROOT = resolve("data/uploads");
 
-  if (!existsSync(fullPath)) {
+export const serveRawFile = new Hono().get("/*", (c) => {
+  const rawPath = c.req.path.replace("/raw/", "");
+  const resolved = resolve(UPLOADS_ROOT, rawPath);
+
+  if (!resolved.startsWith(UPLOADS_ROOT + sep)) {
+    return c.json({ error: "Forbidden" }, 403);
+  }
+
+  if (!existsSync(resolved)) {
     return c.json({ error: "File not found" }, 404);
   }
 
-  const stat = statSync(fullPath);
-  const buf = readFileSync(fullPath);
-  const ext = filePath.split(".").pop() || "";
+  const stat = statSync(resolved);
+  const buf = readFileSync(resolved);
+  const ext = rawPath.split(".").pop() || "";
   const mimeMap: Record<string, string> = {
     mp4: "video/mp4",
     webm: "video/webm",

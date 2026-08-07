@@ -98,7 +98,7 @@ export default function AdminFaqPage() {
           value={cid}
           onChange={(e) => setCid(e.target.value)}
         >
-          <option value="">Global (tất cả trang)</option>
+          <option value="">Toàn trang (tất cả trang)</option>
           {courses.map((c) => (
             <option key={c.id} value={c.id}>
               {c.title}
@@ -139,7 +139,7 @@ export default function AdminFaqPage() {
                   {f.courseId
                     ? courses.find((c) => c.id === f.courseId)?.title ||
                       f.courseId
-                    : "Global"}
+                    : "Toàn trang"}
                 </td>
                 <td className={styles.act}>
                   <button className={styles.editBtn} onClick={() => edit(f)}>

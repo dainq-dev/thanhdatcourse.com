@@ -1,10 +1,11 @@
 import { zValidator } from "@hono/zod-validator";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "../db";
 import { courseLessons, courseModules, courses } from "../db/schema";
 import { authMiddleware } from "../middleware/auth";
+import { optionalAuth } from "../middleware/auth";
 
 const CreateModuleSchema = z.object({
   title: z.string().min(1),
@@ -22,8 +23,9 @@ const ReorderSchema = z.array(
 );
 
 export const moduleRoutes = new Hono()
-  .get("/", async (c) => {
+  .get("/", optionalAuth(), async (c) => {
     const courseId = c.req.param("courseId");
+    const isAdmin = c.get("user")?.role === "ADMIN";
 
     const [course] = await db
       .select()
@@ -39,11 +41,15 @@ export const moduleRoutes = new Hono()
 
     const curriculum = await Promise.all(
       modules.map(async (mod) => {
-        const lessons = await db
+        const lessonQuery = db
           .select()
           .from(courseLessons)
           .where(eq(courseLessons.moduleId, mod.id))
-          .orderBy(courseLessons.sortOrder);
+          .$dynamic();
+        if (!isAdmin) {
+          lessonQuery.where(eq(courseLessons.isPublished, 1));
+        }
+        const lessons = await lessonQuery.orderBy(courseLessons.sortOrder);
         return { ...mod, lessons };
       }),
     );
@@ -85,14 +91,14 @@ export const moduleRoutes = new Hono()
     authMiddleware("ADMIN"),
     zValidator("json", ReorderSchema),
     async (c) => {
-      const _courseId = c.req.param("courseId");
+      const courseId = c.req.param("courseId");
       const items = c.req.valid("json");
 
       for (const item of items) {
         await db
           .update(courseModules)
           .set({ sortOrder: item.sortOrder })
-          .where(eq(courseModules.id, item.id));
+          .where(and(eq(courseModules.id, item.id), eq(courseModules.courseId, courseId)));
       }
 
       return c.json({ success: true });
@@ -103,14 +109,14 @@ export const moduleRoutes = new Hono()
     authMiddleware("ADMIN"),
     zValidator("json", UpdateModuleSchema),
     async (c) => {
-      const _courseId = c.req.param("courseId");
+      const courseId = c.req.param("courseId");
       const id = c.req.param("id");
       const data = c.req.valid("json");
 
       const [mod] = await db
         .select()
         .from(courseModules)
-        .where(eq(courseModules.id, id));
+        .where(and(eq(courseModules.id, id), eq(courseModules.courseId, courseId)));
       if (!mod) return c.json({ error: "Not found" }, 404);
 
       const updates: Record<string, string | number | null> = {};
@@ -134,8 +140,11 @@ export const moduleRoutes = new Hono()
     },
   )
   .delete("/:id", authMiddleware("ADMIN"), async (c) => {
+    const courseId = c.req.param("courseId");
     const id = c.req.param("id");
-    await db.delete(courseModules).where(eq(courseModules.id, id));
+    await db
+      .delete(courseModules)
+      .where(and(eq(courseModules.id, id), eq(courseModules.courseId, courseId)));
     return c.json({ success: true });
   });
 

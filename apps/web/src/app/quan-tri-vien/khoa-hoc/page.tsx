@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api, extractData } from "@/lib/api";
 import styles from "./page.module.scss";
+import { Switch } from "@/components/ui";
 
 interface Course {
   id: string;
@@ -61,6 +62,7 @@ export default function AdminCoursesPage() {
       <div className={styles.header}>
         <h1 className={styles.pageTitle}>Quản lý khóa học</h1>
         <button
+          type="button"
           className={styles.addBtn}
           onClick={() => router.push("/quan-tri-vien/khoa-hoc/tao-moi")}
         >
@@ -88,7 +90,17 @@ export default function AdminCoursesPage() {
       </div>
 
       {loading ? (
-        <div className={styles.loading}>Đang tải...</div>
+        <div className={styles.loading}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={`skel-${i}`} className={styles.skeletonRow}>
+              <div className={styles.skeleton} style={{ width: "60%" }} />
+              <div className={styles.skeleton} style={{ width: "30%" }} />
+              <div className={styles.skeleton} style={{ width: "25%" }} />
+              <div className={styles.skeleton} style={{ width: "25%" }} />
+              <div className={styles.skeleton} style={{ width: "20%" }} />
+            </div>
+          ))}
+        </div>
       ) : courses.length === 0 ? (
         <div className={styles.empty}>
           <p>Chưa có khóa học nào</p>
@@ -101,42 +113,53 @@ export default function AdminCoursesPage() {
               <th>Giá</th>
               <th>Trạng thái</th>
               <th>Cập nhật</th>
-              <th></th>
+              <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
             {courses.map((course) => (
               <tr key={course.id}>
-                <td className={styles.titleCell}>
+                <td >
+                  <div className={styles.titleCell}>
                   <span className={styles.courseTitle}>{course.title}</span>
                   <span className={styles.slug}>{course.slug}</span>
+                  </div>
                 </td>
                 <td>{formatPrice(course.basePrice)}</td>
                 <td>
                   <span
                     className={`${styles.badge} ${course.isPublished ? styles.published : styles.draft}`}
                   >
-                    {course.isPublished ? "Published" : "Draft"}
+                    {course.isPublished ? "Đã xuất bản" : "Nháp"}
                   </span>
                 </td>
                 <td className={styles.date}>
                   {new Date(course.updatedAt).toLocaleDateString("vi-VN")}
                 </td>
                 <td className={styles.actions}>
-                  <button
-                    className={styles.editBtn}
-                    onClick={() =>
+                  <div className={styles.actionsWraper}>
+                    <Switch
+                      checked={Boolean(course.isPublished)}
+                      size="sm"
+                      onChange={() => {
+
+                      }}
+                    />
+                    <button
+                      className={styles.editBtn}
+                      onClick={() =>
                       router.push(`/quan-tri-vien/khoa-hoc/${course.slug}`)
                     }
-                  >
+                    >
                     Sửa
                   </button>
                   <button
                     className={styles.deleteBtn}
                     onClick={() => handleDelete(course.id, course.title)}
-                  >
+                    >
                     Xóa
                   </button>
+                    </div>
                 </td>
               </tr>
             ))}

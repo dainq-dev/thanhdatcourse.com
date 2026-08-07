@@ -17,12 +17,14 @@ const SIDEBAR_ITEMS = [
   { label: "Cấu hình trang", href: "/quan-tri-vien/cai-dat" },
   { label: "Quản lý khóa học", href: "/quan-tri-vien/khoa-hoc" },
   { label: "Quản lý bài viết", href: "/quan-tri-vien/bai-viet" },
-  { label: "Dự án thực hiện", href: "/quan-tri-vien/san-pham" },
+  { label: "Dự án thực hiện", href: "/quan-tri-vien/du-an" },
+  { label: "Sản phẩm số", href: "/quan-tri-vien/san-pham" },
   { label: "Câu hỏi thường gặp", href: "/quan-tri-vien/faq" },
   { label: "Đánh giá học viên", href: "/quan-tri-vien/danh-gia" },
   { label: "Khách hàng tiềm năng", href: "/quan-tri-vien/khach-hang" },
   { label: "Chương trình khuyến mãi", href: "/quan-tri-vien/khuyen-mai" },
   { label: "Thư viện ảnh & video", href: "/quan-tri-vien/media" },
+  { label: "Presets & LUTs", href: "/quan-tri-vien/presets-luts" },
 ];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -91,14 +93,23 @@ export default function AdminLayout({
           className={styles.logo}
           onClick={() => setSidebarOpen(false)}
         >
-          Minh Travel
+          <span className={styles.logoIcon}>MT</span>
+          <span>Minh Travel</span>
         </Link>
         <nav className={styles.nav}>
           {SIDEBAR_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`${styles.navItem} ${pathname === item.href || (item.href !== "/quan-tri-vien" && pathname.startsWith(item.href)) ? styles.active : ""}`}
+              className={`${styles.navItem} ${
+                pathname === item.href ||
+                (
+                  item.href !== "/quan-tri-vien" &&
+                    pathname.startsWith(item.href)
+                )
+                  ? styles.active
+                  : ""
+              }`}
               onClick={() => setSidebarOpen(false)}
             >
               {item.label}
@@ -110,6 +121,7 @@ export default function AdminLayout({
       <div className={styles.mainWrapper}>
         <header className={styles.header}>
           <button
+            type="button"
             className={styles.hamburger}
             onClick={() => setSidebarOpen(!sidebarOpen)}
             aria-label="Toggle menu"
@@ -120,7 +132,11 @@ export default function AdminLayout({
           </button>
           <div className={styles.headerRight}>
             <span className={styles.userName}>{user.name}</span>
-            <button onClick={handleLogout} className={styles.logoutBtn}>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={styles.logoutBtn}
+            >
               Đăng xuất
             </button>
           </div>
@@ -129,7 +145,12 @@ export default function AdminLayout({
       </div>
 
       {sidebarOpen && (
-        <div className={styles.overlay} onClick={() => setSidebarOpen(false)} />
+        <button
+          type="button"
+          className={styles.overlay}
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
+        />
       )}
     </div>
   );

@@ -1,0 +1,684 @@
+.pageBuilder {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--admin-bg);
+  font-family: inherit;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--admin-surface);
+  border-bottom: 1px solid var(--admin-border);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.headerCount {
+  font-size: 0.7rem;
+  color: var(--admin-text-secondary);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unsavedBadge {
+  font-size: 0.7rem;
+  color: var(--admin-warning);
+  font-weight: 600;
+}
+
+.saveAllBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--admin-border);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-accent-hover);
+  transition: all 0.2s;
+
+  &:disabled {
+    cursor: pointer;
+    opacity: 1;
+  }
+}
+
+.saveBtnIdle {
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--admin-surface-hover);
+  }
+}
+
+.saveActive {
+  background: var(--admin-warning-bg);
+  border-color: var(--admin-warning);
+  color: var(--admin-warning);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--admin-primary-dark);
+  }
+}
+
+.saveIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: var(--admin-text-secondary);
+}
+
+.saveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.saved { background: var(--admin-success); }
+.unsaved { background: var(--admin-warning); }
+.saving { background: var(--admin-warning); animation: admin-pulse-dot 1s ease-in-out infinite; }
+
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.leftPanel {
+  width: 390px;
+  min-width: 390px;
+  background: var(--admin-surface);
+  border-right: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--admin-border);
+  flex-shrink: 0;
+}
+
+.panelTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--admin-text-secondary);
+  text-transform: uppercase;
+}
+
+.catalogBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.maxMessage {
+  padding: 16px;
+  text-align: center;
+  color: var(--admin-warning);
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: var(--admin-warning-bg);
+  border-radius: var(--admin-radius-md);
+  margin: 6px;
+}
+
+.catalogGroup {
+  margin-bottom: 8px;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 8px;
+  background: none;
+  border: none;
+  color: var(--admin-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+
+  &:hover {
+    color: var(--admin-text);
+    background: var(--admin-surface-hover);
+    border-radius: var(--admin-radius-sm);
+  }
+}
+
+.groupLabel {
+  flex-shrink: 0;
+}
+
+.groupItems {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 8px 8px;
+}
+
+.catalogCard {
+  display: flex;
+  flex-direction: column;
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-lg);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.15s;
+  width: 100%;
+
+  &:hover:not(:disabled) {
+    border-color: var(--admin-accent);
+    background: var(--admin-surface-hover);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.99);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-accent);
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.catalogCardDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.catalogCardPreview {
+  width: 100%;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: var(--admin-surface);
+  border-bottom: 1px solid var(--admin-border);
+  overflow: hidden;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.catalogCardFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  color: var(--admin-text);
+  font-weight: 600;
+}
+
+.alreadyAdded {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--admin-success);
+  background: var(--admin-success-bg);
+  padding: 1px 5px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.canvasWrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--admin-bg);
+}
+
+.canvas {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  background: var(--admin-surface);
+  border-radius: var(--admin-radius-lg);
+  min-height: 400px;
+}
+
+.canvasLoading {
+  padding: 16px;
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.skeletonGrip {
+  width: 20px;
+  height: 24px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--admin-surface-hover) 25%,
+    var(--admin-bg) 50%,
+    var(--admin-surface-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: admin-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeletonLine {
+  height: 12px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--admin-surface-hover) 25%,
+    var(--admin-bg) 50%,
+    var(--admin-surface-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: admin-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 350px;
+  padding: 3rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--admin-text);
+  margin: 0 0 6px 0;
+}
+
+.emptyHint {
+  font-size: 0.85rem;
+  color: var(--admin-text-secondary);
+  margin: 0;
+}
+
+.sectionList {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Preview mode (real section rendering) ──
+.previewWrapper {
+  position: relative;
+
+  &:not(:last-child) {
+    margin-bottom: 24px;
+  }
+}
+
+.previewToolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm) var(--admin-radius-sm) 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.previewToolbarActive {
+  border-color: var(--admin-accent);
+  background: rgba(255, 0, 90, 0.04);
+}
+
+.previewDragHandle {
+  color: var(--admin-text-disabled);
+  cursor: grab;
+  padding: 2px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.previewLabel {
+  flex: 1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.previewActions {
+  display: flex;
+  gap: 2px;
+}
+
+.previewActionBtn {
+  padding: 3px 6px;
+  background: none;
+  border: none;
+  color: var(--admin-text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+
+  &:hover {
+    background: var(--admin-surface-hover);
+    color: var(--admin-text);
+  }
+}
+
+.previewActionOff {
+  color: var(--admin-text-disabled);
+}
+
+.previewActionDelete {
+  padding: 3px 6px;
+  background: none;
+  border: none;
+  color: var(--admin-text-disabled);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+
+  &:hover {
+    background: var(--admin-danger-bg);
+    color: var(--admin-danger);
+  }
+}
+
+.emptyGroup {
+  padding: 0 24px;
+  font-size: 14px;
+  color: var(--admin-text-secondary);
+  font-style: italic;
+  text-align: center;
+  font-weight: 500;
+}
+
+.previewBody {
+  // border: 1px solid var(--admin-border);
+  border-top: none;
+  border-radius: 0 0 var(--admin-radius-sm) var(--admin-radius-sm);
+  overflow: hidden;
+  background: #fff;
+  font-size: 62.5%;   // scale down to 60% so preview fits
+  cursor: pointer;
+  transition: border-color 0.15s, opacity 0.15s;
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-accent);
+    outline-offset: -2px;
+  }
+}
+
+.previewBodyActive {
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 1px var(--admin-accent);
+}
+
+.previewBodyHidden {
+  opacity: 0.4;
+  filter: grayscale(60%);
+}
+
+.previewScale {
+  pointer-events: none;
+  user-select: none;
+}
+
+.previewFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  font-size: 0.85rem;
+  color: var(--admin-text-secondary);
+  background: var(--admin-surface);
+}
+
+// ── End preview mode ──
+
+.configPanel {
+  width: 380px;
+  min-width: 380px;
+  background: var(--admin-surface);
+  border-left: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.configPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--admin-border);
+  flex-shrink: 0;
+}
+
+.configPanelTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.configPanelType {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.configPanelLabel {
+  font-size: 0.65rem;
+  color: var(--admin-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.configPanelActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.configSaveBtn {
+  padding: 5px 14px;
+  background: var(--admin-accent);
+  color: var(--admin-accent-text);
+  border: none;
+  border-radius: var(--admin-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover:not(:disabled) {
+    background: var(--admin-accent-hover);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.configCloseBtn {
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    border-color: var(--admin-border-heavy);
+    color: var(--admin-text);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.configPanelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.noForm {
+  padding: 2rem;
+  text-align: center;
+  color: var(--admin-text-secondary);
+  font-size: 0.85rem;
+}
+
+.toastContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 10px 16px;
+  border-radius: var(--admin-radius-md);
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: all;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: toastIn 0.2s ease-out;
+}
+
+.toastSuccess {
+  background: var(--admin-success-bg);
+  color: var(--admin-success);
+  border: 1px solid var(--admin-success-border);
+}
+
+.toastError {
+  background: var(--admin-danger-bg);
+  color: var(--admin-danger);
+  border: 1px solid var(--admin-danger-border);
+}
+
+.toastMessage {
+  flex: 1;
+}
+
+.toastRetry {
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: var(--admin-radius-sm);
+  color: inherit;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

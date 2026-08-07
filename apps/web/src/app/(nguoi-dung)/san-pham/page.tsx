@@ -1,5 +1,6 @@
 import { PageHeader } from "@workspace/ui";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import { getSiteSettings, parseSetting } from "@/lib/settings";
 import styles from "./page.module.scss";
@@ -28,6 +29,19 @@ async function getPortfolios(): Promise<PortfolioItem[]> {
     });
   } catch {
     return [];
+  }
+}
+
+async function getPortfolioItem(id: string): Promise<PortfolioItem | null> {
+  try {
+    const res = await api.fetch(`/api/portfolios/${id}`, {
+      next: { revalidate: 300 },
+    });
+    if (res.status === 404) return null;
+    const json = await res.json();
+    return json.data || json;
+  } catch {
+    return null;
   }
 }
 
@@ -70,12 +84,23 @@ export default async function PortfolioPage() {
               key={item.id}
               className={`${styles.projectItem} ${isReversed ? styles.reversed : ""}`}
             >
-              <div className={styles.projectThumb}>
+              <Link href={`/san-pham/${item.id}`} className={styles.projectThumb}>
+                <img
+                  src={
+                    item.thumbnailUrl ||
+                    (item.youtubeVideoId
+                      ? `https://img.youtube.com/vi/${item.youtubeVideoId}/hqdefault.jpg`
+                      : "")
+                  }
+                  alt={item.title}
+                  className={styles.thumbImg}
+                />
                 <div className={styles.projectOverlay} />
                 <span className={styles.playIcon}>▶</span>
-              </div>
+              </Link>
               <div className={styles.projectInfo}>
                 <h2 className={styles.projectTitle}>{item.title}</h2>
+                <span className={styles.categoryBadge}>{item.category}</span>
                 <p className={styles.projectDesc}>{item.description}</p>
               </div>
             </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { api, extractData } from "@/lib/api";
+import Link from "next/link";
 import styles from "./page.module.scss";
 
 interface Stats {
@@ -20,13 +21,22 @@ interface Stats {
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [productCount, setProductCount] = useState<number | null>(null);
+  const [portfolioCount, setPortfolioCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api
-      .get<Stats>("/api/admin/stats")
-      .then((data) => setStats(data))
+    Promise.all([
+      api.get<Stats>("/api/admin/stats"),
+      api.publicGet<unknown[]>("/api/products").catch(() => []),
+      api.publicGet<unknown[]>("/api/portfolios").catch(() => []),
+    ])
+      .then(([statsData, productData, portfolioData]) => {
+        setStats(statsData);
+        setProductCount(extractData(productData as []).length);
+        setPortfolioCount(extractData(portfolioData as []).length);
+      })
       .catch(() => setError("Không thể tải dữ liệu"))
       .finally(() => setLoading(false));
   }, []);
@@ -36,7 +46,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className={styles.pageTitle}>Bảng điều khiển</h1>
         <div className={styles.grid}>
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className={styles.cardSkeleton} />
           ))}
         </div>
@@ -77,14 +87,36 @@ export default function AdminDashboard() {
         </div>
         <div className={styles.statCard}>
           <div className={styles.statValue}>{stats?.leads.newToday ?? 0}</div>
-          <div className={styles.statLabel}>Leads mới</div>
+          <div className={styles.statLabel}>Khách hàng mới</div>
           <div className={styles.statSub}>hôm nay</div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statValue}>0</div>
-          <div className={styles.statLabel}>Media</div>
-          <div className={styles.statSub}>files</div>
+          <div className={styles.statValue}>{productCount ?? 0}</div>
+          <div className={styles.statLabel}>Sản phẩm</div>
+          <div className={styles.statSub}>sản phẩm số</div>
         </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{portfolioCount ?? 0}</div>
+          <div className={styles.statLabel}>Dự án</div>
+          <div className={styles.statSub}>portfolio</div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>–</div>
+          <div className={styles.statLabel}>Media</div>
+          <div className={styles.statSub}>đang phát triển</div>
+        </div>
+      </div>
+
+      <div className={styles.quickLinks}>
+        <Link href="/quan-tri-vien/khoa-hoc/tao-moi" className={styles.quickLink}>
+          + Tạo khóa học mới
+        </Link>
+        <Link href="/quan-tri-vien/du-an/tao-moi" className={styles.quickLink}>
+          + Tạo dự án mới
+        </Link>
+        <Link href="/quan-tri-vien/bai-viet/tao-moi" className={styles.quickLink}>
+          + Viết bài mới
+        </Link>
       </div>
 
       <div className={styles.section}>

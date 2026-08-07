@@ -1,9 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MediaTrigger } from "@/components/admin/media-manager/media-trigger";
 import { api } from "@/lib/api";
+import {
+  ALL_FIELDS,
+  type FieldDef,
+  SECTIONS,
+  type Section,
+} from "./field-defs";
 import styles from "./page.module.scss";
+
+const PRESET_LINKS = [
+  { label: "Trang chủ", value: "/" },
+  { label: "Khóa học", value: "/khoa-hoc" },
+  { label: "Dự án", value: "/san-pham" },
+  { label: "Công cụ", value: "/cong-cu" },
+  { label: "Liên hệ", value: "/lien-he" },
+  { label: "Bài viết", value: "/bai-viet" },
+  { label: "Khác (nhập bên dưới)", value: "__custom__" },
+];
 
 interface SettingEntry {
   key: string;
@@ -11,465 +27,14 @@ interface SettingEntry {
   description: string | null;
 }
 
-interface FieldDef {
-  key: string;
-  label: string;
-  placeholder?: string;
-  type?: "text" | "textarea" | "color" | "media" | "media-video" | "select";
-  options?: { label: string; value: string }[];
-  showWhen?: { key: string; value: string };
-}
-
-interface Section {
-  id: string;
-  title: string;
-  description: string;
-  pageHint: string;
-  fields: FieldDef[];
-}
-
-const SECTIONS: Section[] = [
-  {
-    id: "brand",
-    title: "Nhận diện thương hiệu",
-    description: "Tên website, mô tả SEO, logo, favicon, cấu hình PWA.",
-    pageHint: "Toàn bộ website — thẻ <title>, <meta>, manifest.json",
-    fields: [
-      {
-        key: "site_title",
-        label: "Tiêu đề trang web",
-        placeholder: "VD: Minh Travel",
-      },
-      {
-        key: "site_title_template",
-        label: "Mẫu tiêu đề",
-        placeholder: "%s | Minh Travel",
-      },
-      {
-        key: "site_description",
-        label: "Mô tả trang web",
-        type: "textarea",
-        placeholder: "Mô tả ngắn gọn về website",
-      },
-      {
-        key: "site_keywords",
-        label: "Từ khóa SEO",
-        placeholder: "quay dựng, chỉnh màu, khóa học...",
-      },
-      {
-        key: "site_url",
-        label: "Địa chỉ website",
-        placeholder: "https://minhtravel.vn",
-      },
-      { key: "theme_color", label: "Màu chủ đạo", type: "color" },
-      {
-        key: "apple_web_app_title",
-        label: "Tên app iOS",
-        placeholder: "Minh Travel",
-      },
-      { key: "logo_url", label: "Đường dẫn logo", type: "media" },
-      {
-        key: "logo_alt",
-        label: "Mô tả ảnh logo",
-        placeholder: "Logo Minh Travel",
-      },
-      { key: "favicon_url", label: "Favicon", type: "media" },
-      {
-        key: "pwa_name",
-        label: "Tên ứng dụng PWA",
-        placeholder: "Minh Travel",
-      },
-      {
-        key: "pwa_short_name",
-        label: "Tên PWA rút gọn",
-        placeholder: "Minh Travel",
-      },
-      { key: "pwa_description", label: "Mô tả PWA", type: "textarea" },
-      { key: "pwa_bg_color", label: "Màu nền PWA", type: "color" },
-      { key: "pwa_theme_color", label: "Màu giao diện PWA", type: "color" },
-    ],
-  },
-  {
-    id: "hero",
-    title: "Ảnh bìa trang chủ (Hero Banner)",
-    description:
-      "Video YouTube hoặc video tự upload nền, khẩu hiệu, nút kêu gọi hành động, logo (ảnh hoặc text), thương hiệu hợp tác.",
-    pageHint: "Trang chủ — phần đầu tiên người dùng nhìn thấy",
-    fields: [
-      {
-        key: "hero_video_type",
-        label: "Loại video nền",
-        type: "select",
-        options: [
-          { label: "YouTube", value: "youtube" },
-          { label: "Video tự tải lên", value: "upload" },
-        ],
-      },
-      {
-        key: "hero_youtube_id",
-        label: "ID video YouTube",
-        placeholder: "VD: dQw4w9WgXcQ",
-        showWhen: { key: "hero_video_type", value: "youtube" },
-      },
-      {
-        key: "hero_video_url",
-        label: "Video đã tải lên",
-        type: "media-video",
-        showWhen: { key: "hero_video_type", value: "upload" },
-      },
-      {
-        key: "hero_video_title",
-        label: "Tiêu đề video",
-        placeholder: "Minh Travel Showreel 2025",
-      },
-      {
-        key: "hero_tagline",
-        label: "Dòng khẩu hiệu chính",
-        placeholder: "Kể câu chuyện của bạn qua từng khung hình",
-      },
-      {
-        key: "hero_logo_type",
-        label: "Kiểu logo",
-        type: "select",
-        options: [
-          { label: "Ảnh", value: "image" },
-          { label: "Chữ", value: "text" },
-        ],
-      },
-      {
-        key: "hero_logo_url",
-        label: "Ảnh logo",
-        type: "media",
-        showWhen: { key: "hero_logo_type", value: "image" },
-      },
-      {
-        key: "hero_logo_text",
-        label: "Tên hiển thị",
-        placeholder: "Minh Travel",
-        showWhen: { key: "hero_logo_type", value: "text" },
-      },
-      {
-        key: "hero_btn1_text",
-        label: "Nút chính - Chữ",
-        placeholder: "Xem khóa học",
-      },
-      {
-        key: "hero_btn1_url",
-        label: "Nút chính - Đường dẫn",
-        placeholder: "/khoa-hoc",
-      },
-      { key: "hero_btn2_text", label: "Nút phụ - Chữ", placeholder: "Liên hệ" },
-      {
-        key: "hero_btn2_url",
-        label: "Nút phụ - Đường dẫn",
-        placeholder: "/lien-he",
-      },
-      { key: "hero_brands", label: "Thương hiệu hợp tác" },
-    ],
-  },
-  {
-    id: "homepage",
-    title: "Nội dung trang chủ",
-    description:
-      "Các mục: Dự án nổi bật, Sản phẩm, Chỉ số, Văn bản giới thiệu.",
-    pageHint: "Trang chủ — các section bên dưới Hero",
-    fields: [
-      {
-        key: "home_work_heading",
-        label: "Tiêu đề mục Dự án",
-        placeholder: "Dự án tiêu biểu",
-      },
-      { key: "home_work_card1_title", label: "Card dự án 1 - Tiêu đề" },
-      {
-        key: "home_work_card1_desc",
-        label: "Card dự án 1 - Mô tả",
-        type: "textarea",
-      },
-      { key: "home_work_card1_link_text", label: "Card dự án 1 - Chữ nút" },
-      { key: "home_work_card1_href", label: "Card dự án 1 - Đường dẫn" },
-      { key: "home_work_card2_title", label: "Card dự án 2 - Tiêu đề" },
-      {
-        key: "home_work_card2_desc",
-        label: "Card dự án 2 - Mô tả",
-        type: "textarea",
-      },
-      { key: "home_work_card2_link_text", label: "Card dự án 2 - Chữ nút" },
-      { key: "home_work_card2_href", label: "Card dự án 2 - Đường dẫn" },
-      {
-        key: "home_products_heading",
-        label: "Tiêu đề mục Sản phẩm",
-        placeholder: "Công cụ & Presets",
-      },
-      {
-        key: "home_products_card1_label",
-        label: "Card SP 1 - Nhãn",
-        placeholder: "Bán chạy",
-      },
-      { key: "home_products_card1_title", label: "Card SP 1 - Tiêu đề" },
-      {
-        key: "home_products_card1_desc",
-        label: "Card SP 1 - Mô tả",
-        type: "textarea",
-      },
-      { key: "home_products_card1_href", label: "Card SP 1 - Đường dẫn" },
-      { key: "home_products_card2_label", label: "Card SP 2 - Nhãn" },
-      { key: "home_products_card2_title", label: "Card SP 2 - Tiêu đề" },
-      {
-        key: "home_products_card2_desc",
-        label: "Card SP 2 - Mô tả",
-        type: "textarea",
-      },
-      { key: "home_products_card2_href", label: "Card SP 2 - Đường dẫn" },
-      {
-        key: "home_counters",
-        label: "Chỉ số nổi bật",
-        type: "textarea",
-        placeholder:
-          '[{"value":"3600+","label":"Học viên"},{"value":"50+","label":"Khóa học"}]',
-      },
-      {
-        key: "home_about_text_1",
-        label: "Giới thiệu — Đoạn 1",
-        type: "textarea",
-      },
-      {
-        key: "home_about_text_2",
-        label: "Giới thiệu — Đoạn 2",
-        type: "textarea",
-      },
-    ],
-  },
-  {
-    id: "navigation",
-    title: "Điều hướng & Liên kết",
-    description: "Menu chính, menu chân trang, mạng xã hội, email, link LMS.",
-    pageHint: "Toàn bộ website — header + footer",
-    fields: [
-      {
-        key: "nav_items",
-        label: "Menu chính",
-        type: "textarea",
-        placeholder:
-          '[{"label":"Khóa học","href":"/khoa-hoc"},{"label":"Blog","href":"/bai-viet"}]',
-      },
-      {
-        key: "lms_url",
-        label: "Đường dẫn LMS (học viên)",
-        placeholder: "https://lms.minhtravel.vn",
-      },
-      { key: "lms_cta_text", label: "Chữ nút vào LMS", placeholder: "VÀO HỌC" },
-      {
-        key: "footer_nav",
-        label: "Menu chân trang",
-        type: "textarea",
-        placeholder: '[{"label":"Khóa học","href":"/khoa-hoc"}]',
-      },
-      {
-        key: "social_links",
-        label: "Mạng xã hội",
-        type: "textarea",
-        placeholder:
-          '[{"platform":"youtube","url":"..."},{"platform":"facebook","url":"..."}]',
-      },
-      {
-        key: "contact_email",
-        label: "Email liên hệ",
-        placeholder: "contact@minhtravel.vn",
-      },
-      {
-        key: "footer_background_url",
-        label: "Ảnh nền chân trang",
-        type: "media",
-      },
-    ],
-  },
-  {
-    id: "courses",
-    title: "Trang danh sách khóa học",
-    description: "Tiêu đề, dòng tin cậy, chữ nút mua, tiêu đề FAQ.",
-    pageHint: "/khoa-hoc — danh sách tất cả khóa học",
-    fields: [
-      {
-        key: "courses_page_hero_title",
-        label: "Tiêu đề lớn đầu trang",
-        placeholder: "Bắt đầu sự nghiệp của bạn",
-      },
-      {
-        key: "courses_page_trust_text",
-        label: "Dòng tin cậy",
-        placeholder: "Được tin tưởng bởi 3,600+ thành viên",
-      },
-      {
-        key: "courses_page_trust_icon_url",
-        label: "Icon dòng tin cậy",
-        type: "media",
-      },
-      {
-        key: "courses_page_default_btn_text",
-        label: "Chữ nút mua mặc định",
-        placeholder: "Mua ngay",
-      },
-      {
-        key: "courses_page_faq_heading",
-        label: "Tiêu đề mục FAQ",
-        placeholder: "Câu hỏi thường gặp",
-      },
-    ],
-  },
-  {
-    id: "courseDetail",
-    title: "Trang chi tiết khóa học",
-    description: "Tiêu đề các section bên trong trang chi tiết từng khóa học.",
-    pageHint: "/khoa-hoc/[tên-khóa] — trang chi tiết",
-    fields: [
-      {
-        key: "course_detail_brands_title",
-        label: "Tiêu đề mục thương hiệu",
-        placeholder: "Thương hiệu đã hợp tác",
-      },
-      { key: "course_detail_modules_title", label: "Tiêu đề mục giáo trình" },
-      { key: "course_detail_modules_subtitle", label: "Phụ đề mục giáo trình" },
-      {
-        key: "course_detail_bonuses_title",
-        label: "Tiêu đề mục ưu đãi",
-        placeholder: "Ưu đãi khi đăng ký",
-      },
-      {
-        key: "course_detail_testimonials_title",
-        label: "Tiêu đề mục đánh giá",
-        placeholder: "Học viên nói gì",
-      },
-      { key: "course_detail_faq_heading", label: "Tiêu đề mục FAQ" },
-      {
-        key: "course_target_badges",
-        label: "Đối tượng khóa học",
-        type: "textarea",
-        placeholder: '["Người mới","Content Creator","Chủ shop"]',
-      },
-      {
-        key: "hero_subtitle",
-        label: "Phụ đề Hero khóa học",
-        placeholder: "TIẾT LỘ BÍ QUYẾT...",
-      },
-    ],
-  },
-  {
-    id: "portfolio",
-    title: "Trang dự án thực hiện",
-    description: "Tiêu đề, phụ đề, nút kêu gọi hành động.",
-    pageHint: "/san-pham — portfolio các dự án phim",
-    fields: [
-      {
-        key: "portfolio_page_title",
-        label: "Tiêu đề trang",
-        placeholder: "Films by Minh Travel",
-      },
-      { key: "portfolio_page_subtitle", label: "Phụ đề trang" },
-      {
-        key: "portfolio_cta_heading",
-        label: "Tiêu đề CTA cuối trang",
-        placeholder: "Bạn muốn làm việc cùng tôi?",
-      },
-      {
-        key: "portfolio_cta_items",
-        label: "Nút CTA",
-        type: "textarea",
-        placeholder:
-          '[{"text":"Liên hệ","href":"..."},{"text":"Xem thêm","href":"..."}]',
-      },
-    ],
-  },
-  {
-    id: "presets",
-    title: "Trang công cụ & Presets",
-    description: "Tiêu đề, phụ đề, chữ nút mua.",
-    pageHint: "/cong-cu — LUTs & Presets",
-    fields: [
-      {
-        key: "presets_page_title",
-        label: "Tiêu đề trang",
-        placeholder: "LUTs & Presets",
-      },
-      { key: "presets_page_subtitle", label: "Phụ đề trang", type: "textarea" },
-      {
-        key: "presets_page_btn_text",
-        label: "Chữ nút mua",
-        placeholder: "Mua ngay",
-      },
-    ],
-  },
-  {
-    id: "contact",
-    title: "Trang liên hệ",
-    description: "Tiêu đề, thông tin liên hệ, địa chỉ, giờ làm việc.",
-    pageHint: "/lien-he — form liên hệ + thông tin",
-    fields: [
-      {
-        key: "contact_page_title",
-        label: "Tiêu đề trang",
-        placeholder: "Liên hệ",
-      },
-      { key: "contact_page_subtitle", label: "Phụ đề trang" },
-      {
-        key: "contact_success_title",
-        label: "Tiêu đề sau khi gửi thành công",
-        placeholder: "Cảm ơn bạn!",
-      },
-      {
-        key: "contact_success_text",
-        label: "Nội dung sau khi gửi thành công",
-        type: "textarea",
-      },
-      {
-        key: "contact_info_title",
-        label: "Tiêu đề khối thông tin",
-        placeholder: "Thông tin liên hệ",
-      },
-      {
-        key: "contact_address",
-        label: "Địa chỉ",
-        placeholder: "Hà Nội, Việt Nam",
-      },
-      {
-        key: "contact_phone",
-        label: "Số điện thoại",
-        placeholder: "0900 123 456",
-      },
-      {
-        key: "contact_hours",
-        label: "Giờ làm việc",
-        placeholder: "Thứ 2 - Thứ 6, 9:00 - 18:00",
-      },
-    ],
-  },
-  {
-    id: "blog",
-    title: "Trang blog",
-    description: "Tiêu đề trang danh sách bài viết.",
-    pageHint: "/bai-viet — danh sách bài viết",
-    fields: [
-      {
-        key: "blog_page_title",
-        label: "Tiêu đề trang blog",
-        placeholder: "Blog — Kiến thức quay dựng",
-      },
-    ],
-  },
-];
-
 const PREVIEW_PAGES = [
   { label: "Trang chủ", path: "/" },
   { label: "Khóa học", path: "/khoa-hoc" },
-  { label: "Bài viết", path: "/bai-viet" },
   { label: "Dự án", path: "/san-pham" },
   { label: "Công cụ", path: "/cong-cu" },
   { label: "Liên hệ", path: "/lien-he" },
+  { label: "Bài viết", path: "/bai-viet" },
 ];
-
-// Flat list of all fields for search
-const ALL_FIELDS = SECTIONS.flatMap((s) =>
-  s.fields.map((f) => ({ ...f, sectionId: s.id, sectionTitle: s.title })),
-);
 
 function buildPreviewCookie(changed: Record<string, string>): string {
   let json = JSON.stringify(changed);
@@ -502,13 +67,15 @@ export default function SettingsPage() {
   const [search, setSearch] = useState("");
   const [previewPath, setPreviewPath] = useState("/");
   const [previewKey, setPreviewKey] = useState(0);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
-    // Default expand only "brand" and "hero"
     const s = new Set<string>();
-    s.add("brand");
-    s.add("hero");
+    s.add("homepage");
     return s;
   });
+  const [expandedSubs, setExpandedSubs] = useState<Set<string>>(
+    () => new Set(["home-hero"]),
+  );
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -527,17 +94,25 @@ export default function SettingsPage() {
     };
   }, []);
 
-  const handleChange = (key: string, value: string) => {
-    const next = { ...formData, [key]: value };
-    setFormData(next);
-    const changed: Record<string, string> = {};
-    for (const k of Object.keys(next)) {
-      if (next[k] !== settings[k]) changed[k] = next[k];
-    }
-    writePreviewCookie(changed);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setPreviewKey((k) => k + 1), 1500);
-  };
+  const handleChange = useCallback(
+    (key: string, value: string) => {
+      const next = { ...formData, [key]: value };
+      setFormData(next);
+      const changed: Record<string, string> = {};
+      for (const k of Object.keys(next)) {
+        if (next[k] !== settings[k]) changed[k] = next[k];
+      }
+      writePreviewCookie(changed);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        setPreviewLoading(true);
+        setPreviewKey((k) => k + 1);
+      }, 500);
+    },
+    [formData, settings],
+  );
+
+  const handleIframeLoad = useCallback(() => setPreviewLoading(false), []);
 
   const changedKeys = Object.keys(formData).filter(
     (k) => formData[k] !== settings[k],
@@ -555,8 +130,9 @@ export default function SettingsPage() {
       await api.put("/api/settings/batch", changed);
       setSettings({ ...formData });
       writePreviewCookie({});
+      setPreviewLoading(true);
       setPreviewKey((k) => k + 1);
-      setSuccess(`Đã lưu ${Object.keys(changed).length} cài đặt`);
+      setSuccess(`Đã lưu ${Object.keys(changed).length} thay đổi`);
       setTimeout(() => setSuccess(""), 3000);
     } catch {
       setSaveError("Lỗi khi lưu — thử lại");
@@ -568,19 +144,48 @@ export default function SettingsPage() {
   const toggleSection = (id: string) => {
     setExpandedSections((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id);
+      else {
+        next.add(id);
+        const section = SECTIONS.find((s) => s.id === id);
+        if (section) setPreviewPath(section.previewPath);
+      }
       return next;
     });
   };
 
-  const reloadPreview = () => setPreviewKey((k) => k + 1);
+  const toggleSub = (id: string) => {
+    setExpandedSubs((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
-  // Section-level unsaved count
-  const sectionChangedCount = (section: Section) =>
-    section.fields.filter((f) => formData[f.key] !== settings[f.key]).length;
+  const reloadPreview = () => {
+    setPreviewLoading(true);
+    setPreviewKey((k) => k + 1);
+  };
 
-  // Search
-  const isSearching = search.length > 0;
+  const subChangedCount = (fields: FieldDef[]) =>
+    fields.filter((f) => formData[f.key] !== settings[f.key]).length;
+
+  const sectionChangedCount = (section: Section) => {
+    let count = section.fields.filter(
+      (f) => formData[f.key] !== settings[f.key],
+    ).length;
+    if (section.subSections) {
+      for (const sub of section.subSections) {
+        count += sub.fields.filter(
+          (f) => formData[f.key] !== settings[f.key],
+        ).length;
+      }
+    }
+    return count;
+  };
+
+  const isSearching = search.trim().length > 0;
   const searchResults = isSearching
     ? ALL_FIELDS.filter(
         (f) =>
@@ -589,11 +194,10 @@ export default function SettingsPage() {
       )
     : [];
 
-  if (loading) return <div className={styles.loading}>Đang tải...</div>;
+  if (loading) return <div className={styles.loading}>Đang tải cài đặt...</div>;
 
   return (
     <div className={styles.page}>
-      {/* ── Left: Editor ── */}
       <div className={styles.editor}>
         <div className={styles.editorHeader}>
           <div>
@@ -616,7 +220,7 @@ export default function SettingsPage() {
               onClick={handleSave}
               disabled={saving || changedKeys.length === 0}
             >
-              {saving ? "Đang lưu..." : "Lưu"}
+              {saving ? "Đang lưu..." : `Lưu (${changedKeys.length})`}
             </button>
           </div>
         </div>
@@ -624,30 +228,22 @@ export default function SettingsPage() {
         {success && <div className={styles.successBar}>{success}</div>}
         {saveError && <div className={styles.errorBar}>{saveError}</div>}
 
-        {/* ── Search results (flat) ── */}
         {isSearching && (
           <div className={styles.fieldsScroll}>
-            {searchResults
-              .filter(
-                (f) =>
-                  !f.showWhen || formData[f.showWhen.key] === f.showWhen.value,
-              )
-              .map((f) => (
-                <FieldRow
-                  key={`sr-${f.key}`}
-                  field={f}
-                  value={formData[f.key] ?? ""}
-                  onChange={handleChange}
-                  showContext
-                />
-              ))}
+            {searchResults.map((f) => (
+              <FieldRow
+                key={`sr-${f.key}`}
+                field={f}
+                value={formData[f.key] ?? ""}
+                onChange={handleChange}
+              />
+            ))}
             {searchResults.length === 0 && (
               <p className={styles.noResults}>Không tìm thấy cài đặt nào</p>
             )}
           </div>
         )}
 
-        {/* ── Section accordions (grouped) ── */}
         {!isSearching && (
           <div className={styles.fieldsScroll}>
             {SECTIONS.map((section) => {
@@ -672,7 +268,7 @@ export default function SettingsPage() {
                           {section.title}
                         </span>
                         <span className={styles.sectionHint}>
-                          {section.pageHint}
+                          {section.description}
                         </span>
                       </div>
                     </div>
@@ -680,33 +276,88 @@ export default function SettingsPage() {
                       {dirty > 0 && (
                         <span className={styles.sectionDirty}>{dirty}</span>
                       )}
-                      <span className={styles.sectionCount}>
-                        {section.fields.length}
-                      </span>
                     </div>
                   </button>
 
                   {isOpen && (
                     <div className={styles.sectionBody}>
-                      <p className={styles.sectionDesc}>
-                        {section.description}
-                      </p>
-                      {section.fields
-                        .filter((f) => {
-                          if (!f.showWhen) return true;
-                          return formData[f.showWhen.key] === f.showWhen.value;
-                        })
-                        .map((field) => (
-                          <FieldRow
-                            key={field.key}
-                            field={field}
-                            value={formData[field.key] ?? ""}
-                            onChange={handleChange}
-                            isDirty={
-                              formData[field.key] !== settings[field.key]
-                            }
-                          />
-                        ))}
+                      {section.fields.length > 0 && (
+                        <div className={styles.fieldGroup}>
+                          {section.fields.map((field) => (
+                            <FieldRow
+                              key={field.key}
+                              field={field}
+                              value={formData[field.key] ?? ""}
+                              onChange={handleChange}
+                              isDirty={
+                                formData[field.key] !== settings[field.key]
+                              }
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {section.subSections?.map((sub) => {
+                        const subOpen = expandedSubs.has(sub.id);
+                        const subDirty = subChangedCount(sub.fields);
+
+                        return (
+                          <div key={sub.id} className={styles.subSection}>
+                            <button
+                              className={styles.subSectionHeader}
+                              onClick={() => toggleSub(sub.id)}
+                              type="button"
+                            >
+                              <div className={styles.subSectionHeaderLeft}>
+                                <span
+                                  className={`${styles.subChevron} ${subOpen ? styles.subChevronOpen : ""}`}
+                                >
+                                  ▸
+                                </span>
+                                <span className={styles.subSectionTitle}>
+                                  {sub.title}
+                                </span>
+                              </div>
+                              <div className={styles.subSectionHeaderRight}>
+                                <span className={styles.subSectionHint}>
+                                  {sub.hint}
+                                </span>
+                                {subDirty > 0 && (
+                                  <span className={styles.sectionDirty}>
+                                    {subDirty}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                            {subOpen && (
+                              <div className={styles.subBody}>
+                                <div className={styles.fieldGroup}>
+                                  {sub.fields
+                                    .filter((f) => {
+                                      if (!f.showWhen) return true;
+                                      return (
+                                        formData[f.showWhen.key] ===
+                                        f.showWhen.value
+                                      );
+                                    })
+                                    .map((field) => (
+                                      <FieldRow
+                                        key={field.key}
+                                        field={field}
+                                        value={formData[field.key] ?? ""}
+                                        onChange={handleChange}
+                                        isDirty={
+                                          formData[field.key] !==
+                                          settings[field.key]
+                                        }
+                                      />
+                                    ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -726,7 +377,6 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* ── Right: Preview ── */}
       <div className={styles.preview}>
         <div className={styles.previewHeader}>
           <div className={styles.previewTabs}>
@@ -745,6 +395,11 @@ export default function SettingsPage() {
             ))}
           </div>
           <div className={styles.previewDevice}>
+            {previewLoading && (
+              <span className={styles.previewSpinner}>
+                <span className={styles.spinner} />
+              </span>
+            )}
             <button
               className={styles.deviceBtn}
               onClick={reloadPreview}
@@ -760,6 +415,7 @@ export default function SettingsPage() {
             src={previewPath}
             className={styles.iframe}
             title="Xem trước trang web"
+            onLoad={handleIframeLoad}
           />
         </div>
       </div>
@@ -767,53 +423,197 @@ export default function SettingsPage() {
   );
 }
 
-// ── FieldRow renders a single setting field ──
+// ── JSON converters ──
 
-const JSON_FIELDS = new Set([
-  "hero_brands",
-  "nav_items",
-  "footer_nav",
-  "social_links",
-  "home_counters",
-  "portfolio_cta_items",
-  "course_target_badges",
-]);
+function countersToText(json: string): string {
+  try {
+    const arr = JSON.parse(json);
+    if (!Array.isArray(arr)) return json;
+    return arr
+      .map(
+        (c: { label?: string; value?: number }) =>
+          `${c.label || ""} = ${c.value ?? 0}`,
+      )
+      .join("\n");
+  } catch {
+    return json;
+  }
+}
+
+function textToCounters(text: string): string {
+  const items = text
+    .split("\n")
+    .map((line) => {
+      const idx = line.indexOf("=");
+      if (idx === -1) return null;
+      return {
+        label: line.slice(0, idx).trim(),
+        value: Number.parseInt(line.slice(idx + 1).trim(), 10) || 0,
+      };
+    })
+    .filter((v): v is { label: string; value: number } => v !== null);
+  return JSON.stringify(items);
+}
+
+function ctaItemsToText(json: string): string {
+  try {
+    const arr = JSON.parse(json);
+    if (!Array.isArray(arr)) return json;
+    return arr
+      .map(
+        (c: { text?: string; href?: string }) =>
+          `${c.text || ""} = ${c.href || ""}`,
+      )
+      .join("\n");
+  } catch {
+    return json;
+  }
+}
+
+function textToCtaItems(text: string): string {
+  const items = text
+    .split("\n")
+    .map((line) => {
+      const idx = line.indexOf("=");
+      if (idx === -1) return null;
+      return {
+        text: line.slice(0, idx).trim(),
+        href: line.slice(idx + 1).trim(),
+      };
+    })
+    .filter(
+      (v): v is { text: string; href: string } =>
+        v !== null && v.text !== "" && v.href !== "",
+    );
+  return JSON.stringify(items);
+}
+
+function badgesToText(json: string): string {
+  try {
+    const arr = JSON.parse(json);
+    if (!Array.isArray(arr)) return json;
+    return arr.map(String).join("\n");
+  } catch {
+    return json;
+  }
+}
+
+function textToBadges(text: string): string {
+  return JSON.stringify(
+    text
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean),
+  );
+}
+
+function extractYoutubeId(input: string): string {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /^[a-zA-Z0-9_-]{11}$/,
+  ];
+  for (const p of patterns) {
+    const m = input.match(p);
+    if (m) return m[1] ?? m[0];
+  }
+  return input;
+}
+
+// ── FieldRow ──
 
 function FieldRow({
   field,
   value,
   onChange,
   isDirty,
-  showContext,
 }: {
   field: FieldDef;
   value: string;
   onChange: (key: string, val: string) => void;
   isDirty?: boolean;
-  showContext?: boolean;
 }) {
-  // ── Media picker ──
+  const key = field.key;
+
+  if (key === "hero_youtube_id") {
+    return (
+      <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
+        <label className={styles.label} htmlFor={`sf-${key}`}>
+          {field.label}
+          {isDirty && <span className={styles.dirtyDot}>•</span>}
+        </label>
+        <input
+          id={`sf-${key}`}
+          type="text"
+          className={styles.input}
+          value={value}
+          onChange={(e) => onChange(key, e.target.value)}
+          placeholder={field.placeholder}
+          onBlur={(e) => {
+            const extracted = extractYoutubeId(e.target.value);
+            if (extracted !== e.target.value) onChange(key, extracted);
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (key === "portfolio_cta_items") {
+    return (
+      <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
+        <label className={styles.label} htmlFor={`sf-${key}`}>
+          {field.label}
+          {isDirty && <span className={styles.dirtyDot}>•</span>}
+        </label>
+        <textarea
+          id={`sf-${key}`}
+          className={styles.textarea}
+          value={ctaItemsToText(value)}
+          onChange={(e) => onChange(key, textToCtaItems(e.target.value))}
+          rows={3}
+          placeholder={field.placeholder}
+        />
+      </div>
+    );
+  }
+
+  if (key === "course_target_badges") {
+    return (
+      <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
+        <label className={styles.label} htmlFor={`sf-${key}`}>
+          {field.label}
+          {isDirty && <span className={styles.dirtyDot}>•</span>}
+        </label>
+        <textarea
+          id={`sf-${key}`}
+          className={styles.textarea}
+          value={badgesToText(value)}
+          onChange={(e) => onChange(key, textToBadges(e.target.value))}
+          rows={3}
+          placeholder={field.placeholder}
+        />
+      </div>
+    );
+  }
+
   if (field.type === "media" || field.type === "media-video") {
     const isVideo = field.type === "media-video";
     return (
       <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
-        <label className={styles.label} htmlFor={`sf-${field.key}`}>
+        <label className={styles.label} htmlFor={`sf-${key}`}>
           {field.label}
-          <span className={styles.keyHint}>
-            {showContext ? field.key : isDirty ? "đã sửa" : ""}
-          </span>
+          {isDirty && <span className={styles.dirtyDot}>•</span>}
         </label>
         <div className={styles.mediaRow}>
           <input
-            id={`sf-${field.key}`}
+            id={`sf-${key}`}
             type="text"
             className={styles.input}
             value={value}
-            onChange={(e) => onChange(field.key, e.target.value)}
+            onChange={(e) => onChange(key, e.target.value)}
             placeholder={field.placeholder || "https://..."}
           />
           <MediaTrigger
-            onSelect={(url) => onChange(field.key, url)}
+            onSelect={(url) => onChange(key, url)}
             value={value}
             filter={isVideo ? "video" : "image"}
             accept={isVideo ? "video/*" : "image/*"}
@@ -824,7 +624,7 @@ function FieldRow({
             <button
               type="button"
               className={styles.clearMediaBtn}
-              onClick={() => onChange(field.key, "")}
+              onClick={() => onChange(key, "")}
               title="Xóa"
             >
               ✕
@@ -835,34 +635,73 @@ function FieldRow({
     );
   }
 
-  // ── Key-value editor for JSON arrays ──
-  if (JSON_FIELDS.has(field.key)) {
+  if (field.type === "toggle") {
     return (
-      <KeyValueField
+      <div className={`${styles.field} ${styles.fieldToggle} ${isDirty ? styles.fieldDirty : ""}`}>
+        <label className={styles.toggleLabel}>
+          <span>{field.label}</span>
+          <label className={styles.switch}>
+            <input
+              type="checkbox"
+              checked={value === "1"}
+              onChange={(e) => onChange(key, e.target.checked ? "1" : "0")}
+            />
+            <span className={styles.slider} />
+          </label>
+        </label>
+      </div>
+    );
+  }
+
+  if (field.type === "counters") {
+    return (
+      <CountersInput
         field={field}
         value={value}
-        onChange={(v) => onChange(field.key, v)}
+        onChange={(v) => onChange(key, v)}
         isDirty={isDirty}
-        showContext={showContext}
       />
     );
   }
 
-  // ── Select dropdown ──
+  if (field.type === "tags") {
+    return (
+      <TagsInput
+        field={field}
+        value={value}
+        onChange={(v) => onChange(key, v)}
+        isDirty={isDirty}
+      />
+    );
+  }
+
+  if (field.type === "reference") {
+    return <ReferenceField field={field} onChange={onChange} />;
+  }
+
+  if (field.type === "link") {
+    return (
+      <LinkSelect
+        field={field}
+        value={value}
+        onChange={(v) => onChange(key, v)}
+        isDirty={isDirty}
+      />
+    );
+  }
+
   if (field.type === "select" && field.options) {
     return (
       <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
-        <label className={styles.label} htmlFor={`sf-${field.key}`}>
+        <label className={styles.label} htmlFor={`sf-${key}`}>
           {field.label}
-          <span className={styles.keyHint}>
-            {showContext ? field.key : isDirty ? "đã sửa" : ""}
-          </span>
+          {isDirty && <span className={styles.dirtyDot}>•</span>}
         </label>
         <select
-          id={`sf-${field.key}`}
+          id={`sf-${key}`}
           className={styles.selectInput}
           value={value}
-          onChange={(e) => onChange(field.key, e.target.value)}
+          onChange={(e) => onChange(key, e.target.value)}
         >
           {field.options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -874,42 +713,39 @@ function FieldRow({
     );
   }
 
-  // ── Standard text / textarea / color ──
   return (
     <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
-      <label className={styles.label} htmlFor={`sf-${field.key}`}>
+      <label className={styles.label} htmlFor={`sf-${key}`}>
         {field.label}
-        <span className={styles.keyHint}>
-          {showContext ? field.key : isDirty ? "đã sửa" : ""}
-        </span>
+        {isDirty && <span className={styles.dirtyDot}>•</span>}
       </label>
       {field.type === "textarea" ? (
         <textarea
-          id={`sf-${field.key}`}
+          id={`sf-${key}`}
           className={styles.textarea}
           value={value}
-          onChange={(e) => onChange(field.key, e.target.value)}
+          onChange={(e) => onChange(key, e.target.value)}
           rows={3}
           placeholder={field.placeholder}
         />
       ) : field.type === "color" ? (
         <div className={styles.colorRow}>
           <input
-            id={`sf-${field.key}`}
+            id={`sf-${key}`}
             type="color"
             className={styles.colorInput}
             value={value || "#000000"}
-            onChange={(e) => onChange(field.key, e.target.value)}
+            onChange={(e) => onChange(key, e.target.value)}
           />
           <span className={styles.colorValue}>{value || "#000000"}</span>
         </div>
       ) : (
         <input
-          id={`sf-${field.key}`}
+          id={`sf-${key}`}
           type="text"
           className={styles.input}
           value={value}
-          onChange={(e) => onChange(field.key, e.target.value)}
+          onChange={(e) => onChange(key, e.target.value)}
           placeholder={field.placeholder}
         />
       )}
@@ -917,134 +753,314 @@ function FieldRow({
   );
 }
 
-// ── Key-Value visual editor for JSON fields ──
-
-interface KVItem {
-  [k: string]: string;
-}
-
-function parseAsKVArray(raw: string): KVItem[] {
-  try {
-    const p = JSON.parse(raw);
-    if (Array.isArray(p)) return p as KVItem[];
-  } catch {
-    /* fallthrough */
-  }
-  return [];
-}
-
-function KeyValueField({
+function CountersInput({
   field,
   value,
   onChange,
   isDirty,
-  showContext,
 }: {
   field: FieldDef;
   value: string;
   onChange: (val: string) => void;
   isDirty?: boolean;
-  showContext?: boolean;
 }) {
-  const [localText, setLocalText] = useState(value);
-  const [mode, setMode] = useState<"visual" | "json">("visual");
-  const items = parseAsKVArray(value);
+  const counters: Array<{ label: string; value: number }> = (() => {
+    if (!value) return [];
+    try {
+      const arr = JSON.parse(value);
+      return Array.isArray(arr)
+        ? arr.filter((c: { label?: string; value?: number }) => c.label)
+        : [];
+    } catch {
+      return [];
+    }
+  })();
 
-  const emit = (newItems: KVItem[]) => {
-    const j = JSON.stringify(newItems);
-    setLocalText(j);
-    onChange(j);
+  const emit = (items: Array<{ label: string; value: number }>) => {
+    onChange(JSON.stringify(items));
   };
-  useEffect(() => {
-    if (mode !== "json") setLocalText(value);
-  }, [value, mode]);
+
+  const updateLabel = (idx: number, label: string) => {
+    const next = [...counters];
+    next[idx] = { ...next[idx], label };
+    emit(next);
+  };
+
+  const updateValue = (idx: number, val: string) => {
+    const num = Number.parseInt(val.replace(/[^0-9]/g, ""), 10) || 0;
+    const next = [...counters];
+    next[idx] = { ...next[idx], value: num };
+    emit(next);
+  };
+
+  const remove = (idx: number) => emit(counters.filter((_, i) => i !== idx));
+
+  const add = () => emit([...counters, { label: "", value: 0 }]);
 
   return (
     <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
       <label className={styles.label}>
         {field.label}
-        <span className={styles.keyHint}>
-          <button
-            type="button"
-            className={styles.modeToggle}
-            onClick={() =>
-              mode === "visual"
-                ? setMode("json")
-                : (setMode("visual"), onChange(localText))
-            }
-          >
-            {mode === "visual" ? "JSON" : "Trực quan"}
-          </button>
-          {showContext ? ` · ${field.key}` : isDirty ? " · đã sửa" : ""}
-        </span>
+        <span className={styles.tagCount}>({counters.length})</span>
       </label>
-      {mode === "json" ? (
-        <textarea
-          className={styles.textarea}
-          value={localText}
-          onChange={(e) => setLocalText(e.target.value)}
-          onBlur={() => onChange(localText)}
-          rows={5}
-          placeholder={field.placeholder}
-        />
-      ) : items.length === 0 ? (
-        <button
-          type="button"
-          className={styles.kvAdd}
-          onClick={() => emit([{}])}
-        >
-          + Thêm mục đầu tiên
-        </button>
-      ) : (
-        <div className={styles.kvList}>
-          {items.map((item, idx) => {
-            const keys = Object.keys(item);
-            return (
-              <div key={idx} className={styles.kvRow}>
-                <input
-                  className={styles.kvInput}
-                  placeholder="Tên"
-                  value={item[keys[0] || "label"] || ""}
-                  onChange={(e) => {
-                    const next = [...items];
-                    next[idx] = {
-                      ...next[idx],
-                      [keys[0] || "label"]: e.target.value,
-                    };
-                    emit(next);
-                  }}
-                />
-                <input
-                  className={styles.kvInput}
-                  placeholder="Giá trị"
-                  value={item[keys[1] || "href"] || ""}
-                  onChange={(e) => {
-                    const next = [...items];
-                    next[idx] = {
-                      ...next[idx],
-                      [keys[1] || "href"]: e.target.value,
-                    };
-                    emit(next);
-                  }}
-                />
-                <button
-                  type="button"
-                  className={styles.kvRemove}
-                  onClick={() => emit(items.filter((_, i) => i !== idx))}
-                >
-                  ✕
-                </button>
-              </div>
-            );
-          })}
-          <button
-            type="button"
-            className={styles.kvAdd}
-            onClick={() => emit([...items, {}])}
-          >
-            + Thêm mục
+      {counters.map((c, i) => (
+        <div key={i} className={styles.counterRow}>
+          <input
+            type="text"
+            className={styles.input}
+            value={c.label}
+            onChange={(e) => updateLabel(i, e.target.value)}
+            placeholder="VD: Học viên"
+          />
+          <input
+            type="text"
+            className={styles.input}
+            value={c.value || ""}
+            onChange={(e) => updateValue(i, e.target.value)}
+            placeholder="VD: 3600"
+            style={{ maxWidth: 100, textAlign: "right" }}
+          />
+          <button type="button" className={styles.counterRemove} onClick={() => remove(i)}>
+            ✕
           </button>
         </div>
+      ))}
+      <button type="button" className={styles.counterAdd} onClick={add}>
+        + Thêm số liệu
+      </button>
+    </div>
+  );
+}
+
+function TagsInput({
+  field,
+  value,
+  onChange,
+  isDirty,
+}: {
+  field: FieldDef;
+  value: string;
+  onChange: (val: string) => void;
+  isDirty?: boolean;
+}) {
+  const [input, setInput] = useState("");
+  const tags: string[] = (() => {
+    if (!value) return [];
+    try {
+      const arr = JSON.parse(value);
+      return Array.isArray(arr)
+        ? arr.map((t: { name?: string } | string) =>
+            typeof t === "string" ? t : t.name || "",
+          )
+        : [];
+    } catch {
+      return [];
+    }
+  })();
+
+  const emit = (newTags: string[]) => {
+    onChange(JSON.stringify(newTags.map((name) => ({ name }))));
+  };
+
+  const addTag = () => {
+    const trimmed = input.trim();
+    if (
+      trimmed &&
+      !tags.some((t) => t.toLowerCase() === trimmed.toLowerCase())
+    ) {
+      emit([...tags, trimmed]);
+    }
+    setInput("");
+  };
+
+  return (
+    <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
+      <label className={styles.label}>
+        {field.label}
+        <span className={styles.tagCount}>({tags.length})</span>
+      </label>
+      <div className={styles.tagList}>
+        {tags.map((tag) => (
+          <span key={tag} className={styles.tagChip}>
+            {tag}
+            <button
+              type="button"
+              className={styles.tagRemove}
+              onClick={() => emit(tags.filter((t) => t !== tag))}
+            >
+              ✕
+            </button>
+          </span>
+        ))}
+      </div>
+      <div className={styles.tagInputRow}>
+        <input
+          type="text"
+          className={styles.input}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addTag();
+            }
+          }}
+          placeholder="Nhập thương hiệu rồi Enter..."
+        />
+      </div>
+    </div>
+  );
+}
+
+function ReferenceField({
+  field,
+  onChange,
+}: {
+  field: FieldDef;
+  onChange: (key: string, val: string) => void;
+}) {
+  const [items, setItems] = useState<Array<Record<string, unknown>>>([]);
+  const apiPath = field.placeholder || "";
+
+  useEffect(() => {
+    if (!apiPath) return;
+    api
+      .publicGet<unknown>(apiPath)
+      .then((res) => {
+        const data = Array.isArray(res)
+          ? res
+          : (res as { data?: Array<Record<string, unknown>> }).data;
+        setItems(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setItems([]));
+  }, [apiPath]);
+
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const idx = Number.parseInt(e.target.value, 10);
+    if (Number.isNaN(idx) || !items[idx]) return;
+
+    const item = items[idx];
+    // Map reference key to actual schema keys the component reads
+    const mapping: Record<
+      string,
+      Array<{ target: string; source: string; static?: string }>
+    > = {
+      home_work_card1_ref: [
+        { target: "home_work_card1_title", source: "title" },
+        { target: "home_work_card1_desc", source: "description" },
+        { target: "home_work_card1_href", source: "", static: "/san-pham" },
+      ],
+      home_work_card2_ref: [
+        { target: "home_work_card2_title", source: "title" },
+        { target: "home_work_card2_desc", source: "description" },
+        { target: "home_work_card2_href", source: "", static: "/san-pham" },
+      ],
+      home_products_card1_ref: [
+        { target: "home_products_card1_title", source: "title" },
+        { target: "home_products_card1_desc", source: "description" },
+        {
+          target: "home_products_card1_href",
+          source: "slug",
+          static: "/khoa-hoc/",
+        },
+      ],
+      home_products_card2_ref: [
+        { target: "home_products_card2_title", source: "title" },
+        { target: "home_products_card2_desc", source: "description" },
+        {
+          target: "home_products_card2_href",
+          source: "slug",
+          static: "/cong-cu/",
+        },
+      ],
+    };
+
+    const map = mapping[field.key];
+    if (!map) return;
+
+    for (const m of map) {
+      if (m.static) {
+        const val = m.source
+          ? m.static + String(item[m.source] ?? "")
+          : m.static;
+        onChange(m.target, val);
+      } else {
+        onChange(m.target, String(item[m.source] ?? ""));
+      }
+    }
+  };
+
+  return (
+    <div className={styles.field}>
+      <label className={styles.label}>{field.label}</label>
+      <select
+        className={styles.selectInput}
+        onChange={handleSelect}
+        defaultValue=""
+      >
+        <option value="" disabled>
+          — Chọn từ danh sách —
+        </option>
+        {items.map((item, i) => (
+          <option key={i} value={String(i)}>
+            {String(item.title ?? "")}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function LinkSelect({
+  field,
+  value,
+  onChange,
+  isDirty,
+}: {
+  field: FieldDef;
+  value: string;
+  onChange: (val: string) => void;
+  isDirty?: boolean;
+}) {
+  const isKnown = PRESET_LINKS.some(
+    (p) => p.value !== "__custom__" && p.value === value,
+  );
+  const [showCustom, setShowCustom] = useState(!isKnown && !!value);
+
+  return (
+    <div className={`${styles.field} ${isDirty ? styles.fieldDirty : ""}`}>
+      <label className={styles.label}>
+        {field.label}
+        {isDirty && <span className={styles.dirtyDot}>•</span>}
+      </label>
+      <select
+        className={styles.selectInput}
+        value={isKnown ? value : "__custom__"}
+        onChange={(e) => {
+          const v = e.target.value;
+          if (v === "__custom__") {
+            setShowCustom(true);
+          } else {
+            setShowCustom(false);
+            onChange(v);
+          }
+        }}
+      >
+        {PRESET_LINKS.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      {showCustom && (
+        <input
+          type="text"
+          className={styles.input}
+          style={{ marginTop: "0.35rem" }}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://..."
+        />
       )}
     </div>
   );

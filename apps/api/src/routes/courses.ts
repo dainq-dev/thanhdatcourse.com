@@ -1,14 +1,15 @@
 import { zValidator } from "@hono/zod-validator";
 import { ContentSchema } from "@workspace/types";
-import { and, desc, eq, like, type SQL, sql } from "drizzle-orm";
+import { and, asc, desc, eq, like, type SQL, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "../db";
-import { courseLessons, courseModules, courses } from "../db/schema";
-import { authMiddleware } from "../middleware/auth";
+import { courseLessons, courseModules, courses, sections } from "../db/schema";
+import { authMiddleware, optionalAuth } from "../middleware/auth";
 
 const CourseQuerySchema = z.object({
   published: z.coerce.boolean().optional(),
+  draft: z.coerce.boolean().optional(),
   featured: z.coerce.boolean().optional(),
   search: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
@@ -20,9 +21,14 @@ const CreateCourseSchema = z.object({
   slug: z.string().min(3).optional(),
   description: z.string().min(1),
   basePrice: z.number().int().positive(),
-  thumbnailUrl: z.string().optional(),
+  thumbnailUrl: z.string().optional().nullable(),
+  trailerVideoUrl: z.string().optional().nullable(),
+  externalCheckoutUrl: z.string().optional().nullable(),
   level: z.enum(["beginner", "intermediate", "advanced", "all"]).optional(),
+  buttonText: z.string().optional().nullable(),
   isPublished: z.boolean().optional(),
+  isFeaturedOnHome: z.boolean().optional(),
+  isComboOnly: z.boolean().optional(),
   learningOutcomes: z.array(z.string()).optional(),
   contentBlocks: z
     .string()
@@ -56,11 +62,19 @@ function slugify(text: string): string {
 }
 
 export const coursesRoutes = new Hono()
-  .get("/", zValidator("query", CourseQuerySchema), async (c) => {
-    const { published, featured, search, page, limit } = c.req.valid("query");
+  .get("/", optionalAuth(), zValidator("query", CourseQuerySchema), async (c) => {
+    const { published, draft, featured, search, page, limit } = c.req.valid("query");
 
     const conditions: SQL[] = [];
-    if (published) conditions.push(eq(courses.isPublished, published ? 1 : 0));
+    const isAdmin = c.get("user")?.role === "ADMIN";
+
+    if (draft && isAdmin) {
+      conditions.push(eq(courses.isPublished, 0));
+    } else if (published !== undefined) {
+      conditions.push(eq(courses.isPublished, published ? 1 : 0));
+    } else if (!isAdmin) {
+      conditions.push(eq(courses.isPublished, 1));
+    }
     if (featured)
       conditions.push(eq(courses.isFeaturedOnHome, featured ? 1 : 0));
     if (search) conditions.push(like(courses.title, `%${search}%`));
@@ -87,12 +101,17 @@ export const coursesRoutes = new Hono()
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   })
-  .get("/:slug", async (c) => {
+  .get("/:slug", optionalAuth(), async (c) => {
     const slug = c.req.param("slug");
+    const isAdmin = c.get("user")?.role === "ADMIN";
+
+    const conditions = [eq(courses.slug, slug)];
+    if (!isAdmin) conditions.push(eq(courses.isPublished, 1));
+
     const [course] = await db
       .select()
       .from(courses)
-      .where(and(eq(courses.slug, slug), eq(courses.isPublished, 1)));
+      .where(and(...conditions));
 
     if (!course) return c.json({ error: "Not found" }, 404);
 
@@ -104,16 +123,33 @@ export const coursesRoutes = new Hono()
 
     const curriculum = await Promise.all(
       modules.map(async (mod) => {
-        const lessons = await db
+        const lessonQuery = db
           .select()
           .from(courseLessons)
           .where(eq(courseLessons.moduleId, mod.id))
-          .orderBy(courseLessons.sortOrder);
+          .orderBy(courseLessons.sortOrder)
+          .$dynamic();
+        if (!isAdmin) {
+          lessonQuery.where(eq(courseLessons.isPublished, 1));
+        }
+        const lessons = await lessonQuery;
         return { ...mod, lessons };
       }),
     );
 
-    return c.json({ ...course, modules: curriculum });
+    const sectionRows = await db
+      .select()
+      .from(sections)
+      .where(
+        and(eq(sections.entityType, "course"), eq(sections.entityId, course.id)),
+      )
+      .orderBy(asc(sections.sortOrder));
+
+    const parsedSections = sectionRows
+      .filter((s) => isAdmin || s.isPublished === 1)
+      .map((s) => ({ ...s, config: JSON.parse(s.config) }));
+
+    return c.json({ ...course, modules: curriculum, sections: parsedSections });
   })
   .post(
     "/",
@@ -139,8 +175,13 @@ export const coursesRoutes = new Hono()
         description: data.description,
         basePrice: data.basePrice,
         thumbnailUrl: data.thumbnailUrl,
+        trailerVideoUrl: data.trailerVideoUrl,
+        externalCheckoutUrl: data.externalCheckoutUrl,
         level: data.level,
+        buttonText: data.buttonText,
         isPublished: data.isPublished ? 1 : 0,
+        isFeaturedOnHome: data.isFeaturedOnHome ? 1 : 0,
+        isComboOnly: data.isComboOnly ? 1 : 0,
         learningOutcomes: data.learningOutcomes
           ? JSON.stringify(data.learningOutcomes)
           : null,
@@ -187,9 +228,18 @@ export const coursesRoutes = new Hono()
       if (data.basePrice !== undefined) updates.basePrice = data.basePrice;
       if (data.thumbnailUrl !== undefined)
         updates.thumbnailUrl = data.thumbnailUrl;
+      if (data.trailerVideoUrl !== undefined)
+        updates.trailerVideoUrl = data.trailerVideoUrl;
+      if (data.externalCheckoutUrl !== undefined)
+        updates.externalCheckoutUrl = data.externalCheckoutUrl;
       if (data.level !== undefined) updates.level = data.level;
+      if (data.buttonText !== undefined) updates.buttonText = data.buttonText;
       if (data.isPublished !== undefined)
         updates.isPublished = data.isPublished ? 1 : 0;
+      if (data.isFeaturedOnHome !== undefined)
+        updates.isFeaturedOnHome = data.isFeaturedOnHome ? 1 : 0;
+      if (data.isComboOnly !== undefined)
+        updates.isComboOnly = data.isComboOnly ? 1 : 0;
       if (data.learningOutcomes !== undefined)
         updates.learningOutcomes = JSON.stringify(data.learningOutcomes);
       if (data.contentBlocks !== undefined)

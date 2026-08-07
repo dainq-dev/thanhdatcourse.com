@@ -1,0 +1,47 @@
+@use 'abstracts/variables' as brand;
+@use 'abstracts/admin-variables' as admin;
+
+:root {
+  --admin-bg:             #{admin.$admin-bg};
+  --admin-surface:        #{admin.$admin-surface};
+  --admin-surface-raised: #{admin.$admin-surface-raised};
+  --admin-surface-hover:  #{admin.$admin-surface-hover};
+  --admin-border:         #{admin.$admin-border};
+  --admin-border-heavy:   #{admin.$admin-border-heavy};
+  --admin-text:           #{admin.$admin-text};
+  --admin-text-secondary: #{admin.$admin-text-secondary};
+  --admin-text-disabled:  #{admin.$admin-text-disabled};
+  --admin-accent:         #{brand.$clr-primary};
+  --admin-accent-hover:   #{brand.$clr-primary-dark};
+  --admin-accent-text:    #{admin.$admin-accent-text};
+  --admin-success:        #{admin.$admin-success};
+  --admin-success-bg:     #{admin.$admin-success-bg};
+  --admin-success-border: #{admin.$admin-success-border};
+  --admin-danger:         #{admin.$admin-danger};
+  --admin-danger-bg:      #{admin.$admin-danger-bg};
+  --admin-danger-border:  #{admin.$admin-danger-border};
+  --admin-warning:        #{admin.$admin-warning};
+  --admin-warning-bg:     #{admin.$admin-warning-bg};
+  --admin-radius:         #{admin.$admin-radius-md};
+  --admin-radius-sm:      #{admin.$admin-radius-sm};
+  --admin-radius-lg:      #{admin.$admin-radius-lg};
+  --admin-sidebar-width:  #{admin.$admin-sidebar-width};
+  --admin-header-height:  #{admin.$admin-header-height};
+  --admin-ease-out:       #{brand.$ease-out-expo};
+  --admin-duration-fast:  #{brand.$duration-fast};
+  --admin-duration-normal:#{brand.$duration-normal};
+}
+
+@keyframes admin-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes admin-pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes admin-spin {
+  to { transform: rotate(360deg); }
+}

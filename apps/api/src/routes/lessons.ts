@@ -1,10 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "../db";
 import { courseLessons, courseModules } from "../db/schema";
-import { authMiddleware } from "../middleware/auth";
+import { authMiddleware, optionalAuth } from "../middleware/auth";
 
 const CreateLessonSchema = z.object({
   title: z.string().min(1),
@@ -21,14 +21,19 @@ const CreateLessonSchema = z.object({
 const UpdateLessonSchema = CreateLessonSchema.partial();
 
 export const lessonRoutes = new Hono()
-  .get("/", async (c) => {
+  .get("/", optionalAuth(), async (c) => {
     const moduleId = c.req.param("moduleId");
+    const isAdmin = c.get("user")?.role === "ADMIN";
 
-    const lessons = await db
+    const query = db
       .select()
       .from(courseLessons)
       .where(eq(courseLessons.moduleId, moduleId))
-      .orderBy(courseLessons.sortOrder);
+      .$dynamic();
+    if (!isAdmin) {
+      query.where(eq(courseLessons.isPublished, 1));
+    }
+    const lessons = await query.orderBy(courseLessons.sortOrder);
 
     return c.json(lessons);
   })
@@ -73,14 +78,14 @@ export const lessonRoutes = new Hono()
     authMiddleware("ADMIN"),
     zValidator("json", UpdateLessonSchema),
     async (c) => {
-      const _moduleId = c.req.param("moduleId");
+      const moduleId = c.req.param("moduleId");
       const id = c.req.param("id");
       const data = c.req.valid("json");
 
       const [lesson] = await db
         .select()
         .from(courseLessons)
-        .where(eq(courseLessons.id, id));
+        .where(and(eq(courseLessons.id, id), eq(courseLessons.moduleId, moduleId)));
       if (!lesson) return c.json({ error: "Not found" }, 404);
 
       const updates: Record<string, string | number | null> = {};
@@ -114,8 +119,11 @@ export const lessonRoutes = new Hono()
     },
   )
   .delete("/:id", authMiddleware("ADMIN"), async (c) => {
+    const moduleId = c.req.param("moduleId");
     const id = c.req.param("id");
-    await db.delete(courseLessons).where(eq(courseLessons.id, id));
+    await db
+      .delete(courseLessons)
+      .where(and(eq(courseLessons.id, id), eq(courseLessons.moduleId, moduleId)));
     return c.json({ success: true });
   });
 

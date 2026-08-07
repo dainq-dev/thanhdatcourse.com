@@ -1,0 +1,195 @@
+@mixin field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+@mixin label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@mixin input {
+  padding: 0.45rem 0.6rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-md);
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus { border-color: var(--admin-accent); }
+  &::placeholder { color: var(--admin-text-disabled); }
+}
+
+@mixin select {
+  padding: 0.45rem 0.6rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-md);
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+
+  &:focus { border-color: var(--admin-accent); }
+}
+
+@mixin textarea {
+  padding: 0.45rem 0.6rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-md);
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus { border-color: var(--admin-accent); }
+  &::placeholder { color: var(--admin-text-disabled); }
+}
+
+@mixin toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--admin-text);
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    accent-color: var(--admin-accent);
+    width: 15px;
+    height: 15px;
+  }
+}
+
+@mixin toggleSwitch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .switchTrack {
+    width: 36px;
+    height: 20px;
+    background: var(--admin-border-heavy);
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.15s ease;
+  }
+
+  input:checked + .switchTrack {
+    background: var(--admin-accent);
+  }
+
+  .switchThumb {
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.15s ease;
+  }
+
+  input:checked + .switchTrack .switchThumb {
+    transform: translateX(16px);
+  }
+}
+
+@mixin listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-md);
+  margin-bottom: 0.4rem;
+}
+
+@mixin listItemContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+@mixin btnSmall {
+  padding: 0.3rem 0.6rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--admin-border-heavy);
+    color: var(--admin-text);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@mixin btnDangerSmall {
+  @include btnSmall;
+  color: var(--admin-danger);
+
+  &:hover {
+    background: var(--admin-danger-bg);
+    border-color: var(--admin-danger-border);
+  }
+}
+
+@mixin btnAccentSmall {
+  padding: 0.3rem 0.7rem;
+  background: var(--admin-accent);
+  color: var(--admin-accent-text);
+  border: none;
+  border-radius: var(--admin-radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+
+  &:hover { background: var(--admin-accent-hover); }
+  &:active { transform: scale(0.98); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+@mixin helperText {
+  font-size: 0.65rem;
+  color: var(--admin-text-secondary);
+  margin-top: 0.1rem;
+}

@@ -22,6 +22,12 @@ function serveFile(c: Context, diskPath: string, mimeType: string) {
   return c.body(buf);
 }
 
+const ALLOWED_FORMATS = new Set(["webp", "jpeg", "avif", "png"]);
+const MIN_WIDTH = 16;
+const MAX_WIDTH = 3840;
+const MIN_QUALITY = 10;
+const MAX_QUALITY = 100;
+
 export const imageRoutes = new Hono()
   .get("/:id", async (c) => {
     const id = c.req.param("id");
@@ -31,7 +37,17 @@ export const imageRoutes = new Hono()
 
     // Check if requested width for dynamic resize
     if (w) {
-      return serveDynamicResize(c, id, parseInt(w, 10), format, quality);
+      const width = parseInt(w, 10);
+      if (Number.isNaN(width) || width < MIN_WIDTH || width > MAX_WIDTH) {
+        return c.json({ error: `Width must be between ${MIN_WIDTH} and ${MAX_WIDTH}` }, 400);
+      }
+      if (!ALLOWED_FORMATS.has(format)) {
+        return c.json({ error: `Unsupported format: ${format}` }, 400);
+      }
+      if (Number.isNaN(quality) || quality < MIN_QUALITY || quality > MAX_QUALITY) {
+        return c.json({ error: `Quality must be between ${MIN_QUALITY} and ${MAX_QUALITY}` }, 400);
+      }
+      return serveDynamicResize(c, id, width, format, quality);
     }
 
     // Serve medium variant by default
