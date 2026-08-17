@@ -9,6 +9,7 @@
 
 .container {
   @include container;
+  margin: 80px auto 0;
 }
 
 /* Bento grid — dashboard-style tiles */
@@ -72,6 +73,7 @@
 .tileWide {
   grid-column: span 4;
   grid-row: span 1;
+  margin-bottom: 40px;
 }
 
 .tileImg {
