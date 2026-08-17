@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { getPresetsEngine, type PresetsTemplateId } from "@/lib/layout-engine";
 import { api } from "@/lib/api";
 import { getSiteSettings } from "@/lib/settings";
-import { PresetsDefault } from "./_templates/presets-default";
-import { PresetsFeatured } from "./_templates/presets-featured";
+import { getConcept } from "@/concepts";
 
 export const metadata: Metadata = {
   title: "Presets & LUTs",
@@ -34,20 +32,14 @@ async function fetchProducts(): Promise<Product[]> {
   }
 }
 
-const PRESETS_TEMPLATES = {
-  default: PresetsDefault,
-  featured: PresetsFeatured,
-} as const;
-
 export default async function PresetsPage() {
   const [products, settings] = await Promise.all([
     fetchProducts(),
     getSiteSettings(),
   ]);
 
-  const templateId = (settings.presets_template || "default") as PresetsTemplateId;
-  const Template = PRESETS_TEMPLATES[templateId] ?? PresetsDefault;
-  const engine = getPresetsEngine(settings);
+  const { module } = getConcept(settings.site_concept);
+  const ProductsView = module.Products;
 
-  return <Template settings={settings} products={products} engine={engine} />;
+  return <ProductsView settings={settings} products={products} />;
 }

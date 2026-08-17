@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { getCoursesEngine, type CoursesTemplateId } from "@/lib/layout-engine";
 import { api } from "@/lib/api";
 import { getSiteSettings } from "@/lib/settings";
-import { CoursesDefault } from "./_templates/courses-default";
-import { CoursesMinimal } from "./_templates/courses-minimal";
-import { CoursesFull } from "./_templates/courses-full";
+import { getConcept } from "@/concepts";
 
 interface Course {
   id: string;
@@ -52,12 +49,6 @@ export const metadata: Metadata = {
     "Danh sách khóa học quay dựng, chỉnh màu chuyên nghiệp từ Minh Travel.",
 };
 
-const COURSES_TEMPLATES = {
-  default: CoursesDefault,
-  minimal: CoursesMinimal,
-  full: CoursesFull,
-} as const;
-
 export default async function CoursesPage() {
   const [courses, faqs, settings] = await Promise.all([
     getCourses(),
@@ -65,9 +56,8 @@ export default async function CoursesPage() {
     getSiteSettings(),
   ]);
 
-  const templateId = (settings.courses_template || "default") as CoursesTemplateId;
-  const Template = COURSES_TEMPLATES[templateId] ?? CoursesDefault;
-  const engine = getCoursesEngine(settings);
+  const { module } = getConcept(settings.site_concept);
+  const CourseListView = module.CourseList;
 
-  return <Template settings={settings} courses={courses} faqs={faqs} engine={engine} />;
+  return <CourseListView settings={settings} courses={courses} faqs={faqs} />;
 }

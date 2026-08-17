@@ -6,7 +6,8 @@
     "dev": "bun run --hot src/index.ts",
     "start": "bun run src/index.ts",
     "test": "bun test",
-    "truncate": "bun run src/db/truncate.ts"
+    "truncate": "bun run src/db/truncate.ts",
+    "resync": "bun run src/db/resync.ts"
   },
   "dependencies": {
     "@workspace/types": "workspace:*",

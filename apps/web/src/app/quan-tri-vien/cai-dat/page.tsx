@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MediaTrigger } from "@/components/admin/media-manager/media-trigger";
-import { LayoutWizard } from "@/components/admin/layout-wizard/LayoutWizard";
-import { PAGE_CONFIGS } from "@/lib/layout-engine";
 import { api } from "@/lib/api";
+import { CONCEPT_META, type ConceptId } from "@/concepts/meta";
 import {
   ALL_FIELDS,
   type FieldDef,
@@ -70,14 +69,7 @@ export default function SettingsPage() {
   const [previewPath, setPreviewPath] = useState("/");
   const [previewKey, setPreviewKey] = useState(0);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
-    const s = new Set<string>();
-    s.add("homepage");
-    return s;
-  });
-  const [expandedSubs, setExpandedSubs] = useState<Set<string>>(
-    () => new Set(["home-hero"]),
-  );
+  const [activeSection, setActiveSection] = useState("homepage");
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -144,34 +136,10 @@ export default function SettingsPage() {
   };
 
   const toggleSection = (id: string) => {
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else {
-        next.add(id);
-        const section = SECTIONS.find((s) => s.id === id);
-        if (section) setPreviewPath(section.previewPath);
-      }
-      return next;
-    });
+    setActiveSection(id);
+    const section = SECTIONS.find((s) => s.id === id);
+    if (section) setPreviewPath(section.previewPath);
   };
-
-  const toggleSub = (id: string) => {
-    setExpandedSubs((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const reloadPreview = () => {
-    setPreviewLoading(true);
-    setPreviewKey((k) => k + 1);
-  };
-
-  const subChangedCount = (fields: FieldDef[]) =>
-    fields.filter((f) => formData[f.key] !== settings[f.key]).length;
 
   const sectionChangedCount = (section: Section) => {
     let count = section.fields.filter(
@@ -187,6 +155,11 @@ export default function SettingsPage() {
     return count;
   };
 
+  const reloadPreview = () => {
+    setPreviewLoading(true);
+    setPreviewKey((k) => k + 1);
+  };
+
   const isSearching = search.trim().length > 0;
   const searchResults = isSearching
     ? ALL_FIELDS.filter(
@@ -200,6 +173,25 @@ export default function SettingsPage() {
 
   return (
     <div className={styles.page}>
+      <nav className={styles.topTabs}>
+        {SECTIONS.map((section) => {
+          const dirty = sectionChangedCount(section);
+          return (
+            <button
+              key={section.id}
+              type="button"
+              className={`${styles.topTab} ${
+                activeSection === section.id ? styles.topTabActive : ""
+              }`}
+              onClick={() => toggleSection(section.id)}
+            >
+              <span className={styles.topTabLabel}>{section.title}</span>
+              {dirty > 0 && <span className={styles.topTabBadge}>{dirty}</span>}
+            </button>
+          );
+        })}
+      </nav>
+
       <div className={styles.editor}>
         <div className={styles.editorHeader}>
           <div>
@@ -248,170 +240,131 @@ export default function SettingsPage() {
 
         {!isSearching && (
           <div className={styles.fieldsScroll}>
-            {SECTIONS.map((section) => {
-              const isOpen = expandedSections.has(section.id);
-              const dirty = sectionChangedCount(section);
+            {SECTIONS.filter((s) => s.id === activeSection).map((section) => {
+              const selectConcept = async (id: ConceptId) => {
+                setSaving(true);
+                setSuccess("");
+                setSaveError("");
+                try {
+                  await api.put("/api/settings/batch", { site_concept: id });
+                  setSettings((prev) => ({ ...prev, site_concept: id }));
+                  setFormData((prev) => ({ ...prev, site_concept: id }));
+                  writePreviewCookie({});
+                  setPreviewLoading(true);
+                  setPreviewKey((k) => k + 1);
+                  setSuccess(`Đã áp dụng concept ${CONCEPT_META[id].label}`);
+                  setTimeout(() => setSuccess(""), 3000);
+                } catch {
+                  setSaveError("Lỗi khi lưu — thử lại");
+                } finally {
+                  setSaving(false);
+                }
+              };
 
               return (
-                <div key={section.id} className={styles.section}>
-                  <button
-                    className={styles.sectionHeader}
-                    onClick={() => toggleSection(section.id)}
-                    type="button"
-                  >
-                    <div className={styles.sectionHeaderLeft}>
-                      <span
-                        className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}
-                      >
-                        ▸
-                      </span>
-                      <div>
-                        <span className={styles.sectionTitle}>
-                          {section.title}
-                        </span>
-                        <span className={styles.sectionHint}>
-                          {section.description}
-                        </span>
-                      </div>
-                    </div>
-                    <div className={styles.sectionHeaderRight}>
-                      {dirty > 0 && (
-                        <span className={styles.sectionDirty}>{dirty}</span>
-                      )}
-                    </div>
-                  </button>
+                <div key={section.id} className={styles.sectionContent}>
+                  <div className={styles.sectionHead}>
+                    <h2 className={styles.sectionHeading}>{section.title}</h2>
+                    <p className={styles.sectionHint}>{section.description}</p>
+                  </div>
 
-                  {isOpen && (
-                    <div className={styles.sectionBody}>
-                      {section.id === "design" ? (
-                        <LayoutWizard
-                          settings={formData}
-                          onChange={(key, value) => handleChange(key, value)}
-                          onSave={async () => {
-                            const allPageIds = Object.keys(PAGE_CONFIGS) as Array<keyof typeof PAGE_CONFIGS>;
-                            const designKeys: string[] = [];
-                            for (const pid of allPageIds) {
-                              const pc = PAGE_CONFIGS[pid];
-                              designKeys.push(pc.templateKey, ...Object.values(pc.engineKeys));
-                            }
-                            const batch: Record<string, string> = {};
-                            for (const key of designKeys) {
-                              if (formData[key] !== undefined && formData[key] !== (settings[key] ?? "")) {
-                                batch[key] = formData[key];
-                              }
-                            }
-                            if (Object.keys(batch).length === 0) {
-                              setSuccess("Không có thay đổi nào");
-                              setTimeout(() => setSuccess(""), 3000);
-                              return;
-                            }
-                            setSaving(true);
-                            setSuccess("");
-                            setSaveError("");
-                            try {
-                              await api.put("/api/settings/batch", batch);
-                              setSettings((prev) => ({ ...prev, ...batch }));
-                              writePreviewCookie({});
-                              setPreviewLoading(true);
-                              setPreviewKey((k) => k + 1);
-                              setSuccess(`Đã lưu ${Object.keys(batch).length} thay đổi giao diện`);
-                              setTimeout(() => setSuccess(""), 3000);
-                            } catch {
-                              setSaveError("Lỗi khi lưu — thử lại");
-                            } finally {
-                              setSaving(false);
-                            }
-                          }}
-                          onPreviewReload={(path: string) => {
-                            setPreviewPath(path);
-                            setTimeout(() => {
-                              setPreviewLoading(true);
-                              setPreviewKey((k) => k + 1);
-                            }, 100);
-                          }}
-                        />
-                      ) : (
-                        <>
-                          {section.fields.length > 0 && (
-                            <div className={styles.fieldGroup}>
-                              {section.fields.map((field) => (
-                                <FieldRow
-                                  key={field.key}
-                                  field={field}
-                                  value={formData[field.key] ?? ""}
-                                  onChange={handleChange}
-                                  isDirty={
-                                    formData[field.key] !== settings[field.key]
-                                  }
-                                />
-                              ))}
+                  {section.id === "design" ? (
+                    <div className={styles.conceptGrid}>
+                      {(Object.keys(CONCEPT_META) as ConceptId[]).map((id) => {
+                        const meta = CONCEPT_META[id];
+                        const active =
+                          (settings.site_concept ?? "cinematic") === id;
+                        return (
+                          <div
+                            key={id}
+                            className={`${styles.conceptCard} ${
+                              active ? styles.conceptCardActive : ""
+                            }`}
+                          >
+                            <div className={styles.conceptCardHead}>
+                              <span className={styles.conceptCardTitle}>
+                                {meta.label}
+                              </span>
+                              {active && (
+                                <span className={styles.conceptBadge}>
+                                  Đang dùng
+                                </span>
+                              )}
                             </div>
-                          )}
-
-                          {section.subSections?.map((sub) => {
-                            const subOpen = expandedSubs.has(sub.id);
-                            const subDirty = subChangedCount(sub.fields);
-
-                            return (
-                              <div key={sub.id} className={styles.subSection}>
-                                <button
-                                  className={styles.subSectionHeader}
-                                  onClick={() => toggleSub(sub.id)}
-                                  type="button"
-                                >
-                                  <div className={styles.subSectionHeaderLeft}>
-                                    <span
-                                      className={`${styles.subChevron} ${subOpen ? styles.subChevronOpen : ""}`}
-                                    >
-                                      ▸
-                                    </span>
-                                    <span className={styles.subSectionTitle}>
-                                      {sub.title}
-                                    </span>
-                                  </div>
-                                  <div className={styles.subSectionHeaderRight}>
-                                    <span className={styles.subSectionHint}>
-                                      {sub.hint}
-                                    </span>
-                                    {subDirty > 0 && (
-                                      <span className={styles.sectionDirty}>
-                                        {subDirty}
-                                      </span>
-                                    )}
-                                  </div>
-                                </button>
-                                {subOpen && (
-                                  <div className={styles.subBody}>
-                                    <div className={styles.fieldGroup}>
-                                      {sub.fields
-                                        .filter((f) => {
-                                          if (!f.showWhen) return true;
-                                          return (
-                                            formData[f.showWhen.key] ===
-                                            f.showWhen.value
-                                          );
-                                        })
-                                        .map((field) => (
-                                          <FieldRow
-                                            key={field.key}
-                                            field={field}
-                                            value={formData[field.key] ?? ""}
-                                            onChange={handleChange}
-                                            isDirty={
-                                              formData[field.key] !==
-                                              settings[field.key]
-                                            }
-                                          />
-                                        ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </>
-                      )}
+                            <p className={styles.conceptCardDesc}>
+                              {meta.description}
+                            </p>
+                            <button
+                              type="button"
+                              className={styles.conceptApplyBtn}
+                              disabled={saving || active}
+                              onClick={() => selectConcept(id)}
+                            >
+                              {active
+                                ? "Đang áp dụng"
+                                : saving
+                                  ? "Đang lưu..."
+                                  : "Áp dụng"}
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
+                  ) : (
+                    <>
+                      {section.fields.length > 0 && (
+                        <div className={styles.fieldGroup}>
+                          {section.fields.map((field) => (
+                            <FieldRow
+                              key={field.key}
+                              field={field}
+                              value={formData[field.key] ?? ""}
+                              onChange={handleChange}
+                              isDirty={
+                                formData[field.key] !== settings[field.key]
+                              }
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {section.subSections?.map((sub) => (
+                        <div key={sub.id} className={styles.subCard}>
+                          <div className={styles.subCardHead}>
+                            <span className={styles.subCardTitle}>
+                              {sub.title}
+                            </span>
+                            <span className={styles.subCardHint}>
+                              {sub.hint}
+                            </span>
+                          </div>
+                          <div className={styles.subCardBody}>
+                            <div className={styles.fieldGroup}>
+                              {sub.fields
+                                .filter((f) => {
+                                  if (!f.showWhen) return true;
+                                  return (
+                                    formData[f.showWhen.key] ===
+                                    f.showWhen.value
+                                  );
+                                })
+                                .map((field) => (
+                                  <FieldRow
+                                    key={field.key}
+                                    field={field}
+                                    value={formData[field.key] ?? ""}
+                                    onChange={handleChange}
+                                    isDirty={
+                                      formData[field.key] !==
+                                      settings[field.key]
+                                    }
+                                  />
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
                   )}
                 </div>
               );

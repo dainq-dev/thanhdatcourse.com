@@ -1,0 +1,361 @@
+@use '../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+$gl-bg: #0b0b0b;
+$gl-ink: #f5f5f5;
+$gl-muted: #9a9a9a;
+
+.root {
+  background: $gl-bg;
+  color: $gl-ink;
+  min-height: 100vh;
+}
+
+.container {
+  @include container;
+  max-width: 1400px;
+}
+
+/* Masonry → grid responsive (ảnh 16:9 đều, grid điền trái→phải) */
+.masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: $space-6;
+}
+
+.masonryItem {
+  min-width: 0;
+}
+
+.card {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: $gl-ink;
+  background: #141414;
+}
+
+.cardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform $duration-slow $ease-out-expo;
+}
+
+.card:hover .cardImg {
+  transform: scale(1.04);
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 30%,
+    rgba(0, 0, 0, 0.55) 75%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  transition: opacity $duration-normal;
+}
+
+.cardBody {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: $space-4;
+  transform: translateY(0);
+  transition: transform $duration-normal;
+}
+
+.card:hover .cardBody {
+  transform: translateY(-2px);
+}
+
+.cardTitle {
+  font-size: var(--fs-h3);
+  font-weight: $fw-bold;
+  letter-spacing: -0.02em;
+  margin: 0 0 $space-1;
+}
+
+.cardMeta {
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cardPrice {
+  display: inline-block;
+  margin-top: $space-2;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: $clr-primary;
+  letter-spacing: -0.01em;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 0, 90, 0.4);
+  border-radius: 999px;
+  padding: 0.2rem 0.85rem;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  padding: clamp(5rem, 10vw, 8rem) 0 clamp(3rem, 6vw, 5rem);
+  text-align: center;
+  overflow: hidden;
+}
+
+.heroVideo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+.heroInner {
+  @include container;
+  max-width: 56rem;
+  position: relative;
+  z-index: 2;
+}
+
+.heroTitle {
+  font-size: clamp(2.25rem, 6vw, 4.25rem);
+  font-weight: $fw-extrabold;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  margin: 0 0 $space-4;
+}
+
+.heroSubtitle {
+  font-size: var(--fs-lg);
+  color: $gl-muted;
+  margin: 0;
+}
+
+.heroLogo {
+  height: 44px;
+  width: auto;
+  margin-bottom: $space-4;
+}
+
+.heroEyebrow {
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: $clr-primary;
+  display: block;
+  margin-bottom: $space-4;
+}
+
+.brandRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+  justify-content: center;
+  margin-top: $space-8;
+}
+
+.brandItem {
+  font-size: var(--fs-xs);
+  color: $gl-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.section {
+  padding: $space-8 0 $space-16;
+}
+
+.sectionTitle {
+  font-size: var(--fs-h2);
+  font-weight: $fw-extrabold;
+  letter-spacing: -0.02em;
+  margin: 0 0 $space-8;
+  text-align: center;
+}
+
+/* Featured full-bleed */
+.featuredFull {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: $gl-ink;
+  margin-bottom: $space-4;
+}
+
+.featuredImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.featuredOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.featuredBody {
+  position: absolute;
+  left: $space-6;
+  right: $space-6;
+  bottom: $space-6;
+}
+
+.featuredTag {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: $clr-primary;
+  display: block;
+  margin-bottom: $space-2;
+}
+
+.featuredTitle {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: $fw-extrabold;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Article */
+.article {
+  @include container;
+  max-width: 46rem;
+  padding: clamp(4rem, 8vw, 6rem) 0;
+}
+
+.articleMeta {
+  font-size: var(--fs-sm);
+  color: $gl-muted;
+  margin-bottom: $space-6;
+}
+
+.articleTitle {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: $fw-extrabold;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 $space-8;
+}
+
+.articleBody {
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: #d5d5d5;
+
+  h2 {
+    font-size: var(--fs-h3);
+    font-weight: $fw-bold;
+    color: $gl-ink;
+    margin: $space-8 0 $space-4;
+  }
+
+  p {
+    margin-bottom: $space-4;
+  }
+}
+
+.relatedSection {
+  @include container;
+  max-width: 46rem;
+  padding-bottom: $space-16;
+}
+
+.relatedTitle {
+  font-size: var(--fs-h3);
+  font-weight: $fw-bold;
+  margin: 0 0 $space-6;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-4;
+}
+
+.relatedCard {
+  position: relative;
+  border-radius: $radius-md;
+  overflow: hidden;
+  text-decoration: none;
+  color: $gl-ink;
+  background: #141414;
+  display: block;
+}
+
+.relatedThumb {
+  aspect-ratio: 16 / 9;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.relatedBody {
+  padding: $space-4;
+}
+
+.relatedCardTitle {
+  font-size: var(--fs-sm);
+  font-weight: $fw-semibold;
+  margin: 0 0 $space-1;
+  @include line-clamp(2);
+}
+
+.relatedMeta {
+  font-size: var(--fs-xs);
+  color: $gl-muted;
+}
+
+.actionsRow {
+  display: flex;
+  gap: $space-4;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: $space-8;
+}
+
+.btnPrimary {
+  @include btn-cta-sm;
+}
+
+.btnSecondary {
+  @include btn-outline;
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
+.videoFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.empty {
+  color: $gl-muted;
+  text-align: center;
+  padding: $space-12 0;
+}

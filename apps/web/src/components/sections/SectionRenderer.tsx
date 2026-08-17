@@ -24,31 +24,47 @@ export function SectionRenderer({
   sections: Pick<
     {
       id: string;
-      section_type: string;
+      section_type?: string;
+      sectionType?: string;
       config: unknown;
       sort_order?: number;
+      sortOrder?: number;
       is_published?: boolean | number;
+      isPublished?: boolean | number;
     },
-    "id" | "section_type" | "config" | "sort_order" | "is_published"
+    | "id"
+    | "section_type"
+    | "sectionType"
+    | "config"
+    | "sort_order"
+    | "sortOrder"
+    | "is_published"
+    | "isPublished"
   >[];
   entityMeta?: Record<string, unknown>;
 }) {
   const published = useMemo(() => {
-    const p = sections.filter(
-      (s) => s.is_published !== false && s.is_published !== 0,
-    );
-    p.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    const p = sections.filter((s) => {
+      const pub = s.is_published ?? s.isPublished;
+      return pub !== false && pub !== 0;
+    });
+    p.sort((a, b) => {
+      const ao = a.sort_order ?? a.sortOrder ?? 0;
+      const bo = b.sort_order ?? b.sortOrder ?? 0;
+      return ao - bo;
+    });
     return p;
   }, [sections]);
 
   return (
     <>
       {published.map((s) => {
-        const Comp = SECTION_RENDER_MAP[s.section_type];
+        const type = s.section_type ?? s.sectionType;
+        const Comp = type ? SECTION_RENDER_MAP[type] : undefined;
         if (!Comp) {
           if (process.env.NODE_ENV === "development") {
             console.warn(
-              `[SectionRenderer] Unknown section type: ${s.section_type}`,
+              `[SectionRenderer] Unknown section type: ${String(type)}`,
             );
           }
           return null;

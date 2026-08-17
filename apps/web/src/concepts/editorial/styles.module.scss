@@ -1,0 +1,482 @@
+@use '../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+$ed-bg: #0a0a0c;
+$ed-ink: #f2efe9;
+$ed-muted: #9a958c;
+$ed-border: rgba(255, 255, 255, 0.1);
+
+.root {
+  background: $ed-bg;
+  color: $ed-ink;
+  min-height: 100vh;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.container {
+  @include container;
+}
+
+/* Hero editorial */
+.hero {
+  position: relative;
+  padding: clamp(6rem, 14vw, 11rem) 0 clamp(4rem, 8vw, 6rem);
+  border-bottom: 1px solid $ed-border;
+  overflow: hidden;
+}
+
+.heroVideo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.35;
+  filter: saturate(0.6);
+}
+
+.heroInner {
+  @include container;
+  max-width: 60rem;
+  position: relative;
+  z-index: 2;
+}
+
+.eyebrow {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: $clr-primary;
+  margin-bottom: $space-6;
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 $space-8;
+  color: $ed-ink;
+}
+
+.heroLead {
+  font-size: clamp(1.125rem, 2vw, 1.4rem);
+  line-height: 1.7;
+  color: $ed-muted;
+  max-width: 42rem;
+  margin: 0 0 $space-10;
+  font-style: italic;
+}
+
+.heroActions {
+  display: flex;
+  gap: $space-4;
+  flex-wrap: wrap;
+}
+
+.brandRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-top: $space-8;
+}
+
+.brandItem {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.75rem;
+  color: $ed-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.linkPrimary {
+  font-family: 'Manrope', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  background: $clr-primary;
+  color: #fff;
+  border-radius: $radius-sm;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+
+  &:hover {
+    background: $clr-primary-dark;
+  }
+}
+
+.linkSecondary {
+  font-family: 'Manrope', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  border: 1px solid $ed-ink;
+  color: $ed-ink;
+  border-radius: $radius-sm;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background: $ed-ink;
+    color: $ed-bg;
+  }
+}
+
+.section {
+  padding: clamp(4rem, 8vw, 6rem) 0;
+  border-bottom: 1px solid $ed-border;
+}
+
+.sectionHead {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: $space-8;
+  margin-bottom: $space-12;
+  align-items: baseline;
+
+  @include respond-to($bp-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sectionIndex {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.2em;
+  color: $ed-muted;
+  text-transform: uppercase;
+}
+
+.sectionTitle {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  color: $ed-ink;
+}
+
+/* Featured feature block */
+.featureGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-12;
+  align-items: center;
+
+  @include respond-to($bp-sm) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.featureImg {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  filter: saturate(0.85);
+}
+
+.featureTitle {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0 0 $space-4;
+  color: $ed-ink;
+}
+
+.featureDesc {
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: $ed-muted;
+  margin: 0 0 $space-6;
+}
+
+.featureMeta {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: $clr-primary;
+}
+
+/* List of items */
+.listRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: $space-6;
+  align-items: baseline;
+  padding: $space-6 0;
+  border-top: 1px solid $ed-border;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover .listTitle {
+    color: $clr-primary;
+  }
+}
+
+.listTitle {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin: 0 0 $space-2;
+  color: $ed-ink;
+  transition: color $duration-fast;
+}
+
+.listDesc {
+  font-size: var(--fs-sm);
+  color: $ed-muted;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 40rem;
+}
+
+.listMeta {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.8125rem;
+  color: $ed-muted;
+  white-space: nowrap;
+}
+
+/* Pull quote */
+.pullQuote {
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  font-style: italic;
+  line-height: 1.4;
+  color: $ed-ink;
+  max-width: 44rem;
+  margin: 0;
+}
+
+.pullQuoteAuthor {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $ed-muted;
+  margin-top: $space-4;
+  font-style: normal;
+}
+
+/* Counters strip */
+.counterStrip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-8;
+
+  @include respond-to($bp-md) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.counterValue {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: $ed-ink;
+  display: block;
+}
+
+.counterLabel {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.8125rem;
+  color: $ed-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Products grid */
+.grid3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-10;
+
+  @include respond-to($bp-md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cardCell {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+
+  &:hover .cardTitle {
+    color: $clr-primary;
+  }
+}
+
+.cardImg {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  margin-bottom: $space-4;
+}
+
+.cardTag {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: $clr-primary;
+  display: block;
+  margin-bottom: $space-2;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin: 0 0 $space-2;
+  color: $ed-ink;
+  transition: color $duration-fast;
+}
+
+.cardDesc {
+  font-size: var(--fs-sm);
+  color: $ed-muted;
+  line-height: 1.6;
+  margin: 0 0 $space-3;
+  @include line-clamp(3);
+}
+
+.cardPrice {
+  font-family: 'Manrope', sans-serif;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: $ed-ink;
+}
+
+/* Article */
+.article {
+  @include container;
+  max-width: 46rem;
+  padding: clamp(4rem, 8vw, 6rem) 0;
+}
+
+.articleMeta {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $ed-muted;
+  margin-bottom: $space-6;
+}
+
+.articleTitle {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 $space-10;
+  color: $ed-ink;
+}
+
+.articleBody {
+  font-size: 1.0625rem;
+  line-height: 1.9;
+  color: #c8c4bd;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: $ed-ink;
+    margin: $space-10 0 $space-4;
+  }
+
+  p {
+    margin-bottom: $space-4;
+  }
+}
+
+.relatedSection {
+  @include container;
+  max-width: 46rem;
+  padding-bottom: $space-16;
+}
+
+.relatedTitle {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0 0 $space-6;
+  color: $ed-ink;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-8;
+}
+
+.relatedCard {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  padding-top: $space-4;
+  border-top: 1px solid $ed-border;
+
+  &:hover .relatedCardTitle {
+    color: $clr-primary;
+  }
+}
+
+.relatedThumb {
+  aspect-ratio: 16 / 9;
+  background: #1a1a20;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  margin-bottom: $space-3;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.relatedCardTitle {
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0 0 $space-1;
+  color: $ed-ink;
+  transition: color $duration-fast;
+  @include line-clamp(2);
+}
+
+.relatedMeta {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.75rem;
+  color: $ed-muted;
+}
+
+.empty {
+  color: $ed-muted;
+  text-align: center;
+  padding: $space-12 0;
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.videoFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Site header/footer override note: header sits above; editorial uses light bg.
+   Keep accent visible on light. */

@@ -1,10 +1,8 @@
-import type { Block } from "@workspace/types";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BlockRenderer } from "@/components/blocks/BlockRenderer";
 import { api } from "@/lib/api";
-import styles from "./page.module.scss";
+import { getSiteSettings } from "@/lib/settings";
+import { getConcept } from "@/concepts";
 
 interface Post {
   id: string;
@@ -76,79 +74,16 @@ export default async function BlogDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [post, allPosts] = await Promise.all([
+  const [post, allPosts, settings] = await Promise.all([
     getPost(slug),
     getPublishedPosts(),
+    getSiteSettings(),
   ]);
   if (!post) notFound();
   const relatedArticles = allPosts.filter((p) => p.slug !== slug).slice(0, 4);
 
-  const publishedDate = post.publishedAt
-    ? new Date(post.publishedAt).toLocaleDateString("vi-VN")
-    : null;
+  const { module } = getConcept(settings.site_concept);
+  const BlogDetailView = module.BlogDetail;
 
-  let blocks: Block[] | null = null;
-  if (post.contentBlocks) {
-    try {
-      blocks = JSON.parse(post.contentBlocks);
-    } catch {
-      blocks = null;
-    }
-  }
-
-  return (
-    <>
-      <article className={styles.articleMain}>
-        <div className={styles.articleMeta}>
-          {publishedDate && <time>{publishedDate}</time>}
-          <span>{post.readTime} phút đọc</span>
-        </div>
-
-        <h1 className={styles.articleTitle}>{post.title}</h1>
-
-        {blocks && blocks.length > 0 ? (
-          <div className={styles.articleContent}>
-            <BlockRenderer blocks={blocks} />
-          </div>
-        ) : post.excerpt ? (
-          <div
-            className={styles.articleContent}
-            dangerouslySetInnerHTML={{ __html: post.excerpt }}
-          />
-        ) : (
-          <div className={styles.articleContent}>
-            <p>Nội dung đang được cập nhật...</p>
-          </div>
-        )}
-
-        <hr className={styles.divider} />
-      </article>
-
-      {relatedArticles.length > 0 && (
-        <section className={styles.relatedSection}>
-          <h3 className={styles.relatedTitle}>Bài viết liên quan</h3>
-          <div className={styles.relatedGrid}>
-            {relatedArticles.map((related) => (
-              <Link
-                key={related.id}
-                href={`/bai-viet/${related.slug}`}
-                className={styles.relatedCard}
-              >
-                <div className={styles.relatedThumb}>
-                  <img
-                    src={related.thumbnailUrl || "/placeholder-post.jpg"}
-                    alt=""
-                  />
-                </div>
-                <h4 className={styles.relatedCardTitle}>{related.title}</h4>
-                <span className={styles.relatedMeta}>
-                  {related.readTime} phút đọc
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-    </>
-  );
+  return <BlogDetailView post={post} relatedArticles={relatedArticles} />;
 }

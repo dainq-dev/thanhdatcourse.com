@@ -1,0 +1,358 @@
+@use '../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.root {
+  background: #08080a;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.container {
+  @include container;
+}
+
+/* Bento grid — dashboard-style tiles */
+.bentoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 140px;
+  gap: $space-4;
+
+  @include respond-to($bp-sm) {
+    grid-auto-rows: 160px;
+  }
+}
+
+.tile {
+  position: relative;
+  border-radius: $radius-lg;
+  background: #12121a;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: $space-6;
+  text-decoration: none;
+  color: #fff;
+  transition: transform $duration-normal $ease-out-expo,
+    border-color $duration-normal $ease-out-expo;
+
+  &:hover {
+    border-color: rgba(255, 0, 90, 0.4);
+    transform: translateY(-2px);
+
+    .tileArrow {
+      transform: translateX(4px);
+      color: $clr-primary;
+    }
+  }
+}
+
+.tileSm {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.tileMd {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.tileLg {
+  grid-column: span 2;
+  grid-row: span 3;
+}
+
+.tileHero {
+  grid-column: span 4;
+  grid-row: span 3;
+}
+
+.tileWide {
+  grid-column: span 4;
+  grid-row: span 1;
+}
+
+.tileImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+}
+
+.tileOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.tileContent {
+  position: relative;
+  z-index: 2;
+}
+
+.tileLabel {
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: $clr-primary;
+  margin-bottom: $space-2;
+  display: block;
+}
+
+.tileTitle {
+  font-size: var(--fs-h3);
+  font-weight: $fw-bold;
+  letter-spacing: -0.02em;
+  margin: 0 0 $space-2;
+  line-height: 1.2;
+}
+
+.tileDesc {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.6;
+  @include line-clamp(2);
+}
+
+.tileArrow {
+  display: inline-block;
+  margin-top: $space-3;
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform $duration-normal $ease-out-expo, color $duration-normal;
+}
+
+.tileActions {
+  display: flex;
+  gap: $space-3;
+  flex-wrap: wrap;
+  margin-top: $space-4;
+}
+
+.brandRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+}
+
+.brandItem {
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.tilePrice {
+  font-size: var(--fs-lg);
+  font-weight: $fw-extrabold;
+  color: $clr-primary;
+}
+
+.tileCounter {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: $fw-extrabold;
+  letter-spacing: -0.02em;
+  display: block;
+  line-height: 1;
+}
+
+.tileCounterLabel {
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Hero for list pages */
+.hero {
+  padding: clamp(5rem, 10vw, 8rem) 0 clamp(3rem, 6vw, 5rem);
+}
+
+.heroInner {
+  @include container;
+  max-width: 56rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: $fw-extrabold;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 $space-4;
+}
+
+.heroSubtitle {
+  font-size: var(--fs-lg);
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.section {
+  padding: $space-8 0 $space-16;
+}
+
+.sectionTitle {
+  font-size: var(--fs-h2);
+  font-weight: $fw-extrabold;
+  letter-spacing: -0.02em;
+  margin: 0 0 $space-8;
+}
+
+/* Article */
+.article {
+  @include container;
+  max-width: 48rem;
+  padding: clamp(4rem, 8vw, 6rem) 0;
+}
+
+.articleMeta {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: $space-6;
+}
+
+.articleTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: $fw-extrabold;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 $space-8;
+}
+
+.articleBody {
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.85);
+
+  h2 {
+    font-size: var(--fs-h3);
+    font-weight: $fw-bold;
+    margin: $space-8 0 $space-4;
+    color: #fff;
+  }
+
+  p {
+    margin-bottom: $space-4;
+  }
+}
+
+.relatedSection {
+  @include container;
+  max-width: 48rem;
+  padding-bottom: $space-16;
+}
+
+.relatedTitle {
+  font-size: var(--fs-h3);
+  font-weight: $fw-bold;
+  margin: 0 0 $space-6;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-6;
+}
+
+.relatedCard {
+  position: relative;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background: #12121a;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: $space-4;
+  text-decoration: none;
+  color: #fff;
+  transition: border-color $duration-normal;
+
+  &:hover {
+    border-color: rgba(255, 0, 90, 0.4);
+  }
+}
+
+.relatedThumb {
+  aspect-ratio: 16 / 9;
+  background: #1a1a24;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  margin-bottom: $space-3;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.relatedCardTitle {
+  font-size: var(--fs-sm);
+  font-weight: $fw-semibold;
+  margin: 0 0 $space-1;
+  @include line-clamp(2);
+}
+
+.relatedMeta {
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.empty {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: $space-12 0;
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.videoFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.actionsRow {
+  display: flex;
+  gap: $space-4;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: $space-8;
+}
+
+.btnPrimary {
+  @include btn-cta-sm;
+}
+
+.btnSecondary {
+  @include btn-outline;
+}
+
+@media (max-width: $bp-sm) {
+  .bentoGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tileHero,
+  .tileWide {
+    grid-column: span 2;
+  }
+  .tileLg {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}

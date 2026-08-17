@@ -1,12 +1,13 @@
 .banner {
   position: relative;
   width: 100%;
-  min-height: 620px;
+  min-height: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin: 60px 0;
+  margin: 0;
+  background: #0a0010;
 }
 
 .bg {
@@ -15,17 +16,19 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  filter: saturate(1.1);
 }
 
-// .overlay {
-//   position: absolute;
-//   inset: 0;
-//   background: linear-gradient(
-//     180deg,
-//     rgba(0, 0, 0, 0.55) 0%,
-//     rgba(0, 0, 0, 0.7) 100%
-//   );
-// }
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      120% 120% at 50% 0%,
+      rgba(255, 0, 90, 0.28) 0%,
+      rgba(20, 0, 10, 0.55) 45%,
+      rgba(5, 0, 5, 0.92) 100%
+    );
+}
 
 .content {
   position: relative;
@@ -34,109 +37,159 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   padding: 3rem 1.5rem;
-  max-width: 720px;
+  max-width: 820px;
 }
 
 .tag {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  color: #ff005a;
-  background: rgba(255, 0, 90, 0.12);
-  border: 1px solid rgba(255, 0, 90, 0.25);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+  background: #ff005a;
   border-radius: 999px;
-  padding: 0.2rem 0.85rem;
+  padding: 0.35rem 1.1rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
+  box-shadow: 0 0 24px rgba(255, 0, 90, 0.55);
 }
 
 .title {
-  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-size: clamp(1.75rem, 4.5vw, 3.25rem);
   font-weight: 800;
   color: #fff;
   margin: 0;
-  line-height: 1.15;
+  line-height: 1.1;
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
 }
 
-.discount {
-  font-size: 1.25rem;
-  color: #a0a0a0;
-  margin: 0;
+.discountRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
 
-  strong {
-    color: #ff005a;
-    font-size: 2rem;
-    font-weight: 800;
-  }
+.discountLabel {
+  font-size: 1rem;
+  color: #d6d6d6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.discountValue {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  color: #ff005a;
+  line-height: 1;
+  text-shadow: 0 0 32px rgba(255, 0, 90, 0.6);
 }
 
 .coupon {
-  font-size: 0.875rem;
-  color: #b0b0b0;
+  font-size: 0.9375rem;
+  color: #d6d6d6;
   margin: 0;
 
   code {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px dashed rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px dashed rgba(255, 0, 90, 0.5);
     border-radius: 6px;
-    padding: 0.25rem 0.75rem;
+    padding: 0.3rem 0.9rem;
     font-family: monospace;
-    font-size: 0.9375rem;
+    font-size: 1rem;
     color: #fff;
+    letter-spacing: 0.06em;
   }
+}
+
+.countdownLabel {
+  font-size: 0.8125rem;
+  color: #bdbdbd;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin: 1rem 0 0;
 }
 
 .countdown {
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  gap: 0.75rem;
+  align-items: stretch;
+  margin-top: 0.5rem;
 }
 
 .countdownItem {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 48px;
-  padding: 0.5rem 0.75rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  font-size: 1.125rem;
-  font-weight: 700;
+  min-width: 72px;
+  padding: 0.65rem 0.9rem;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 0, 90, 0.4);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+.countdownNumber {
+  font-size: 1.75rem;
+  font-weight: 800;
   color: #fff;
-  font-family: monospace;
+  font-family: 'SF Mono', 'Cascadia Code', monospace;
+  line-height: 1;
   letter-spacing: 0.02em;
+}
+
+.countdownUnit {
+  font-size: 0.6875rem;
+  color: #ff7ba0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 0.4rem;
+}
+
+.expired {
+  font-size: 1rem;
+  color: #bdbdbd;
+  margin: 1rem 0 0;
 }
 
 .cta {
   display: inline-flex;
   align-items: center;
-  padding: 0.75rem 2rem;
+  padding: 0.9rem 2.5rem;
   background: #ff005a;
   color: #fff;
   border-radius: 999px;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: 1.0625rem;
+  font-weight: 700;
   text-decoration: none;
-  transition: background 0.2s ease, transform 0.15s ease;
-  margin-top: 0.5rem;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  margin-top: 1.25rem;
+  box-shadow: 0 4px 24px rgba(255, 0, 90, 0.45);
 
   &:hover {
     background: #e0004e;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(255, 0, 90, 0.6);
   }
 }
 
 @media (max-width: 640px) {
   .banner {
-    min-height: 360px;
+    min-height: 420px;
+  }
+
+  .countdown {
+    gap: 0.5rem;
   }
 
   .countdownItem {
-    min-width: 36px;
-    padding: 0.35rem 0.5rem;
-    font-size: 0.9375rem;
+    min-width: 62px;
+    padding: 0.5rem 0.55rem;
+  }
+
+  .countdownNumber {
+    font-size: 1.375rem;
   }
 }
