@@ -1,0 +1,91 @@
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.slider {
+  background-color: var(--admin-surface-hover);
+  border-radius: 100px;
+  cursor: pointer;
+  position: relative;
+  display: block;
+  transition: background-color 0.2s ease;
+}
+
+.slider::after {
+  content: "";
+  position: absolute;
+  background-color: var(--admin-text-secondary);
+  border-radius: 50%;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  will-change: transform;
+}
+
+.sm .slider {
+  width: 36px;
+  height: 20px;
+}
+
+.sm .slider::after {
+  width: 16px;
+  height: 16px;
+  top: 2px;
+  left: 2px;
+}
+
+.md .slider {
+  width: 44px;
+  height: 24px;
+}
+
+.md .slider::after {
+  width: 20px;
+  height: 20px;
+  top: 2px;
+  left: 2px;
+}
+
+.lg .slider {
+  width: 52px;
+  height: 28px;
+}
+
+.lg .slider::after {
+  width: 24px;
+  height: 24px;
+  top: 2px;
+  left: 2px;
+}
+
+.switch input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch input[type="checkbox"]:checked + .slider {
+  background-color: var(--admin-accent);
+}
+
+.switch input[type="checkbox"]:checked + .slider::after {
+  background-color: var(--admin-accent-text);
+}
+
+.sm input[type="checkbox"]:checked + .slider::after {
+  transform: translateX(18px);
+}
+
+.md input[type="checkbox"]:checked + .slider::after {
+  transform: translateX(22px);
+}
+
+.lg input[type="checkbox"]:checked + .slider::after {
+  transform: translateX(26px);
+}
+
+.switch input[type="checkbox"]:disabled + .slider {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -1,6 +1,8 @@
+import { MEDIA_URL } from "./env";
+
 export function resolveMediaUrl(
   mediaId: string,
-  variant: "medium" | "thumbnail" | "full" = "medium",
+  variant: "medium" | "thumbnail" | "large" = "medium",
 ): string {
   if (!mediaId) return "";
   if (mediaId.startsWith("http")) return mediaId;
@@ -11,8 +13,7 @@ export function resolveMediaUrl(
   ) {
     return `/img/${mediaId}/${variant}`;
   }
-  const MEDIA_BASE = process.env.NEXT_PUBLIC_MEDIA_URL || "";
-  if (MEDIA_BASE) return `${MEDIA_BASE}/img/${mediaId}/${variant}`;
+  if (MEDIA_URL) return `${MEDIA_URL}/img/${mediaId}/${variant}`;
   return `/img/${mediaId}/${variant}`;
 }
 

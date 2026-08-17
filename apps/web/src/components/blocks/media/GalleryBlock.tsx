@@ -63,7 +63,7 @@ export function GalleryBlock({
                 d.lightbox
                   ? () =>
                       window.open(
-                        resolveMediaUrl(img.mediaId, "full"),
+                        resolveMediaUrl(img.mediaId, "large"),
                         "_blank",
                       )
                   : undefined

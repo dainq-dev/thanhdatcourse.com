@@ -1,8 +1,10 @@
 "use client";
 
+import "@workspace/ui/styles/admin-global.scss";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 import styles from "./layout.module.scss";
 
 interface User {
@@ -18,16 +20,11 @@ const SIDEBAR_ITEMS = [
   { label: "Quản lý khóa học", href: "/quan-tri-vien/khoa-hoc" },
   { label: "Quản lý bài viết", href: "/quan-tri-vien/bai-viet" },
   { label: "Dự án thực hiện", href: "/quan-tri-vien/du-an" },
-  { label: "Sản phẩm số", href: "/quan-tri-vien/san-pham" },
-  { label: "Câu hỏi thường gặp", href: "/quan-tri-vien/faq" },
-  { label: "Đánh giá học viên", href: "/quan-tri-vien/danh-gia" },
   { label: "Khách hàng tiềm năng", href: "/quan-tri-vien/khach-hang" },
   { label: "Chương trình khuyến mãi", href: "/quan-tri-vien/khuyen-mai" },
   { label: "Thư viện ảnh & video", href: "/quan-tri-vien/media" },
   { label: "Presets & LUTs", href: "/quan-tri-vien/presets-luts" },
 ];
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function AdminLayout({
   children,
@@ -49,10 +46,8 @@ export default function AdminLayout({
       return;
     }
 
-    fetch(`${API_URL}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
+    api
+      .get<User>("/api/auth/me")
       .then((data) => {
         if (data.role !== "ADMIN") {
           localStorage.removeItem("token");

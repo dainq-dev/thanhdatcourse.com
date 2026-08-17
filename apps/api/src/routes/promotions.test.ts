@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { promotions, users } from "../db/schema";
-import app from "../index";
+import { app } from "../index";
 
 describe("Promotions Routes", () => {
   let adminToken: string;
@@ -165,5 +165,57 @@ describe("Promotions Routes", () => {
     });
     expect(res.status).toBe(200);
     expect((await res.json()).success).toBe(true);
+  });
+
+  describe("PATCH /:id/toggle", () => {
+    let toggleId: string;
+
+    beforeAll(async () => {
+      const res = await app.request("/api/promotions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          campaign_name: "Toggle Test",
+          discount_percentage: 10,
+          course_ids: [courseId],
+          is_active: true,
+        }),
+      });
+      toggleId = (await res.json()).id;
+    });
+
+    afterAll(async () => {
+      if (toggleId)
+        await db.delete(promotions).where(eq(promotions.id, toggleId));
+    });
+
+    test("toggle requires is_active boolean", async () => {
+      const res = await app.request(`/api/promotions/${toggleId}/toggle`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({}),
+      });
+      expect(res.status).toBe(400);
+    });
+
+    test("toggle deactivates promotion", async () => {
+      const res = await app.request(`/api/promotions/${toggleId}/toggle`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({ is_active: false }),
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.isActive).toBe(0);
+    });
   });
 });

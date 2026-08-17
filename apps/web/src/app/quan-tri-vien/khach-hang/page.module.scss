@@ -1,0 +1,512 @@
+.title {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+  color: var(--admin-text);
+  margin: 0 0 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.toolbarRight {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.searchBarWrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 420px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--admin-text-secondary);
+  pointer-events: none;
+}
+
+.searchBar {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:focus {
+    border-color: var(--admin-accent);
+  }
+
+  &::placeholder {
+    color: var(--admin-text-secondary);
+  }
+}
+
+.csvBtn {
+  padding: 0.5rem 0.875rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--admin-border-heavy);
+    color: var(--admin-text);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.addLeadBtn {
+  padding: 0.5rem 1rem;
+  background: var(--admin-accent);
+  color: var(--admin-accent-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:hover {
+    background: var(--admin-accent-hover);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.statusTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.statusTab {
+  padding: 0.4rem 0.8rem;
+  background: var(--admin-surface);
+  border: 1px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
+}
+
+.loadingText {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+  padding: 2rem 0;
+}
+
+.emptyText {
+  color: var(--admin-text-secondary);
+  text-align: center;
+  padding: 4rem;
+  font-size: 0.875rem;
+}
+
+.leadList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.leadCard {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
+}
+
+.leadHeader {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.leadNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.leadName {
+  color: var(--admin-text);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.courseTag {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  background: rgba(255, 0, 90, 0.12);
+  color: var(--admin-accent);
+  border: 1px solid rgba(255, 0, 90, 0.2);
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.leadEmail {
+  color: var(--admin-text-secondary);
+  font-size: 0.8rem;
+}
+
+.leadStatus {
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.leadExpanded {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--admin-border);
+}
+
+.leadInfo {
+  color: var(--admin-text-secondary);
+  font-size: 0.8rem;
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.phoneLink {
+  color: var(--admin-accent);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.copyBtn {
+  padding: 0.15rem 0.4rem;
+  background: var(--admin-surface-raised);
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  color: var(--admin-text-secondary);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:hover {
+    border-color: var(--admin-border-heavy);
+    color: var(--admin-text);
+  }
+}
+
+.leadDate {
+  color: var(--admin-text-secondary);
+  font-size: 0.8rem;
+}
+
+.leadMessage {
+  color: #ccc;
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+  font-size: 0.85rem;
+}
+
+.leadAdminNotes {
+  color: var(--admin-text-secondary);
+  font-size: 0.8rem;
+  margin: 0 0 0.5rem;
+}
+
+.noteTextarea {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 50px;
+  margin-bottom: 0.5rem;
+  outline: none;
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:focus {
+    border-color: var(--admin-accent);
+  }
+
+  &::placeholder {
+    color: var(--admin-text-disabled);
+  }
+}
+
+.statusActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.statusActionBtn {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  background: none;
+  transition: opacity var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+.pageBtn {
+  padding: 0.35rem 0.75rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:hover:not(:disabled) {
+    border-color: var(--admin-border-heavy);
+    color: var(--admin-text);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.pageInfo {
+  font-size: 0.8125rem;
+  color: var(--admin-text-secondary);
+  font-weight: 500;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modalContent {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modalTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--admin-text);
+  margin: 0 0 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.modalError {
+  padding: 0.5rem 0.75rem;
+  background: var(--admin-danger-bg);
+  border: 1px solid var(--admin-danger-border);
+  border-radius: 6px;
+  color: var(--admin-danger);
+  font-size: 0.8125rem;
+  margin-bottom: 1rem;
+}
+
+.modalSuccess {
+  padding: 0.5rem 0.75rem;
+  background: var(--admin-success-bg);
+  border: 1px solid var(--admin-success-border);
+  border-radius: 6px;
+  color: var(--admin-success);
+  font-size: 0.8125rem;
+  margin-bottom: 1rem;
+}
+
+.formGroup {
+  margin-bottom: 0.875rem;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+.formInput,
+.formSelect {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:focus {
+    border-color: var(--admin-accent);
+  }
+
+  &::placeholder {
+    color: var(--admin-text-disabled);
+  }
+}
+
+.formSelect {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+}
+
+.formTextarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:focus {
+    border-color: var(--admin-accent);
+  }
+
+  &::placeholder {
+    color: var(--admin-text-disabled);
+  }
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.modalCancelBtn {
+  padding: 0.5rem 1rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:hover:not(:disabled) {
+    border-color: var(--admin-border-heavy);
+    color: var(--admin-text);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.modalSubmitBtn {
+  padding: 0.5rem 1.25rem;
+  background: var(--admin-accent);
+  color: var(--admin-accent-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:hover:not(:disabled) {
+    background: var(--admin-accent-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

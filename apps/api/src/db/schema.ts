@@ -27,7 +27,9 @@ export const users = sqliteTable("users", {
 });
 
 export const courses = sqliteTable("courses", {
-  id: text("id") .primaryKey() .$defaultFn(() => crypto.randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
   subtitle: text("subtitle"),
@@ -248,6 +250,10 @@ export const promotions = sqliteTable("promotions", {
   endDate: text("end_date"),
   isActive: integer("is_active").notNull().default(0),
   createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+  bannerImageUrl: text("banner_image_url"),
+  showOnHomepage: integer("show_on_homepage").notNull().default(0),
+  couponCode: text("coupon_code"),
+  usageLimit: integer("usage_limit"),
 });
 
 export const promotionCourses = sqliteTable(

@@ -39,6 +39,9 @@ sqlite.exec(`
   );
 
   CREATE UNIQUE INDEX IF NOT EXISTS unique_variant ON media_variants(media_id, name);
+
+  CREATE INDEX IF NOT EXISTS idx_media_mime_type ON media(mime_type);
+  CREATE INDEX IF NOT EXISTS idx_media_uploaded_at ON media(uploaded_at);
 `);
 
 // SQLite doesn't support IF NOT EXISTS for ALTER TABLE,

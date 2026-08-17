@@ -44,7 +44,7 @@ export default async function BlogPage() {
           >
             <div className={styles.thumb}>
               {post.thumbnailUrl ? (
-                <img src={post.thumbnailUrl} alt={post.title} />
+                <img src={post.thumbnailUrl} alt={post.title} loading="lazy" />
               ) : (
                 <div className={styles.thumbPlaceholder} />
               )}

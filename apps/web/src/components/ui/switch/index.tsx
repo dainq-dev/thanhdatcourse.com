@@ -1,34 +1,34 @@
-import { ReactNode, useId } from "react";
-import "./style.css";
+import { useId } from "react";
+import styles from "./switch.module.scss";
 
 interface SwitchProps {
-    /** Trạng thái on/off (controlled) */
-    checked: boolean;
-    /** Callback khi user toggle */
-    onChange: (checked: boolean) => void;
-    /** Vô hiệu hoá switch */
-    disabled?: boolean;
-    /** Label hiển thị bên cạnh switch, cũng dùng cho aria-label */
-    label?: string;
-    /** Kích thước switch */
-    size?: "sm" | "md" | "lg";
-    className?: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+  label?: string;
+  size?: "sm" | "md" | "lg";
+  className?: string;
 }
 
 export function Switch({
-    checked,
-    onChange,
-    disabled = false,
-    label,
-    size = "md",
-    className,
-}: SwitchProps): ReactNode {
-    const id = useId();
+  checked,
+  onChange,
+  disabled = false,
+  size = "md",
+  className,
+}: SwitchProps) {
+  const id = useId();
 
-    return (
-<label className="switch">
-    <input type="checkbox" />
-    <span className="slider"></span>
-</label>
-    );
+  return (
+    <label className={`${styles.switch} ${styles[size]} ${className ?? ""}`}>
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      <span className={styles.slider} />
+    </label>
+  );
 }

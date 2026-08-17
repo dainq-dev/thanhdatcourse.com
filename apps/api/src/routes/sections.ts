@@ -1,10 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
 import {
   ENTITY_SECTION_MAP,
+  type SectionType,
   SectionTypeSchema,
   SINGLETON_SECTION_TYPES,
   validateSectionConfig,
-  type SectionType,
 } from "@workspace/types";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
@@ -46,7 +46,9 @@ async function checkEntityExists(
     const [row] = await db
       .select({ id: courses.id })
       .from(courses)
-      .where(sql`(${courses.id} = ${entityId} OR ${courses.slug} = ${entityId})`);
+      .where(
+        sql`(${courses.id} = ${entityId} OR ${courses.slug} = ${entityId})`,
+      );
     return !!row;
   }
   const [row] = await db
@@ -166,9 +168,7 @@ export const sectionRoutes = new Hono()
         );
       }
 
-      if (
-        (SINGLETON_SECTION_TYPES as string[]).includes(body.section_type)
-      ) {
+      if ((SINGLETON_SECTION_TYPES as string[]).includes(body.section_type)) {
         const dup = await checkSingletonExists(
           entityType,
           entityId,
@@ -204,8 +204,7 @@ export const sectionRoutes = new Hono()
       try {
         validateSectionConfig(body.section_type as SectionType, config);
       } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : "Invalid config";
+        const message = err instanceof Error ? err.message : "Invalid config";
         return c.json({ error: message }, 400);
       }
 
@@ -275,17 +274,13 @@ export const sectionRoutes = new Hono()
         try {
           validateSectionConfig(existing.sectionType as SectionType, config);
         } catch (err: unknown) {
-          const message =
-            err instanceof Error ? err.message : "Invalid config";
+          const message = err instanceof Error ? err.message : "Invalid config";
           return c.json({ error: message }, 400);
         }
         updates.config = JSON.stringify(config);
       }
 
-      await db
-        .update(sections)
-        .set(updates)
-        .where(eq(sections.id, sectionId));
+      await db.update(sections).set(updates).where(eq(sections.id, sectionId));
 
       const [updated] = await db
         .select()
@@ -339,10 +334,7 @@ export const sectionRoutes = new Hono()
       const existingIds = new Set(existingRows.map((r) => r.id));
 
       if (ordered_ids.length !== existingIds.size) {
-        return c.json(
-          { error: "All section ids must be present" },
-          400,
-        );
+        return c.json({ error: "All section ids must be present" }, 400);
       }
 
       for (const id of ordered_ids) {
@@ -391,7 +383,9 @@ export const sectionRoutes = new Hono()
 
       if (currentCount + payload.length > MAX_SECTIONS) {
         return c.json(
-          { error: `Cannot add ${payload.length} sections: maximum ${MAX_SECTIONS} would be exceeded` },
+          {
+            error: `Cannot add ${payload.length} sections: maximum ${MAX_SECTIONS} would be exceeded`,
+          },
           400,
         );
       }
@@ -399,7 +393,9 @@ export const sectionRoutes = new Hono()
       for (const item of payload) {
         if (!allowedTypes.includes(item.section_type)) {
           return c.json(
-            { error: `"${item.section_type}" is not available for entity type "${entityType}"` },
+            {
+              error: `"${item.section_type}" is not available for entity type "${entityType}"`,
+            },
             400,
           );
         }
@@ -409,7 +405,9 @@ export const sectionRoutes = new Hono()
       const singletonTypesInPayload = payload
         .map((p) => p.section_type)
         .filter((t) => (SINGLETON_SECTION_TYPES as string[]).includes(t));
-      if (new Set(singletonTypesInPayload).size !== singletonTypesInPayload.length) {
+      if (
+        new Set(singletonTypesInPayload).size !== singletonTypesInPayload.length
+      ) {
         return c.json(
           { error: "Duplicate singleton section type in payload" },
           400,
@@ -417,7 +415,7 @@ export const sectionRoutes = new Hono()
       }
 
       let nextOrder = 0;
-      const created: typeof sections.$inferSelect[] = [];
+      const created: (typeof sections.$inferSelect)[] = [];
 
       await db.transaction(async (tx) => {
         // Full replace: delete all existing sections for this entity first
@@ -433,7 +431,11 @@ export const sectionRoutes = new Hono()
         for (const item of payload) {
           let config: unknown = item.config;
           if (typeof config === "string") {
-            try { config = JSON.parse(config); } catch { config = {}; }
+            try {
+              config = JSON.parse(config);
+            } catch {
+              config = {};
+            }
           }
 
           try {

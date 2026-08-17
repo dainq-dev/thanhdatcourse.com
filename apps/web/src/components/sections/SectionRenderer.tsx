@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { SECTION_RENDER_MAP } from "./section-render-map";
 
 function parseConfig(raw: unknown): Record<string, unknown> {
@@ -32,10 +33,13 @@ export function SectionRenderer({
   >[];
   entityMeta?: Record<string, unknown>;
 }) {
-  const published = sections.filter(
-    (s) => s.is_published !== false && s.is_published !== 0,
-  );
-  published.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const published = useMemo(() => {
+    const p = sections.filter(
+      (s) => s.is_published !== false && s.is_published !== 0,
+    );
+    p.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    return p;
+  }, [sections]);
 
   return (
     <>

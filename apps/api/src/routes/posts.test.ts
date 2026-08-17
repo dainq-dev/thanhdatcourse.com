@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { posts, users } from "../db/schema";
-import app from "../index";
+import { app } from "../index";
 
 describe("Posts Routes", () => {
   let adminToken: string;
@@ -50,6 +50,17 @@ describe("Posts Routes", () => {
       const body = await res.json();
       for (const p of body.data) {
         expect(p.isPublished).toBe(1);
+      }
+    });
+
+    test("admin draft filter returns only draft posts", async () => {
+      const res = await app.request("/api/posts?draft=true", {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      for (const p of body.data) {
+        expect(p.isPublished).toBe(0);
       }
     });
   });

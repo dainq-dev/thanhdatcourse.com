@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, asc, desc, eq, gte, isNull, lte, or } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, lte, or } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "../db";
@@ -15,6 +15,10 @@ const CreatePromotionSchema = z
     end_date: z.string().datetime().optional(),
     is_active: z.boolean().optional().default(true),
     course_ids: z.array(z.string()).min(1, "Phải gán ít nhất 1 khóa học"),
+    banner_image_url: z.string().optional(),
+    show_on_homepage: z.boolean().optional().default(false),
+    coupon_code: z.string().optional(),
+    usage_limit: z.number().int().positive().optional(),
   })
   .refine(
     (data) => {
@@ -34,6 +38,10 @@ const UpdatePromotionSchema = z
     start_date: z.string().datetime().optional(),
     end_date: z.string().datetime().optional(),
     is_active: z.boolean().optional(),
+    banner_image_url: z.string().optional(),
+    show_on_homepage: z.boolean().optional(),
+    coupon_code: z.string().optional(),
+    usage_limit: z.number().int().positive().optional(),
   })
   .refine(
     (data) => {
@@ -50,7 +58,10 @@ export async function getActivePromotion(courseId: string) {
   const promos = await db
     .select()
     .from(promotions)
-    .innerJoin(promotionCourses, eq(promotions.id, promotionCourses.promotionId))
+    .innerJoin(
+      promotionCourses,
+      eq(promotions.id, promotionCourses.promotionId),
+    )
     .where(
       and(
         eq(promotionCourses.courseId, courseId),
@@ -90,6 +101,37 @@ export const promotionRoutes = new Hono()
     }
     const promo = await getActivePromotion(courseId);
     return c.json(promo);
+  })
+  .get("/homepage-banner", async (c) => {
+    const now = new Date().toISOString();
+    const result = await db
+      .select()
+      .from(promotions)
+      .where(
+        and(
+          eq(promotions.isActive, 1),
+          eq(promotions.showOnHomepage, 1),
+          or(isNull(promotions.startDate), lte(promotions.startDate, now)),
+          or(isNull(promotions.endDate), gte(promotions.endDate, now)),
+        ),
+      )
+      .orderBy(asc(promotions.endDate), desc(promotions.createdAt))
+      .limit(1);
+
+    if (result.length === 0) {
+      return c.json(null);
+    }
+
+    const promotion = result[0];
+    const courseRows = await db
+      .select()
+      .from(promotionCourses)
+      .where(eq(promotionCourses.promotionId, promotion.id));
+
+    return c.json({
+      ...promotion,
+      course_ids: courseRows.map((r) => r.courseId),
+    });
   })
   .get("/", authMiddleware("ADMIN"), async (c) => {
     const active = c.req.query("active");
@@ -132,11 +174,7 @@ export const promotionRoutes = new Hono()
         const courseRows = await db
           .select({ id: courses.id })
           .from(courses)
-          .where(
-            and(
-              ...data.course_ids.map((cid) => eq(courses.id, cid)),
-            ),
-          );
+          .where(inArray(courses.id, data.course_ids));
         if (courseRows.length !== data.course_ids.length) {
           return c.json(
             { error: "Một hoặc nhiều course_id không tồn tại" },
@@ -154,6 +192,10 @@ export const promotionRoutes = new Hono()
         startDate: data.start_date ?? null,
         endDate: data.end_date ?? null,
         isActive: data.is_active ? 1 : 0,
+        bannerImageUrl: data.banner_image_url ?? null,
+        showOnHomepage: data.show_on_homepage ? 1 : 0,
+        couponCode: data.coupon_code ?? null,
+        usageLimit: data.usage_limit ?? null,
       });
 
       if (data.course_ids.length > 0) {
@@ -202,11 +244,16 @@ export const promotionRoutes = new Hono()
         updates.discountPercentage = data.discount_percentage;
       if (data.discount_amount !== undefined)
         updates.discountAmount = data.discount_amount;
-      if (data.start_date !== undefined)
-        updates.startDate = data.start_date;
+      if (data.start_date !== undefined) updates.startDate = data.start_date;
       if (data.end_date !== undefined) updates.endDate = data.end_date;
       if (data.is_active !== undefined)
         updates.isActive = data.is_active ? 1 : 0;
+      if (data.banner_image_url !== undefined)
+        updates.bannerImageUrl = data.banner_image_url;
+      if (data.show_on_homepage !== undefined)
+        updates.showOnHomepage = data.show_on_homepage ? 1 : 0;
+      if (data.coupon_code !== undefined) updates.couponCode = data.coupon_code;
+      if (data.usage_limit !== undefined) updates.usageLimit = data.usage_limit;
 
       await db.update(promotions).set(updates).where(eq(promotions.id, id));
 
@@ -240,9 +287,7 @@ export const promotionRoutes = new Hono()
         const courseRows = await db
           .select({ id: courses.id })
           .from(courses)
-          .where(
-            and(...course_ids.map((cid) => eq(courses.id, cid))),
-          );
+          .where(inArray(courses.id, course_ids));
         if (courseRows.length !== course_ids.length) {
           return c.json(
             { error: "Một hoặc nhiều course_id không tồn tại" },

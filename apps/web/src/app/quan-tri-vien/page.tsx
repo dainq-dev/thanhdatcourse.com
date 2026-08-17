@@ -1,8 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api, extractData } from "@/lib/api";
-import Link from "next/link";
 import styles from "./page.module.scss";
 
 interface Stats {
@@ -108,13 +108,19 @@ export default function AdminDashboard() {
       </div>
 
       <div className={styles.quickLinks}>
-        <Link href="/quan-tri-vien/khoa-hoc/tao-moi" className={styles.quickLink}>
+        <Link
+          href="/quan-tri-vien/khoa-hoc/tao-moi"
+          className={styles.quickLink}
+        >
           + Tạo khóa học mới
         </Link>
         <Link href="/quan-tri-vien/du-an/tao-moi" className={styles.quickLink}>
           + Tạo dự án mới
         </Link>
-        <Link href="/quan-tri-vien/bai-viet/tao-moi" className={styles.quickLink}>
+        <Link
+          href="/quan-tri-vien/bai-viet/tao-moi"
+          className={styles.quickLink}
+        >
           + Viết bài mới
         </Link>
       </div>

@@ -10,6 +10,7 @@ export interface MediaFile {
   source: "upload" | "youtube" | "external_url";
   altText: string | null;
   diskPath: string;
+  youtubeId?: string;
   url: string;
   uploadedAt: string;
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SectionRenderer } from "@/components/sections/SectionRenderer";
 import { api } from "@/lib/api";
+import { ConsultationForm } from "./components/ConsultationForm";
 import styles from "./page.module.scss";
 
 interface Course {
@@ -11,6 +12,7 @@ interface Course {
   basePrice: number;
   externalCheckoutUrl?: string;
   buttonText?: string;
+  sections?: SectionRow[];
 }
 
 interface SectionRow {
@@ -31,19 +33,6 @@ async function getCourse(slug: string): Promise<Course | null> {
     return json.data || json;
   } catch {
     return null;
-  }
-}
-
-async function getSections(slug: string): Promise<SectionRow[]> {
-  try {
-    const res = await api.fetch(`/api/course/${slug}/sections`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return Array.isArray(json) ? json : (json.data ?? []);
-  } catch {
-    return [];
   }
 }
 
@@ -85,7 +74,12 @@ export default async function CourseDetailPage({
     );
   }
 
-  const sections = await getSections(slug);
+  const sections = course.sections ?? [];
 
-  return <SectionRenderer sections={sections} />;
+  return (
+    <>
+      <SectionRenderer sections={sections} />
+      <ConsultationForm courseId={course.id} courseTitle={course.title} />
+    </>
+  );
 }

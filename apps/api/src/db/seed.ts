@@ -15,7 +15,9 @@ export function seed(sqlite: Database): void {
   );
 
   const row = sqlite
-    .query("SELECT COUNT(*) as c FROM users WHERE email = 'admin@minhtravel.vn'")
+    .query(
+      "SELECT COUNT(*) as c FROM users WHERE email = 'admin@minhtravel.vn'",
+    )
     .get() as { c: number };
 
   if (row.c === 1) {

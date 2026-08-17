@@ -46,6 +46,29 @@ describe("Media CRUD", () => {
     });
     expect(res.status).toBe(404);
   });
+
+  test("DELETE /api/media/bulk — deletes multiple (missing ids skipped)", async () => {
+    const res = await app.request("/api/media/bulk", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ ids: ["non-existent-1", "non-existent-2"] }),
+    });
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.data.success).toBe(true);
+  });
+
+  test("DELETE /api/media/bulk without auth — 401", async () => {
+    const res = await app.request("/api/media/bulk", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: ["x"] }),
+    });
+    expect(res.status).toBe(401);
+  });
 });
 
 describe("External Media", () => {

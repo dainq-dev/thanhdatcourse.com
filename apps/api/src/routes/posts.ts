@@ -20,6 +20,7 @@ function slugify(text: string): string {
 
 const PostQuerySchema = z.object({
   published: z.coerce.boolean().optional(),
+  draft: z.coerce.boolean().optional(),
   category: z.string().optional(),
   search: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
@@ -60,12 +61,17 @@ const UpdatePostSchema = CreatePostSchema.partial();
 
 export const postsRoutes = new Hono()
   .get("/", optionalAuth(), zValidator("query", PostQuerySchema), async (c) => {
-    const { published, category, search, page, limit } = c.req.valid("query");
+    const { published, draft, category, search, page, limit } =
+      c.req.valid("query");
 
     const conditions: SQL[] = [];
     const isAdmin = c.get("user")?.role === "ADMIN";
 
-    if (published || !isAdmin) {
+    if (draft && isAdmin) {
+      conditions.push(eq(posts.isPublished, 0));
+    } else if (published !== undefined) {
+      conditions.push(eq(posts.isPublished, published ? 1 : 0));
+    } else if (!isAdmin) {
       conditions.push(eq(posts.isPublished, 1));
     }
     if (category) {

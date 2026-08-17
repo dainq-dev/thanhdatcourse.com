@@ -12,9 +12,10 @@ const ProductQuerySchema = z.object({
 
 const CreateProductSchema = z.object({
   title: z.string().min(1),
-  description: z.string().min(1),
+  description: z.string().optional(),
   price: z.number().int().positive(),
   thumbnailUrl: z.string().optional(),
+  youtubePreviewId: z.string().optional(),
   externalCheckoutUrl: z.string().optional(),
   tag: z.string().optional(),
   isPublished: z.boolean().optional(),
@@ -24,36 +25,38 @@ const CreateProductSchema = z.object({
 const UpdateProductSchema = CreateProductSchema.partial();
 
 export const productRoutes = new Hono()
-  .get("/", optionalAuth(), zValidator("query", ProductQuerySchema), async (c) => {
-    const { published } = c.req.valid("query");
-    const isAdmin = c.get("user")?.role === "ADMIN";
+  .get(
+    "/",
+    optionalAuth(),
+    zValidator("query", ProductQuerySchema),
+    async (c) => {
+      const { published } = c.req.valid("query");
+      const isAdmin = c.get("user")?.role === "ADMIN";
 
-    const conditions = [];
-    if (published !== undefined && isAdmin) {
-      conditions.push(eq(digitalProducts.isPublished, published ? 1 : 0));
-    } else if (!isAdmin) {
-      conditions.push(eq(digitalProducts.isPublished, 1));
-    }
+      const conditions = [];
+      if (published !== undefined && isAdmin) {
+        conditions.push(eq(digitalProducts.isPublished, published ? 1 : 0));
+      } else if (!isAdmin) {
+        conditions.push(eq(digitalProducts.isPublished, 1));
+      }
 
-    const where = conditions.length > 0 ? and(...conditions) : undefined;
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-    const totalQuery = db
-      .select({ count: sql<number>`count(*)` })
-      .from(digitalProducts)
-      .$dynamic();
-    if (where) totalQuery.where(where);
-    const [totalRow] = await totalQuery;
-    const total = Number(totalRow?.count);
+      const totalQuery = db
+        .select({ count: sql<number>`count(*)` })
+        .from(digitalProducts)
+        .$dynamic();
+      if (where) totalQuery.where(where);
+      const [totalRow] = await totalQuery;
+      const total = Number(totalRow?.count);
 
-    const resultQuery = db
-      .select()
-      .from(digitalProducts)
-      .$dynamic();
-    if (where) resultQuery.where(where);
-    const result = await resultQuery.orderBy(desc(digitalProducts.createdAt));
+      const resultQuery = db.select().from(digitalProducts).$dynamic();
+      if (where) resultQuery.where(where);
+      const result = await resultQuery.orderBy(desc(digitalProducts.createdAt));
 
-    return c.json({ data: result, total });
-  })
+      return c.json({ data: result, total });
+    },
+  )
   .get("/:id", optionalAuth(), async (c) => {
     const id = c.req.param("id");
     const isAdmin = c.get("user")?.role === "ADMIN";
@@ -81,9 +84,10 @@ export const productRoutes = new Hono()
       await db.insert(digitalProducts).values({
         id,
         title: data.title,
-        description: data.description,
+        description: data.description ?? "",
         price: data.price,
         thumbnailUrl: data.thumbnailUrl,
+        youtubePreviewId: data.youtubePreviewId,
         externalCheckoutUrl: data.externalCheckoutUrl,
         tag: data.tag,
         isPublished: data.isPublished ? 1 : 0,
@@ -120,6 +124,8 @@ export const productRoutes = new Hono()
       if (data.price !== undefined) updates.price = data.price;
       if (data.thumbnailUrl !== undefined)
         updates.thumbnailUrl = data.thumbnailUrl;
+      if (data.youtubePreviewId !== undefined)
+        updates.youtubePreviewId = data.youtubePreviewId;
       if (data.externalCheckoutUrl !== undefined)
         updates.externalCheckoutUrl = data.externalCheckoutUrl;
       if (data.tag !== undefined) updates.tag = data.tag;

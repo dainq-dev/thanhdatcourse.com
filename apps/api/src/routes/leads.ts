@@ -1,9 +1,19 @@
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, like, or } from "drizzle-orm";
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { db } from "../db";
 import { leads } from "../db/schema";
 import { authMiddleware } from "../middleware/auth";
 import { createRateLimiter, getClientIp } from "../middleware/rate-limit";
+
+const CreateLeadSchema = z.object({
+  customerName: z.string().min(1, "Họ tên không được để trống"),
+  customerPhone: z.string().min(1, "Số điện thoại không được để trống"),
+  customerEmail: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
+  message: z.string().max(5000, "Lời nhắn quá dài").optional(),
+  courseId: z.string().uuid("Khóa học không hợp lệ").optional(),
+});
 
 const VALID_STATUSES = ["NEW", "CONTACTED", "CONVERTED", "CANCELLED"] as const;
 
@@ -14,7 +24,7 @@ const leadLimiter = createRateLimiter({
 }); // 3/hour
 
 export const leadRoutes = new Hono()
-  .post("/", async (c) => {
+  .post("/", zValidator("json", CreateLeadSchema), async (c) => {
     const ip = getClientIp(c);
     if (!leadLimiter(ip)) {
       return c.json(
@@ -23,39 +33,18 @@ export const leadRoutes = new Hono()
       );
     }
 
-    let body: Record<string, unknown>;
-    try {
-      body = await c.req.json();
-    } catch {
-      return c.json({ error: "Invalid JSON body" }, 400);
-    }
-
-    const { customerName, customerEmail, customerPhone, message, courseId } =
-      body as {
-        customerName?: string;
-        customerEmail?: string;
-        customerPhone?: string;
-        message?: string;
-        courseId?: string;
-      };
-
-    if (!customerName) {
-      return c.json({ error: "customerName is required" }, 400);
-    }
-    if (!customerPhone) {
-      return c.json({ error: "customerPhone is required" }, 400);
-    }
+    const body = c.req.valid("json");
 
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
 
     await db.insert(leads).values({
       id,
-      customerName,
-      customerEmail: customerEmail ?? null,
-      customerPhone,
-      message: message ?? null,
-      courseId: courseId ?? null,
+      customerName: body.customerName,
+      customerEmail: body.customerEmail || null,
+      customerPhone: body.customerPhone,
+      message: body.message || null,
+      courseId: body.courseId || null,
       status: "NEW",
       createdAt: now,
     });
@@ -76,6 +65,16 @@ export const leadRoutes = new Hono()
     const conditions = [];
     if (status) {
       conditions.push(eq(leads.status, status));
+    }
+    const search = c.req.query("search");
+    if (search) {
+      conditions.push(
+        or(
+          like(leads.customerName, `%${search}%`),
+          like(leads.customerPhone, `%${search}%`),
+          like(leads.customerEmail, `%${search}%`),
+        ),
+      );
     }
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;

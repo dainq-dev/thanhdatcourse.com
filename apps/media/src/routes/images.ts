@@ -39,13 +39,25 @@ export const imageRoutes = new Hono()
     if (w) {
       const width = parseInt(w, 10);
       if (Number.isNaN(width) || width < MIN_WIDTH || width > MAX_WIDTH) {
-        return c.json({ error: `Width must be between ${MIN_WIDTH} and ${MAX_WIDTH}` }, 400);
+        return c.json(
+          { error: `Width must be between ${MIN_WIDTH} and ${MAX_WIDTH}` },
+          400,
+        );
       }
       if (!ALLOWED_FORMATS.has(format)) {
         return c.json({ error: `Unsupported format: ${format}` }, 400);
       }
-      if (Number.isNaN(quality) || quality < MIN_QUALITY || quality > MAX_QUALITY) {
-        return c.json({ error: `Quality must be between ${MIN_QUALITY} and ${MAX_QUALITY}` }, 400);
+      if (
+        Number.isNaN(quality) ||
+        quality < MIN_QUALITY ||
+        quality > MAX_QUALITY
+      ) {
+        return c.json(
+          {
+            error: `Quality must be between ${MIN_QUALITY} and ${MAX_QUALITY}`,
+          },
+          400,
+        );
       }
       return serveDynamicResize(c, id, width, format, quality);
     }

@@ -1,4 +1,6 @@
 import { Counter } from "@workspace/ui";
+import { MotionReveal } from "@/components/sections/motion-reveal";
+import { getHomepageMotion } from "@/lib/motion";
 import { parseSetting } from "@/lib/parse-setting";
 import styles from "./index.module.scss";
 
@@ -19,6 +21,13 @@ interface Props {
 }
 
 export function CounterSection({ settings }: Props) {
+  const visible =
+    settings.home_counters_section_visible !== "0" &&
+    settings.home_counters_section_visible !== "false";
+
+  if (!visible) return null;
+
+  const concept = getHomepageMotion(settings);
   const counters = parseSetting<CounterData[]>(
     settings,
     "home_counters",
@@ -27,15 +36,15 @@ export function CounterSection({ settings }: Props) {
 
   return (
     <section className={styles.section}>
-      <div className={styles.counters}>
-        {counters.map((counter) => (
-          <Counter
-            key={counter.label}
-            label={counter.label}
-            value={counter.value}
-          />
-        ))}
-      </div>
+      <MotionReveal concept={concept}>
+        <div className={styles.counters}>
+          {counters.map((counter) => (
+            <div key={counter.label} data-motion-item>
+              <Counter label={counter.label} value={counter.value} />
+            </div>
+          ))}
+        </div>
+      </MotionReveal>
     </section>
   );
 }

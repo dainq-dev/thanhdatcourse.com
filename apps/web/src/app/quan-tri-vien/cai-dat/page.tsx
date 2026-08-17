@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MediaTrigger } from "@/components/admin/media-manager/media-trigger";
+import { LayoutWizard } from "@/components/admin/layout-wizard/LayoutWizard";
+import { PAGE_CONFIGS } from "@/lib/layout-engine";
 import { api } from "@/lib/api";
 import {
   ALL_FIELDS,
@@ -281,83 +283,134 @@ export default function SettingsPage() {
 
                   {isOpen && (
                     <div className={styles.sectionBody}>
-                      {section.fields.length > 0 && (
-                        <div className={styles.fieldGroup}>
-                          {section.fields.map((field) => (
-                            <FieldRow
-                              key={field.key}
-                              field={field}
-                              value={formData[field.key] ?? ""}
-                              onChange={handleChange}
-                              isDirty={
-                                formData[field.key] !== settings[field.key]
+                      {section.id === "design" ? (
+                        <LayoutWizard
+                          settings={formData}
+                          onChange={(key, value) => handleChange(key, value)}
+                          onSave={async () => {
+                            const allPageIds = Object.keys(PAGE_CONFIGS) as Array<keyof typeof PAGE_CONFIGS>;
+                            const designKeys: string[] = [];
+                            for (const pid of allPageIds) {
+                              const pc = PAGE_CONFIGS[pid];
+                              designKeys.push(pc.templateKey, ...Object.values(pc.engineKeys));
+                            }
+                            const batch: Record<string, string> = {};
+                            for (const key of designKeys) {
+                              if (formData[key] !== undefined && formData[key] !== (settings[key] ?? "")) {
+                                batch[key] = formData[key];
                               }
-                            />
-                          ))}
-                        </div>
-                      )}
+                            }
+                            if (Object.keys(batch).length === 0) {
+                              setSuccess("Không có thay đổi nào");
+                              setTimeout(() => setSuccess(""), 3000);
+                              return;
+                            }
+                            setSaving(true);
+                            setSuccess("");
+                            setSaveError("");
+                            try {
+                              await api.put("/api/settings/batch", batch);
+                              setSettings((prev) => ({ ...prev, ...batch }));
+                              writePreviewCookie({});
+                              setPreviewLoading(true);
+                              setPreviewKey((k) => k + 1);
+                              setSuccess(`Đã lưu ${Object.keys(batch).length} thay đổi giao diện`);
+                              setTimeout(() => setSuccess(""), 3000);
+                            } catch {
+                              setSaveError("Lỗi khi lưu — thử lại");
+                            } finally {
+                              setSaving(false);
+                            }
+                          }}
+                          onPreviewReload={(path: string) => {
+                            setPreviewPath(path);
+                            setTimeout(() => {
+                              setPreviewLoading(true);
+                              setPreviewKey((k) => k + 1);
+                            }, 100);
+                          }}
+                        />
+                      ) : (
+                        <>
+                          {section.fields.length > 0 && (
+                            <div className={styles.fieldGroup}>
+                              {section.fields.map((field) => (
+                                <FieldRow
+                                  key={field.key}
+                                  field={field}
+                                  value={formData[field.key] ?? ""}
+                                  onChange={handleChange}
+                                  isDirty={
+                                    formData[field.key] !== settings[field.key]
+                                  }
+                                />
+                              ))}
+                            </div>
+                          )}
 
-                      {section.subSections?.map((sub) => {
-                        const subOpen = expandedSubs.has(sub.id);
-                        const subDirty = subChangedCount(sub.fields);
+                          {section.subSections?.map((sub) => {
+                            const subOpen = expandedSubs.has(sub.id);
+                            const subDirty = subChangedCount(sub.fields);
 
-                        return (
-                          <div key={sub.id} className={styles.subSection}>
-                            <button
-                              className={styles.subSectionHeader}
-                              onClick={() => toggleSub(sub.id)}
-                              type="button"
-                            >
-                              <div className={styles.subSectionHeaderLeft}>
-                                <span
-                                  className={`${styles.subChevron} ${subOpen ? styles.subChevronOpen : ""}`}
+                            return (
+                              <div key={sub.id} className={styles.subSection}>
+                                <button
+                                  className={styles.subSectionHeader}
+                                  onClick={() => toggleSub(sub.id)}
+                                  type="button"
                                 >
-                                  ▸
-                                </span>
-                                <span className={styles.subSectionTitle}>
-                                  {sub.title}
-                                </span>
-                              </div>
-                              <div className={styles.subSectionHeaderRight}>
-                                <span className={styles.subSectionHint}>
-                                  {sub.hint}
-                                </span>
-                                {subDirty > 0 && (
-                                  <span className={styles.sectionDirty}>
-                                    {subDirty}
-                                  </span>
+                                  <div className={styles.subSectionHeaderLeft}>
+                                    <span
+                                      className={`${styles.subChevron} ${subOpen ? styles.subChevronOpen : ""}`}
+                                    >
+                                      ▸
+                                    </span>
+                                    <span className={styles.subSectionTitle}>
+                                      {sub.title}
+                                    </span>
+                                  </div>
+                                  <div className={styles.subSectionHeaderRight}>
+                                    <span className={styles.subSectionHint}>
+                                      {sub.hint}
+                                    </span>
+                                    {subDirty > 0 && (
+                                      <span className={styles.sectionDirty}>
+                                        {subDirty}
+                                      </span>
+                                    )}
+                                  </div>
+                                </button>
+                                {subOpen && (
+                                  <div className={styles.subBody}>
+                                    <div className={styles.fieldGroup}>
+                                      {sub.fields
+                                        .filter((f) => {
+                                          if (!f.showWhen) return true;
+                                          return (
+                                            formData[f.showWhen.key] ===
+                                            f.showWhen.value
+                                          );
+                                        })
+                                        .map((field) => (
+                                          <FieldRow
+                                            key={field.key}
+                                            field={field}
+                                            value={formData[field.key] ?? ""}
+                                            onChange={handleChange}
+                                            isDirty={
+                                              formData[field.key] !==
+                                              settings[field.key]
+                                            }
+                                          />
+                                        ))}
+                                    </div>
+                                  </div>
                                 )}
                               </div>
-                            </button>
-                            {subOpen && (
-                              <div className={styles.subBody}>
-                                <div className={styles.fieldGroup}>
-                                  {sub.fields
-                                    .filter((f) => {
-                                      if (!f.showWhen) return true;
-                                      return (
-                                        formData[f.showWhen.key] ===
-                                        f.showWhen.value
-                                      );
-                                    })
-                                    .map((field) => (
-                                      <FieldRow
-                                        key={field.key}
-                                        field={field}
-                                        value={formData[field.key] ?? ""}
-                                        onChange={handleChange}
-                                        isDirty={
-                                          formData[field.key] !==
-                                          settings[field.key]
-                                        }
-                                      />
-                                    ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                            );
+                          })}
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -637,7 +690,9 @@ function FieldRow({
 
   if (field.type === "toggle") {
     return (
-      <div className={`${styles.field} ${styles.fieldToggle} ${isDirty ? styles.fieldDirty : ""}`}>
+      <div
+        className={`${styles.field} ${styles.fieldToggle} ${isDirty ? styles.fieldDirty : ""}`}
+      >
         <label className={styles.toggleLabel}>
           <span>{field.label}</span>
           <label className={styles.switch}>
@@ -820,7 +875,11 @@ function CountersInput({
             placeholder="VD: 3600"
             style={{ maxWidth: 100, textAlign: "right" }}
           />
-          <button type="button" className={styles.counterRemove} onClick={() => remove(i)}>
+          <button
+            type="button"
+            className={styles.counterRemove}
+            onClick={() => remove(i)}
+          >
             ✕
           </button>
         </div>

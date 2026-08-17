@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Kolker_Brush, Manrope } from "next/font/google";
 import "@workspace/ui/styles/global.scss";
-import "@workspace/ui/styles/admin-global.scss";
-
 const manrope = Manrope({
   subsets: ["latin", "vietnamese"],
   variable: "--font-manrope",
   display: "swap",
 });
+const kolkerBrush = Kolker_Brush({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-kolker-brush",
+  display: "swap",
+});
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0B0F19",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -47,11 +57,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={manrope.variable} suppressHydrationWarning>
+    <html lang="vi" className={`${manrope.variable} ${kolkerBrush.variable}`} suppressHydrationWarning>
       <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Kolker+Brush&display=swap"
-          rel="stylesheet"
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Minh Travel",
+              "url": "https://minhtravel.vn",
+              "logo": "https://minhtravel.vn/wp-content/uploads/2023/12/logo-size-to-1-100x30.png",
+              "description": "Học quay dựng, chỉnh màu chuyên nghiệp cùng Minh Travel. Khóa học từ cơ bản đến nâng cao, presets & LUTs độc quyền.",
+              "sameAs": [
+                "https://www.youtube.com/@MinhTravel96",
+                "https://www.tiktok.com/@minhtravel",
+                "https://www.facebook.com/minhtravel11",
+              ],
+            }),
+          }}
         />
       </head>
       <body>{children}</body>

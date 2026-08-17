@@ -1,0 +1,142 @@
+@use '../../../../../../../../packages/ui/styles/abstracts/variables' as *;
+@use '../../../../../../../../packages/ui/styles/abstracts/mixins' as *;
+
+.section {
+  @include section;
+  background: $clr-bg;
+}
+
+.inner {
+  @include container;
+  max-width: 600px;
+}
+
+.title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: $fw-extrabold;
+  color: $clr-text;
+  margin: 0 0 $space-2;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: var(--fs-body, 1rem);
+  @include text-muted;
+  text-align: center;
+  margin: 0 0 $space-8;
+  line-height: 1.6;
+}
+
+.form {
+  background: $clr-bg-card;
+  border: 1px solid $clr-border;
+  border-radius: $radius-lg;
+  padding: $space-8;
+}
+
+.field {
+  margin-bottom: $space-4;
+}
+
+.label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: $fw-semibold;
+  color: $clr-text-muted;
+  margin-bottom: $space-1;
+}
+
+.required {
+  color: $clr-primary;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: $space-3 $space-4;
+  background: $clr-bg;
+  border: 1px solid $clr-border;
+  border-radius: $radius-md;
+  color: $clr-text;
+  font-size: 0.875rem;
+  font-family: $ff-sans;
+  outline: none;
+  transition: border-color $duration-normal $ease-out-expo;
+
+  &:focus {
+    border-color: $clr-primary;
+  }
+
+  &::placeholder {
+    color: $clr-text-muted;
+    opacity: 0.6;
+  }
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: $space-3 $space-6;
+  background: $clr-primary;
+  color: $clr-white;
+  border: none;
+  border-radius: $radius-md;
+  font-size: 0.9375rem;
+  font-weight: $fw-bold;
+  cursor: pointer;
+  font-family: $ff-sans;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  transition: background $duration-fast $ease-out-expo,
+    transform $duration-fast $ease-out-expo;
+
+  &:hover:not(:disabled) {
+    background: $clr-primary-dark;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.errorMsg {
+  padding: $space-3 $space-4;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: $radius-md;
+  color: #ef4444;
+  font-size: 0.8125rem;
+  margin-bottom: $space-4;
+}
+
+.successMsg {
+  text-align: center;
+  background: $clr-bg-card;
+  border: 1px solid $clr-border;
+  border-radius: $radius-lg;
+  padding: $space-10 $space-8;
+
+  p {
+    font-size: var(--fs-lg, 1.125rem);
+    color: $clr-text;
+    margin: 0 0 $space-2;
+
+    strong {
+      color: $clr-primary;
+    }
+  }
+}
+
+.successSub {
+  font-size: var(--fs-sm, 0.875rem) !important;
+  @include text-muted;
+}

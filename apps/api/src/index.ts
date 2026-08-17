@@ -13,14 +13,13 @@ import { lessonRoutes } from "./routes/lessons";
 import { moduleRoutes } from "./routes/modules";
 import { portfolioRoutes } from "./routes/portfolios";
 import { postsRoutes } from "./routes/posts";
-import { presetsRoutes } from "./routes/presets";
 import { productRoutes } from "./routes/products";
 import { promotionRoutes } from "./routes/promotions";
 import { sectionRoutes } from "./routes/sections";
 import { settingsRoutes } from "./routes/settings";
 import { testimonialRoutes } from "./routes/testimonials";
 
-const app = new Hono()
+export const app = new Hono()
   .use("*", cors())
   .onError((err, c) => {
     if (err instanceof HTTPException) {
@@ -50,8 +49,7 @@ const app = new Hono()
   .route("/api/instructors", instructorRoutes)
   .route("/api", courseInstructorRoutes)
   .route("/api/course", sectionRoutes)
-  .route("/api/product", sectionRoutes)
-  .route("/api/presets-page", presetsRoutes);
+  .route("/api/product", sectionRoutes);
 
 export default {
   port: 3001,

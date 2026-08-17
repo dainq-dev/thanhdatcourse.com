@@ -1,9 +1,10 @@
-import { PageHeader } from "@workspace/ui";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { getPortfolioEngine, type PortfolioTemplateId } from "@/lib/layout-engine";
 import { api } from "@/lib/api";
 import { getSiteSettings, parseSetting } from "@/lib/settings";
-import styles from "./page.module.scss";
+import { PortfolioDefault } from "./_templates/portfolio-default";
+import { PortfolioCategorized } from "./_templates/portfolio-categorized";
+import { PortfolioShowcase } from "./_templates/portfolio-showcase";
 
 interface PortfolioItem {
   id: string;
@@ -32,23 +33,16 @@ async function getPortfolios(): Promise<PortfolioItem[]> {
   }
 }
 
-async function getPortfolioItem(id: string): Promise<PortfolioItem | null> {
-  try {
-    const res = await api.fetch(`/api/portfolios/${id}`, {
-      next: { revalidate: 300 },
-    });
-    if (res.status === 404) return null;
-    const json = await res.json();
-    return json.data || json;
-  } catch {
-    return null;
-  }
-}
-
 export const metadata: Metadata = {
   title: "Sản phẩm",
   description: "Dự án phim tiêu biểu của Minh Travel.",
 };
+
+const PORTFOLIO_TEMPLATES = {
+  default: PortfolioDefault,
+  categorized: PortfolioCategorized,
+  showcase: PortfolioShowcase,
+} as const;
 
 export default async function PortfolioPage() {
   const [portfolios, settings] = await Promise.all([
@@ -56,10 +50,6 @@ export default async function PortfolioPage() {
     getSiteSettings(),
   ]);
 
-  const pageTitle = settings.portfolio_page_title || "Films by Minh Travel";
-  const pageSubtitle = settings.portfolio_page_subtitle || "";
-  const ctaHeading =
-    settings.portfolio_cta_heading || "Bạn muốn làm việc cùng tôi?";
   const ctaItems: CTAItem[] = parseSetting(settings, "portfolio_cta_items", [
     {
       text: "Liên hệ làm việc",
@@ -73,56 +63,11 @@ export default async function PortfolioPage() {
     },
   ]);
 
+  const templateId = (settings.portfolio_template || "default") as PortfolioTemplateId;
+  const Template = PORTFOLIO_TEMPLATES[templateId] ?? PortfolioDefault;
+  const engine = getPortfolioEngine(settings);
+
   return (
-    <>
-      <PageHeader title={pageTitle} subtitle={pageSubtitle} />
-      <section className={styles.projectList}>
-        {portfolios.map((item, idx) => {
-          const isReversed = idx % 2 === 1;
-          return (
-            <div
-              key={item.id}
-              className={`${styles.projectItem} ${isReversed ? styles.reversed : ""}`}
-            >
-              <Link href={`/san-pham/${item.id}`} className={styles.projectThumb}>
-                <img
-                  src={
-                    item.thumbnailUrl ||
-                    (item.youtubeVideoId
-                      ? `https://img.youtube.com/vi/${item.youtubeVideoId}/hqdefault.jpg`
-                      : "")
-                  }
-                  alt={item.title}
-                  className={styles.thumbImg}
-                />
-                <div className={styles.projectOverlay} />
-                <span className={styles.playIcon}>▶</span>
-              </Link>
-              <div className={styles.projectInfo}>
-                <h2 className={styles.projectTitle}>{item.title}</h2>
-                <span className={styles.categoryBadge}>{item.category}</span>
-                <p className={styles.projectDesc}>{item.description}</p>
-              </div>
-            </div>
-          );
-        })}
-      </section>
-      <section className={styles.ctaSection}>
-        <h2 className={styles.ctaTitle}>{ctaHeading}</h2>
-        <div className={styles.ctaRow}>
-          {ctaItems.map((cta, i) => (
-            <a
-              key={i}
-              href={cta.href}
-              target={cta.target || "_self"}
-              rel="noopener noreferrer"
-              className={i === 0 ? styles.ctaPrimary : styles.ctaSecondary}
-            >
-              {cta.text}
-            </a>
-          ))}
-        </div>
-      </section>
-    </>
+    <Template settings={settings} portfolios={portfolios} ctaItems={ctaItems} engine={engine} />
   );
 }

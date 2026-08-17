@@ -36,6 +36,15 @@
   margin-bottom: 1rem;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
+}
+
+.searchFilter{
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-start;
+  width: fit-content;
 }
 
 .search {
@@ -46,7 +55,8 @@
   color: var(--admin-text);
   font-size: 0.8125rem;
   font-family: inherit;
-  min-width: 240px;
+  min-width: 340px;
+  width: fit-content;
   outline: none;
   transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
 
@@ -64,6 +74,8 @@
   font-family: inherit;
   cursor: pointer;
   outline: none;
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
+  min-width: 200px;
 }
 
 .viewToggles {
@@ -130,6 +142,16 @@
     height: 100%;
     object-fit: cover;
   }
+}
+
+.mediaPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--admin-text-secondary);
+  background: var(--admin-surface-raised);
 }
 
 .playOverlay {
@@ -265,11 +287,10 @@
 }
 
 .thumbCell {
-  width: 100px;
+  width: 150px;
 
   img {
-    width: 80px;
-    height: 45px;
+    width: 150px;
     object-fit: cover;
     border-radius: 4px;
   }

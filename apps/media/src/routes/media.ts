@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, rmdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { desc, eq, like, or, sql } from "drizzle-orm";
+import { asc, desc, eq, like, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { db } from "../db";
 import { media, mediaVariants } from "../db/schema";
@@ -32,13 +32,28 @@ export const mediaRoutes = new Hono()
       );
     }
 
-    const [countRow] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(media);
-    const rows = await query
-      .orderBy(desc(media.uploadedAt))
-      .limit(limit)
-      .offset(offset);
+    const sort = c.req.query("sort") || "newest";
+
+    let countQuery = db.select({ count: sql<number>`count(*)` }).from(media).$dynamic();
+    if (type === "image") countQuery = countQuery.where(sql`${media.mimeType} LIKE 'image/%'`);
+    else if (type === "video") countQuery = countQuery.where(sql`${media.mimeType} LIKE 'video/%'`);
+    else if (type === "youtube") countQuery = countQuery.where(eq(media.source, "youtube"));
+    if (search) {
+      countQuery = countQuery.where(
+        or(like(media.originalName, `%${search}%`), like(media.altText, `%${search}%`)),
+      );
+    }
+    const [countRow] = await countQuery;
+
+    if (sort === "oldest") query = query.orderBy(asc(media.uploadedAt));
+    else if (sort === "name_asc")
+      query = query.orderBy(asc(media.originalName));
+    else if (sort === "name_desc")
+      query = query.orderBy(desc(media.originalName));
+    else if (sort === "size_desc") query = query.orderBy(desc(media.fileSize));
+    else query = query.orderBy(desc(media.uploadedAt));
+
+    const rows = await query.limit(limit).offset(offset);
 
     return c.json({
       data: rows,
@@ -68,6 +83,35 @@ export const mediaRoutes = new Hono()
     const [row] = await db.select().from(media).where(eq(media.id, id));
     if (!row) return c.json({ error: "Media not found" }, 404);
     return c.json({ data: row });
+  })
+  .delete("/bulk", authMiddleware("ADMIN"), async (c) => {
+    const body = await c.req.json();
+    const ids = Array.isArray(body?.ids) ? body.ids : [];
+
+    for (const id of ids) {
+      const [row] = await db.select().from(media).where(eq(media.id, id));
+      if (!row) continue;
+
+      const variantsDir = join("data/variants", id);
+      if (existsSync(variantsDir)) {
+        try {
+          for (const f of readdirSync(variantsDir)) {
+            unlinkSync(join(variantsDir, f));
+          }
+          rmdirSync(variantsDir);
+        } catch {}
+      }
+
+      if (row.diskPath && existsSync(row.diskPath)) {
+        try {
+          unlinkSync(row.diskPath);
+        } catch {}
+      }
+
+      await db.delete(media).where(eq(media.id, id));
+    }
+
+    return c.json({ data: { success: true, deleted: ids.length } });
   })
   .delete("/:id", authMiddleware("ADMIN"), async (c) => {
     const id = c.req.param("id");

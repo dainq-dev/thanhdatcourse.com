@@ -2,9 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { api } from "@/lib/api";
 import styles from "./page.module.scss";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,24 +23,16 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Đăng nhập thất bại");
-        return;
-      }
+      const data = await api.submit<{ token: string; user: unknown }>(
+        "/api/auth/login",
+        { email, password },
+      );
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       router.push("/quan-tri-vien");
     } catch {
-      setError("Không thể kết nối đến máy chủ");
+      setError("Email hoặc mật khẩu không đúng");
     } finally {
       setLoading(false);
     }

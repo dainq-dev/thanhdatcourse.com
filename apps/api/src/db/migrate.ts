@@ -111,7 +111,11 @@ sqlite.exec(`
     id TEXT PRIMARY KEY, campaign_name TEXT NOT NULL,
     discount_percentage INTEGER NOT NULL, discount_amount INTEGER,
     start_date TEXT, end_date TEXT, is_active INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    banner_image_url TEXT,
+    show_on_homepage INTEGER NOT NULL DEFAULT 0,
+    coupon_code TEXT,
+    usage_limit INTEGER
   );
   CREATE TABLE IF NOT EXISTS promotion_courses (
     promotion_id TEXT NOT NULL REFERENCES promotions(id) ON DELETE CASCADE,
@@ -127,11 +131,43 @@ sqlite.exec(`
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
   CREATE INDEX IF NOT EXISTS idx_sections_entity ON sections(entity_type, entity_id, sort_order);
+
+  CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
+  CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at);
+  CREATE INDEX IF NOT EXISTS idx_courses_is_published ON courses(is_published);
+  CREATE INDEX IF NOT EXISTS idx_courses_is_featured ON courses(is_featured_on_home);
+  CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category_id);
+  CREATE INDEX IF NOT EXISTS idx_posts_is_published ON posts(is_published);
+  CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at);
+  CREATE INDEX IF NOT EXISTS idx_digital_products_is_published ON digital_products(is_published);
+  CREATE INDEX IF NOT EXISTS idx_portfolios_is_featured ON portfolios(is_featured_on_home);
+  CREATE INDEX IF NOT EXISTS idx_promotions_active_dates ON promotions(is_active, start_date, end_date);
+  CREATE INDEX IF NOT EXISTS idx_testimonials_course ON testimonials(course_id);
+  CREATE INDEX IF NOT EXISTS idx_faqs_course ON faqs(course_id);
+  CREATE INDEX IF NOT EXISTS idx_sections_is_published ON sections(is_published);
 `);
 
 console.log("✓ All 19 tables created/verified");
 
 // Verify
+// Migration: add promotion fields (2026-08-09)
+const promotionAlters = [
+  "ALTER TABLE promotions ADD COLUMN banner_image_url TEXT",
+  "ALTER TABLE promotions ADD COLUMN show_on_homepage INTEGER NOT NULL DEFAULT 0",
+  "ALTER TABLE promotions ADD COLUMN coupon_code TEXT",
+  "ALTER TABLE promotions ADD COLUMN usage_limit INTEGER",
+];
+for (const alter of promotionAlters) {
+  try {
+    sqlite.run(alter);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (!msg.includes("duplicate column")) {
+      console.error(`Migration error: ${msg}`);
+    }
+  }
+}
+
 const tables = sqlite
   .query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
   .all()

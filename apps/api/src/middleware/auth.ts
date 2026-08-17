@@ -2,9 +2,15 @@ import { createMiddleware } from "hono/factory";
 
 const JWT_SECRET = (() => {
   const s = process.env.JWT_SECRET;
-  if (!s || s === "dev-secret-change-in-production" || s === "change-this-in-production") {
+  if (
+    !s ||
+    s === "dev-secret-change-in-production" ||
+    s === "change-this-in-production"
+  ) {
     if (process.env.NODE_ENV === "production") {
-      throw new Error("JWT_SECRET environment variable is required in production");
+      throw new Error(
+        "JWT_SECRET environment variable is required in production",
+      );
     }
   }
   return s || "dev-secret-change-in-production";

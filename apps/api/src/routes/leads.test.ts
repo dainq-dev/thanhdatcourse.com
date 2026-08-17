@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { leads, users } from "../db/schema";
-import app from "../index";
+import { app } from "../index";
 
 async function submitLead(ip: string) {
   return app.request("/api/leads", {

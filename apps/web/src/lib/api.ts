@@ -1,4 +1,6 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "./env";
+
+const BASE = API_URL;
 
 class ApiClient {
   private static instance: ApiClient;
@@ -82,6 +84,16 @@ class ApiClient {
   async put<T>(path: string, body?: unknown): Promise<T> {
     const res = await fetch(`${BASE}${path}`, {
       method: "PUT",
+      headers: this.authHeaders(),
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!res.ok) throw new ApiError(res.status, await res.text());
+    return res.json();
+  }
+
+  async patch<T>(path: string, body?: unknown): Promise<T> {
+    const res = await fetch(`${BASE}${path}`, {
+      method: "PATCH",
       headers: this.authHeaders(),
       body: body ? JSON.stringify(body) : undefined,
     });

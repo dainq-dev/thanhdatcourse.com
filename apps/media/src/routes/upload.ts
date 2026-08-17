@@ -4,7 +4,7 @@ import { db } from "../db";
 import { media, mediaVariants } from "../db/schema";
 import { authMiddleware } from "../middleware/auth";
 import { storeFile } from "../services/storage";
-import { validateFile, ValidatedFile } from "../services/validator";
+import { type ValidatedFile, validateFile } from "../services/validator";
 import { generateVariants } from "../services/variants";
 
 const MAX_DIMENSION = 1920;

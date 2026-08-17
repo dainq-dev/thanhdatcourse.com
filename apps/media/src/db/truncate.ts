@@ -1,5 +1,5 @@
-import { existsSync, rmSync } from "node:fs";
 import { Database } from "bun:sqlite";
+import { existsSync, rmSync } from "node:fs";
 
 const sqlite = new Database("data/media.db");
 sqlite.run("PRAGMA foreign_keys = ON");

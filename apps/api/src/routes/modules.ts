@@ -4,8 +4,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "../db";
 import { courseLessons, courseModules, courses } from "../db/schema";
-import { authMiddleware } from "../middleware/auth";
-import { optionalAuth } from "../middleware/auth";
+import { authMiddleware, optionalAuth } from "../middleware/auth";
 
 const CreateModuleSchema = z.object({
   title: z.string().min(1),
@@ -98,7 +97,12 @@ export const moduleRoutes = new Hono()
         await db
           .update(courseModules)
           .set({ sortOrder: item.sortOrder })
-          .where(and(eq(courseModules.id, item.id), eq(courseModules.courseId, courseId)));
+          .where(
+            and(
+              eq(courseModules.id, item.id),
+              eq(courseModules.courseId, courseId),
+            ),
+          );
       }
 
       return c.json({ success: true });
@@ -116,7 +120,9 @@ export const moduleRoutes = new Hono()
       const [mod] = await db
         .select()
         .from(courseModules)
-        .where(and(eq(courseModules.id, id), eq(courseModules.courseId, courseId)));
+        .where(
+          and(eq(courseModules.id, id), eq(courseModules.courseId, courseId)),
+        );
       if (!mod) return c.json({ error: "Not found" }, 404);
 
       const updates: Record<string, string | number | null> = {};
@@ -144,7 +150,9 @@ export const moduleRoutes = new Hono()
     const id = c.req.param("id");
     await db
       .delete(courseModules)
-      .where(and(eq(courseModules.id, id), eq(courseModules.courseId, courseId)));
+      .where(
+        and(eq(courseModules.id, id), eq(courseModules.courseId, courseId)),
+      );
     return c.json({ success: true });
   });
 

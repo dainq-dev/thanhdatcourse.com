@@ -1,0 +1,142 @@
+.banner {
+  position: relative;
+  width: 100%;
+  min-height: 620px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: 60px 0;
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+// .overlay {
+//   position: absolute;
+//   inset: 0;
+//   background: linear-gradient(
+//     180deg,
+//     rgba(0, 0, 0, 0.55) 0%,
+//     rgba(0, 0, 0, 0.7) 100%
+//   );
+// }
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: 3rem 1.5rem;
+  max-width: 720px;
+}
+
+.tag {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #ff005a;
+  background: rgba(255, 0, 90, 0.12);
+  border: 1px solid rgba(255, 0, 90, 0.25);
+  border-radius: 999px;
+  padding: 0.2rem 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.title {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.discount {
+  font-size: 1.25rem;
+  color: #a0a0a0;
+  margin: 0;
+
+  strong {
+    color: #ff005a;
+    font-size: 2rem;
+    font-weight: 800;
+  }
+}
+
+.coupon {
+  font-size: 0.875rem;
+  color: #b0b0b0;
+  margin: 0;
+
+  code {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    padding: 0.25rem 0.75rem;
+    font-family: monospace;
+    font-size: 0.9375rem;
+    color: #fff;
+  }
+}
+
+.countdown {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.countdownItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #fff;
+  font-family: monospace;
+  letter-spacing: 0.02em;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  background: #ff005a;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease;
+  margin-top: 0.5rem;
+
+  &:hover {
+    background: #e0004e;
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 640px) {
+  .banner {
+    min-height: 360px;
+  }
+
+  .countdownItem {
+    min-width: 36px;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.9375rem;
+  }
+}

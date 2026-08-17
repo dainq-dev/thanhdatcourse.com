@@ -26,7 +26,10 @@ export function BrandLogosForm({ config, onChange }: Props) {
   );
 
   const addLogo = () => {
-    update("logos", [...logos, { type: "image", image_url: "", alt: "", text: "" }]);
+    update("logos", [
+      ...logos,
+      { type: "image", image_url: "", alt: "", text: "" },
+    ]);
   };
 
   const removeLogo = (index: number) => {

@@ -1,50 +1,281 @@
 @use '../../../../../../packages/ui/styles/abstracts/variables' as *;
 @use '../../../../../../packages/ui/styles/abstracts/mixins' as *;
 
-.productList {
-  @include container;
-  @include section;
-  padding-bottom: $space-20;
-}
+.hero {
+  padding-block: $space-24 $space-12;
+  text-align: center;
 
-.productItem {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: $space-6;
-  margin-bottom: $space-12;
-  padding-top: $space-12;
-  @include divider;
-
-  @include respond-to($bp-md) {
-    grid-template-columns: 1fr 1fr;
-    gap: $space-8;
-    align-items: center;
-  }
-
-  &:first-child {
-    border-top: none;
-    padding-top: 0;
+  @include respond-to($bp-lg) {
+    padding-block: $space-32 $space-16;
   }
 }
 
-.productThumb {
-  @include video-thumb;
-}
-
-.productTitle {
-  font-size: 1.75rem;
+.heroTitle {
+  font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: $fw-extrabold;
   color: $clr-text;
   margin: 0 0 $space-4;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
-.productDesc {
-  font-size: var(--fs-sm);
-  line-height: 1.7;
-  @include text-muted;
-  margin: 0 0 $space-6;
+.heroSubtitle {
+  font-size: var(--fs-lg, 1.125rem);
+  color: $clr-text-muted;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.grid {
+  @include container;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-6;
+  padding-bottom: $space-20;
+
+  @include respond-to($bp-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-to($bp-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  @include card-dark;
+  @include card-hover;
+  display: flex;
+  flex-direction: column;
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: $clr-bg-elevated;
+  overflow: hidden;
+  cursor: default;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $duration-slow $ease-out-expo;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.playOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  transition: background $duration-fast $ease-out-expo;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  svg {
+    width: 48px;
+    height: 48px;
+    transition: transform $duration-fast $ease-out-expo;
+  }
+
+  &:hover svg {
+    transform: scale(1.1);
+  }
+}
+
+.tag {
+  position: absolute;
+  top: $space-2;
+  left: $space-2;
+  background: $clr-primary;
+  color: $clr-white;
+  padding: 0.125rem 0.5rem;
+  border-radius: $radius-sm;
+  font-size: 0.6875rem;
+  font-weight: $fw-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.body {
+  padding: $space-6;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: $fw-bold;
+  color: $clr-text;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.desc {
+  font-size: var(--fs-sm, 0.875rem);
+  color: $clr-text-muted;
+  line-height: 1.6;
+  margin: 0;
+  @include line-clamp(3);
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: $fw-extrabold;
+  color: $clr-primary;
+  margin: 0;
 }
 
 .buyBtn {
-  @include btn-cta;
+  @include btn-cta-sm;
+  width: 100%;
+  margin-top: auto;
+}
+
+.empty {
+  @include container;
+  text-align: center;
+  padding-block: $space-20;
+  color: $clr-text-muted;
+  font-size: var(--fs-lg, 1.125rem);
+}
+
+.videoModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
+}
+
+.videoInner {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 16 / 9;
+}
+
+.videoIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: $radius-lg;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: $clr-text-muted;
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: $space-1;
+  transition: color $duration-fast $ease-out-expo;
+
+  &:hover {
+    color: $clr-text;
+  }
+}
+
+// ── Single Column Layout (engine: single-col) ──
+.singleColList {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  padding-bottom: $space-20;
+}
+
+.singleColCard {
+  @include card-dark;
+  @include card-hover;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  overflow: hidden;
+
+  @include respond-to($bp-sm) {
+    grid-template-columns: 1fr;
+  }
+
+  .media {
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+    background: $clr-bg-elevated;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform $duration-slow $ease-out-expo;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  .body {
+    padding: $space-6;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    justify-content: center;
+  }
+}
+
+// ── Featured Section (presets-featured) ──
+.featuredSection {
+  @include container;
+  padding-bottom: $space-12;
+}
+
+.featuredProductCard {
+  @include card-dark;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  overflow: hidden;
+
+  @include respond-to($bp-sm) {
+    grid-template-columns: 1fr;
+  }
+
+  .media {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: $clr-bg-elevated;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .body {
+    padding: $space-8;
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    justify-content: center;
+  }
 }

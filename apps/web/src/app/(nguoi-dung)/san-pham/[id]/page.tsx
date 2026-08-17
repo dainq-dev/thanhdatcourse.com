@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { getSiteSettings } from "@/lib/settings";
-import { SectionRenderer } from "@/components/sections/SectionRenderer";
 import styles from "./page.module.scss";
 
 interface PortfolioItem {
@@ -128,9 +127,6 @@ export default async function PortfolioDetailPage({
           </Link>
         </div>
       </section>
-
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <SectionRenderer sections={(item as any).sections || []} entityMeta={item as unknown as Record<string, unknown>} />
     </div>
   );
 }

@@ -1,0 +1,247 @@
+.wizard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.wizardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.wizardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wizardTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--admin-text);
+}
+
+.pageSelect {
+  padding: 0.3rem 0.5rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  
+  &:focus {
+    border-color: var(--admin-accent);
+  }
+}
+
+.stepIndicator {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--admin-border);
+  transition: background var(--admin-duration-fast) var(--admin-ease-out);
+}
+
+.stepDotActive {
+  background: var(--admin-accent);
+  box-shadow: 0 0 6px var(--admin-accent);
+}
+
+.stepDotDone {
+  background: var(--admin-accent);
+  opacity: 0.5;
+}
+
+.wizardBody {
+  padding: 0.5rem 0;
+  min-height: 160px;
+}
+
+.stepTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--admin-text);
+  margin: 0 0 0.25rem;
+}
+
+.stepDesc {
+  font-size: 0.75rem;
+  color: var(--admin-text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.wizardNav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0 0;
+  border-top: 1px solid var(--admin-border);
+}
+
+.navBack {
+  padding: 0.4rem 0.75rem;
+  background: none;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
+  &:hover {
+    border-color: var(--admin-border-heavy);
+    color: var(--admin-text);
+  }
+}
+
+.navNext {
+  padding: 0.4rem 0.85rem;
+  background: var(--admin-accent);
+  color: var(--admin-accent-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--admin-duration-fast) var(--admin-ease-out);
+  &:hover { background: var(--admin-accent-hover); }
+}
+
+/* ── TemplateSelector ── */
+
+.templateGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.templateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.6rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  transition: all var(--admin-duration-fast) var(--admin-ease-out);
+
+  &:hover {
+    border-color: var(--admin-border-heavy);
+    background: var(--admin-surface-raised);
+  }
+}
+
+.templateActive {
+  border-color: var(--admin-accent);
+  background: var(--admin-accent-subtle, rgba(59, 130, 246, 0.08));
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.15);
+}
+
+.templateName {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.templateDesc {
+  font-size: 0.6875rem;
+  color: var(--admin-text-secondary);
+  line-height: 1.3;
+}
+
+/* ── EngineSelector ── */
+
+.engineRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--admin-border);
+  &:last-child { border-bottom: none; }
+}
+
+.engineLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--admin-text);
+  min-width: 70px;
+}
+
+.engineSelect {
+  flex: 1;
+  padding: 0.45rem 0.55rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  color: var(--admin-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out);
+  &:focus { border-color: var(--admin-accent); }
+}
+
+/* ── StepActions ── */
+
+.summary {
+  padding: 0.6rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+
+  p {
+    margin: 0 0 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--admin-text-secondary);
+
+    strong {
+      color: var(--admin-text);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.previewHint {
+  font-size: 0.75rem;
+  color: var(--admin-text-secondary);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+
+.saveBtn {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  background: var(--admin-accent);
+  color: var(--admin-accent-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--admin-duration-fast) var(--admin-ease-out);
+  &:hover { background: var(--admin-accent-hover); }
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+}

@@ -233,7 +233,9 @@ beforeAll(() => {
     created_at TEXT,
     updated_at TEXT
   )`);
-  rawDb.run(`CREATE INDEX IF NOT EXISTS idx_sections_entity ON sections(entity_type, entity_id, sort_order)`);
+  rawDb.run(
+    `CREATE INDEX IF NOT EXISTS idx_sections_entity ON sections(entity_type, entity_id, sort_order)`,
+  );
   rawDb.run(`CREATE TABLE IF NOT EXISTS product_showcases (
     id TEXT PRIMARY KEY,
     product_id TEXT NOT NULL REFERENCES digital_products(id) ON DELETE CASCADE,
@@ -818,7 +820,14 @@ describe("Schema — Insert + Select", () => {
     const id = crypto.randomUUID();
     rawDb.run(
       `INSERT INTO sections (id, entity_type, entity_id, section_type, config, sort_order) VALUES (?, ?, ?, ?, ?, ?)`,
-      [id, "course", "c-test", "hero_banner", JSON.stringify({ heading: "Test" }), 0],
+      [
+        id,
+        "course",
+        "c-test",
+        "hero_banner",
+        JSON.stringify({ heading: "Test" }),
+        0,
+      ],
     );
 
     const row = rawDb

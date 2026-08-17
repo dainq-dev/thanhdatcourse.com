@@ -26,7 +26,8 @@ export function RichTextForm({ config, onChange }: Props) {
     const text = ta.value;
     const selected = text.substring(start, end);
     const replacement = `<${tag}>${selected}</${tag}>`;
-    const newValue = text.substring(0, start) + replacement + text.substring(end);
+    const newValue =
+      text.substring(0, start) + replacement + text.substring(end);
     update("content_html", newValue);
     setTimeout(() => {
       ta.focus();
@@ -42,7 +43,8 @@ export function RichTextForm({ config, onChange }: Props) {
     const text = ta.value;
     const selected = text.substring(start, end) || "Tiêu đề";
     const replacement = `<h2>${selected}</h2>`;
-    const newValue = text.substring(0, start) + replacement + text.substring(end);
+    const newValue =
+      text.substring(0, start) + replacement + text.substring(end);
     update("content_html", newValue);
     setTimeout(() => {
       ta.focus();
@@ -58,7 +60,8 @@ export function RichTextForm({ config, onChange }: Props) {
     const text = ta.value;
     const selected = text.substring(start, end) || "Nội dung";
     const replacement = `<p>${selected}</p>`;
-    const newValue = text.substring(0, start) + replacement + text.substring(end);
+    const newValue =
+      text.substring(0, start) + replacement + text.substring(end);
     update("content_html", newValue);
     setTimeout(() => {
       ta.focus();
@@ -80,7 +83,8 @@ export function RichTextForm({ config, onChange }: Props) {
 
       <div className={s.field}>
         <label className={s.label}>
-          Content (HTML) - Hỗ trợ thẻ HTML: &lt;p&gt;, &lt;h2&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;br&gt;, &lt;ul&gt;, &lt;li&gt;...
+          Content (HTML) - Hỗ trợ thẻ HTML: &lt;p&gt;, &lt;h2&gt;,
+          &lt;strong&gt;, &lt;em&gt;, &lt;br&gt;, &lt;ul&gt;, &lt;li&gt;...
         </label>
         <div className={s.toolbar}>
           <button

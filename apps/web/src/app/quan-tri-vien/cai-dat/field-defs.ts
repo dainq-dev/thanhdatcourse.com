@@ -13,7 +13,9 @@ export interface FieldDef {
     | "reference"
     | "tags"
     | "counters"
-    | "toggle";
+    | "toggle"
+    | "layout-template"
+    | "hidden";
   options?: { label: string; value: string }[];
   showWhen?: { key: string; value: string };
   toggleField?: string;
@@ -41,7 +43,21 @@ export const SECTIONS: Section[] = [
     title: "Trang chủ",
     description: "Banner, dự án nổi bật, sản phẩm, số liệu, giới thiệu.",
     previewPath: "/",
-    fields: [],
+    fields: [
+      {
+        key: "homepage_motion",
+        label: "Hiệu ứng chuyển động toàn trang",
+        type: "select",
+        options: [
+          { label: "Cascade — nối đuôi từng thẻ", value: "cascade" },
+          { label: "Fade — mờ dần nổi lên", value: "fade" },
+          { label: "Slide — trượt ngang xen kẽ", value: "slide" },
+          { label: "Parallax — trôi theo nhiều tầng", value: "parallax" },
+          { label: "Zoom — phóng to vào", value: "zoom" },
+          { label: "Clip — mở dần kiểu điện ảnh", value: "clip" },
+        ],
+      },
+    ],
     subSections: [
       {
         id: "home-hero",
@@ -254,9 +270,18 @@ export const SECTIONS: Section[] = [
         label: "Tiêu đề mục Hỏi & Đáp",
         placeholder: "VD: Câu hỏi thường gặp",
       },
-      { key: "course_detail_modules_title", label: "Chi tiết — Tiêu đề mục Giáo trình" },
-      { key: "course_detail_modules_subtitle", label: "Chi tiết — Phụ đề mục Giáo trình" },
-      { key: "course_detail_bonuses_title", label: "Chi tiết — Tiêu đề mục Ưu đãi" },
+      {
+        key: "course_detail_modules_title",
+        label: "Chi tiết — Tiêu đề mục Giáo trình",
+      },
+      {
+        key: "course_detail_modules_subtitle",
+        label: "Chi tiết — Phụ đề mục Giáo trình",
+      },
+      {
+        key: "course_detail_bonuses_title",
+        label: "Chi tiết — Tiêu đề mục Ưu đãi",
+      },
       {
         key: "course_detail_testimonials_title",
         label: "Chi tiết — Tiêu đề mục Đánh giá",
@@ -280,7 +305,11 @@ export const SECTIONS: Section[] = [
     description: "Tiêu đề & nút kêu gọi hành động trang portfolio.",
     previewPath: "/san-pham",
     fields: [
-      { key: "portfolio_page_title", label: "Tiêu đề trang", placeholder: "VD: Films by Minh Travel" },
+      {
+        key: "portfolio_page_title",
+        label: "Tiêu đề trang",
+        placeholder: "VD: Films by Minh Travel",
+      },
       { key: "portfolio_page_subtitle", label: "Phụ đề trang" },
       {
         key: "portfolio_cta_heading",
@@ -290,7 +319,8 @@ export const SECTIONS: Section[] = [
       {
         key: "portfolio_cta_items",
         label: "Nút kêu gọi",
-        placeholder: "Mỗi dòng: Chữ = Link\nVD:\nLiên hệ = /lien-he\nXem thêm = /san-pham",
+        placeholder:
+          "Mỗi dòng: Chữ = Link\nVD:\nLiên hệ = /lien-he\nXem thêm = /san-pham",
       },
     ],
   },
@@ -300,9 +330,17 @@ export const SECTIONS: Section[] = [
     description: "Tiêu đề & nút mua trang Presets & LUTs.",
     previewPath: "/cong-cu",
     fields: [
-      { key: "presets_page_title", label: "Tiêu đề trang", placeholder: "VD: LUTs & Presets" },
+      {
+        key: "presets_page_title",
+        label: "Tiêu đề trang",
+        placeholder: "VD: LUTs & Presets",
+      },
       { key: "presets_page_subtitle", label: "Phụ đề trang", type: "textarea" },
-      { key: "presets_page_btn_text", label: "Chữ nút mua", placeholder: "VD: Mua ngay" },
+      {
+        key: "presets_page_btn_text",
+        label: "Chữ nút mua",
+        placeholder: "VD: Mua ngay",
+      },
     ],
   },
   {
@@ -311,19 +349,84 @@ export const SECTIONS: Section[] = [
     description: "Thông tin liên hệ, địa chỉ, giờ làm việc.",
     previewPath: "/lien-he",
     fields: [
-      { key: "contact_page_title", label: "Tiêu đề trang", placeholder: "VD: Liên hệ" },
+      {
+        key: "contact_page_title",
+        label: "Tiêu đề trang",
+        placeholder: "VD: Liên hệ",
+      },
       { key: "contact_page_subtitle", label: "Phụ đề trang" },
       {
         key: "contact_success_title",
         label: "Tiêu đề sau gửi form",
         placeholder: "VD: Cảm ơn bạn!",
       },
-      { key: "contact_success_text", label: "Nội dung sau gửi form", type: "textarea" },
-      { key: "contact_info_title", label: "Tiêu đề khối thông tin", placeholder: "VD: Thông tin liên hệ" },
-      { key: "contact_email", label: "Email", placeholder: "VD: contact@minhtravel.vn" },
-      { key: "contact_address", label: "Địa chỉ", placeholder: "VD: Hà Nội, Việt Nam" },
-      { key: "contact_phone", label: "Số điện thoại", placeholder: "VD: 0900 123 456" },
-      { key: "contact_hours", label: "Giờ làm việc", placeholder: "VD: T2-T6, 9:00-18:00" },
+      {
+        key: "contact_success_text",
+        label: "Nội dung sau gửi form",
+        type: "textarea",
+      },
+      {
+        key: "contact_info_title",
+        label: "Tiêu đề khối thông tin",
+        placeholder: "VD: Thông tin liên hệ",
+      },
+      {
+        key: "contact_email",
+        label: "Email",
+        placeholder: "VD: contact@minhtravel.vn",
+      },
+      {
+        key: "contact_address",
+        label: "Địa chỉ",
+        placeholder: "VD: Hà Nội, Việt Nam",
+      },
+      {
+        key: "contact_phone",
+        label: "Số điện thoại",
+        placeholder: "VD: 0900 123 456",
+      },
+      {
+        key: "contact_hours",
+        label: "Giờ làm việc",
+        placeholder: "VD: T2-T6, 9:00-18:00",
+      },
+    ],
+  },
+  {
+    id: "design",
+    title: "Giao diện",
+    description: "Chọn bố cục trang và kiểu hiển thị nội dung.",
+    previewPath: "/",
+    fields: [
+      {
+        key: "homepage_template",
+        label: "Trang chủ - Bố cục",
+        type: "layout-template",
+        placeholder: "homepage",
+      },
+      { key: "homepage_portfolios_engine", label: "", type: "hidden" },
+      { key: "homepage_products_engine", label: "", type: "hidden" },
+      {
+        key: "courses_template",
+        label: "Khóa học - Bố cục",
+        type: "layout-template",
+        placeholder: "courses",
+      },
+      { key: "courses_list_engine", label: "", type: "hidden" },
+      {
+        key: "portfolio_template",
+        label: "Dự án - Bố cục",
+        type: "layout-template",
+        placeholder: "portfolio",
+      },
+      { key: "portfolio_list_engine", label: "", type: "hidden" },
+      {
+        key: "presets_template",
+        label: "Công cụ - Bố cục",
+        type: "layout-template",
+        placeholder: "presets",
+      },
+      { key: "presets_list_engine", label: "", type: "hidden" },
     ],
   },
 ];

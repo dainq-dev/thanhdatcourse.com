@@ -62,45 +62,56 @@ function slugify(text: string): string {
 }
 
 export const coursesRoutes = new Hono()
-  .get("/", optionalAuth(), zValidator("query", CourseQuerySchema), async (c) => {
-    const { published, draft, featured, search, page, limit } = c.req.valid("query");
+  .get(
+    "/",
+    optionalAuth(),
+    zValidator("query", CourseQuerySchema),
+    async (c) => {
+      const { published, draft, featured, search, page, limit } =
+        c.req.valid("query");
 
-    const conditions: SQL[] = [];
-    const isAdmin = c.get("user")?.role === "ADMIN";
+      const conditions: SQL[] = [];
+      const isAdmin = c.get("user")?.role === "ADMIN";
 
-    if (draft && isAdmin) {
-      conditions.push(eq(courses.isPublished, 0));
-    } else if (published !== undefined) {
-      conditions.push(eq(courses.isPublished, published ? 1 : 0));
-    } else if (!isAdmin) {
-      conditions.push(eq(courses.isPublished, 1));
-    }
-    if (featured)
-      conditions.push(eq(courses.isFeaturedOnHome, featured ? 1 : 0));
-    if (search) conditions.push(like(courses.title, `%${search}%`));
+      if (draft && isAdmin) {
+        conditions.push(eq(courses.isPublished, 0));
+      } else if (published !== undefined) {
+        conditions.push(eq(courses.isPublished, published ? 1 : 0));
+      } else if (!isAdmin) {
+        conditions.push(eq(courses.isPublished, 1));
+      }
+      if (featured)
+        conditions.push(eq(courses.isFeaturedOnHome, featured ? 1 : 0));
+      if (search) conditions.push(like(courses.title, `%${search}%`));
 
-    const where = conditions.length > 0 ? and(...conditions) : undefined;
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-    const totalQuery = db
-      .select({ count: sql<number>`count(*)` })
-      .from(courses)
-      .$dynamic();
-    if (where) totalQuery.where(where);
-    const [totalRow] = await totalQuery;
-    const total = Number(totalRow?.count);
+      const totalQuery = db
+        .select({ count: sql<number>`count(*)` })
+        .from(courses)
+        .$dynamic();
+      if (where) totalQuery.where(where);
+      const [totalRow] = await totalQuery;
+      const total = Number(totalRow?.count);
 
-    let query = db.select().from(courses).$dynamic();
-    if (where) query = query.where(where);
-    const result = await query
-      .orderBy(desc(courses.updatedAt))
-      .limit(limit)
-      .offset((page - 1) * limit);
+      let query = db.select().from(courses).$dynamic();
+      if (where) query = query.where(where);
+      const result = await query
+        .orderBy(desc(courses.updatedAt))
+        .limit(limit)
+        .offset((page - 1) * limit);
 
-    return c.json({
-      data: result,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
-  })
+      return c.json({
+        data: result,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      });
+    },
+  )
   .get("/:slug", optionalAuth(), async (c) => {
     const slug = c.req.param("slug");
     const isAdmin = c.get("user")?.role === "ADMIN";
@@ -141,7 +152,10 @@ export const coursesRoutes = new Hono()
       .select()
       .from(sections)
       .where(
-        and(eq(sections.entityType, "course"), eq(sections.entityId, course.id)),
+        and(
+          eq(sections.entityType, "course"),
+          eq(sections.entityId, course.id),
+        ),
       )
       .orderBy(asc(sections.sortOrder));
 

@@ -61,27 +61,23 @@ export const courseInstructorRoutes = new Hono()
       .where(inArray(instructors.id, instructorIds));
     return c.json({ data: instructorsList });
   })
-  .put(
-    "/courses/:courseId/instructors",
-    authMiddleware("ADMIN"),
-    async (c) => {
-      const courseId = c.req.param("courseId");
-      const body = await c.req.json();
-      const ids: string[] = body.instructorIds || [];
+  .put("/courses/:courseId/instructors", authMiddleware("ADMIN"), async (c) => {
+    const courseId = c.req.param("courseId");
+    const body = await c.req.json();
+    const ids: string[] = body.instructorIds || [];
+    await db
+      .delete(courseInstructors)
+      .where(eq(courseInstructors.courseId, courseId));
+    if (ids.length > 0) {
       await db
-        .delete(courseInstructors)
-        .where(eq(courseInstructors.courseId, courseId));
-      if (ids.length > 0) {
-        await db
-          .insert(courseInstructors)
-          .values(ids.map((iid) => ({ courseId, instructorId: iid })));
-      }
-      const rows = await db
-        .select({ instructorId: courseInstructors.instructorId })
-        .from(courseInstructors)
-        .where(eq(courseInstructors.courseId, courseId));
-      return c.json({
-        data: { courseId, instructorIds: rows.map((r) => r.instructorId) },
-      });
-    },
-  );
+        .insert(courseInstructors)
+        .values(ids.map((iid) => ({ courseId, instructorId: iid })));
+    }
+    const rows = await db
+      .select({ instructorId: courseInstructors.instructorId })
+      .from(courseInstructors)
+      .where(eq(courseInstructors.courseId, courseId));
+    return c.json({
+      data: { courseId, instructorIds: rows.map((r) => r.instructorId) },
+    });
+  });

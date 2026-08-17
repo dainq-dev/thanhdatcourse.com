@@ -76,10 +76,11 @@ export default async function BlogDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const [post, allPosts] = await Promise.all([
+    getPost(slug),
+    getPublishedPosts(),
+  ]);
   if (!post) notFound();
-
-  const allPosts = await getPublishedPosts();
   const relatedArticles = allPosts.filter((p) => p.slug !== slug).slice(0, 4);
 
   const publishedDate = post.publishedAt

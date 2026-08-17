@@ -27,18 +27,18 @@ import {
 } from "lucide-react";
 import {
   Component,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { SECTION_RENDER_MAP } from "@/components/sections/section-render-map";
 import { api } from "@/lib/api";
 import styles from "./PageBuilder.module.scss";
-import { Suspense } from "react";
-import { FORM_MAP } from "./section-forms";
 import { SectionSkeletonPreview } from "./SectionSkeletonPreview";
-import { SECTION_RENDER_MAP } from "@/components/sections/section-render-map";
+import { FORM_MAP } from "./section-forms";
 import type { EntityType, Section, SectionType } from "./types";
 import {
   ENTITY_SECTION_MAP,
@@ -195,17 +195,23 @@ export function PageBuilder({
 
       // Refetch thay vì reload để giữ UI state
       const res = await api.get<Record<string, unknown>[]>(`${prefix}`);
-      const raw: Record<string, unknown>[] = Array.isArray(res) ? res : (res as unknown as { data: Record<string, unknown>[] }).data ?? [];
+      const raw: Record<string, unknown>[] = Array.isArray(res)
+        ? res
+        : ((res as unknown as { data: Record<string, unknown>[] }).data ?? []);
       const fresh: Section[] = raw.map((row) => ({
         id: row.id as string,
-        entity_type: (row.entityType ?? row.entity_type ?? "") as Section["entity_type"],
+        entity_type: (row.entityType ??
+          row.entity_type ??
+          "") as Section["entity_type"],
         entity_id: (row.entityId ?? row.entity_id ?? "") as string,
-        section_type: (row.sectionType ?? row.section_type ?? "") as Section["section_type"],
+        section_type: (row.sectionType ??
+          row.section_type ??
+          "") as Section["section_type"],
         title: row.title as string | null,
         config:
           typeof row.config === "string"
             ? JSON.parse(row.config as string)
-            : (row.config as Record<string, unknown> ?? {}),
+            : ((row.config as Record<string, unknown>) ?? {}),
         sort_order: (row.sortOrder ?? row.sort_order ?? 0) as number,
         is_published: (row.isPublished ?? row.is_published ?? true) as boolean,
         created_at: (row.createdAt ?? row.created_at ?? "") as string,

@@ -85,7 +85,9 @@ export const lessonRoutes = new Hono()
       const [lesson] = await db
         .select()
         .from(courseLessons)
-        .where(and(eq(courseLessons.id, id), eq(courseLessons.moduleId, moduleId)));
+        .where(
+          and(eq(courseLessons.id, id), eq(courseLessons.moduleId, moduleId)),
+        );
       if (!lesson) return c.json({ error: "Not found" }, 404);
 
       const updates: Record<string, string | number | null> = {};
@@ -123,7 +125,9 @@ export const lessonRoutes = new Hono()
     const id = c.req.param("id");
     await db
       .delete(courseLessons)
-      .where(and(eq(courseLessons.id, id), eq(courseLessons.moduleId, moduleId)));
+      .where(
+        and(eq(courseLessons.id, id), eq(courseLessons.moduleId, moduleId)),
+      );
     return c.json({ success: true });
   });
 

@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { courses, users } from "../db/schema";
-import app from "../index";
+import { app } from "../index";
 
 describe("Courses Routes", () => {
   let adminToken: string;

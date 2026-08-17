@@ -20,16 +20,6 @@
   }
 }
 
-.reversed {
-  @include respond-to($bp-md) {
-    direction: rtl;
-
-    .projectInfo {
-      direction: ltr;
-    }
-  }
-}
-
 .projectThumb {
   position: relative;
   @include video-thumb;
@@ -154,5 +144,82 @@
 
   &:hover {
     background: rgba(255, 0, 90, 0.1);
+  }
+}
+
+/* ── Masonry Layout (engine: masonry) ── */
+.masonryGrid {
+  columns: 3;
+  column-gap: $space-6;
+  
+  @include respond-to($bp-md) {
+    columns: 2;
+  }
+  
+  @media (max-width: 480px) {
+    columns: 1;
+  }
+}
+
+.masonryItem {
+  break-inside: avoid;
+  margin-bottom: $space-6;
+  
+  .projectItem {
+    display: block;
+    margin-bottom: 0;
+  }
+  
+  .projectThumb {
+    min-height: auto;
+    aspect-ratio: auto;
+  }
+}
+
+// ── Featured Section (portfolio-showcase) ──
+.featuredSection {
+  @include container;
+  @include section;
+  padding-bottom: $space-12;
+}
+
+.featuredItem {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-6;
+
+  @include respond-to($bp-md) {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-12;
+    align-items: center;
+  }
+}
+
+// ── Category Filter (portfolio-categorized) ──
+.categoryFilter {
+  @include container;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  padding-bottom: $space-6;
+}
+
+.filterBtn {
+  padding: 0.375rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: $clr-text-muted;
+  font-size: 0.8125rem;
+  font-weight: $fw-semibold;
+  cursor: pointer;
+  transition: all $duration-fast $ease-out-expo;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &:hover {
+    border-color: $clr-primary;
+    color: $clr-primary;
+    background: rgba(255, 0, 90, 0.08);
   }
 }
